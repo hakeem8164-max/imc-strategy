@@ -212,16 +212,16 @@ export default async function ReportPage() {
           </div>
         </section>
 
-        {/* الأداء حسب البُعد */}
+        {/* الأداء حسب المنظور */}
         {dimAgg.length > 0 && (
           <section className="mt-7">
             <h3 className="mb-3 text-sm font-bold text-mushar-primary">
-              الأداء حسب البُعد الاستراتيجي
+              الأداء حسب المنظور الاستراتيجي
             </h3>
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-slate-200 text-right text-xs text-slate-400">
-                  <th className="py-2 font-semibold">البُعد</th>
+                  <th className="py-2 font-semibold">المنظور</th>
                   <th className="py-2 font-semibold">عدد المؤشرات</th>
                   <th className="py-2 font-semibold">نسبة التحقّق</th>
                 </tr>

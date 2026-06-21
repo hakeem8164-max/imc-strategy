@@ -28,19 +28,18 @@ async function requireAdmin() {
 function revalidateAll() {
   revalidatePath("/admin/library");
   revalidatePath("/kpis");
-  revalidatePath("/dimensions");
   revalidatePath("/");
 }
 
-// ===== الأبعاد =====
+// ===== المناظير =====
 export async function addDimension(name: string, color: string): Promise<Result> {
   const { supabase, ok } = await requireAdmin();
   if (!ok) return { ok: false, error: "صلاحية مدير النظام مطلوبة" };
-  if (!name.trim()) return { ok: false, error: "اسم البعد مطلوب" };
+  if (!name.trim()) return { ok: false, error: "اسم المنظور مطلوب" };
   const { count } = await supabase
     .from("dimensions")
     .select("id", { count: "exact", head: true });
-  const slug = "dim-" + Math.random().toString(36).slice(2, 9);
+  const slug = "persp-" + Math.random().toString(36).slice(2, 9);
   const { error } = await supabase
     .from("dimensions")
     .insert({ name: name.trim(), color, slug, sort_order: (count ?? 0) + 1 });
@@ -48,7 +47,7 @@ export async function addDimension(name: string, color: string): Promise<Result>
     return {
       ok: false,
       error: error.message.includes("duplicate")
-        ? "هذا البعد موجود مسبقًا"
+        ? "هذا المنظور موجود مسبقًا"
         : "تعذّر الإضافة",
     };
   revalidateAll();
@@ -59,28 +58,95 @@ export async function deleteDimension(id: string): Promise<Result> {
   const { supabase, ok } = await requireAdmin();
   if (!ok) return { ok: false, error: "صلاحية مدير النظام مطلوبة" };
   const { count } = await supabase
-    .from("kpis")
+    .from("objectives")
     .select("id", { count: "exact", head: true })
     .eq("dimension_id", id);
   if ((count ?? 0) > 0)
-    return { ok: false, error: "لا يمكن حذف بُعد يحتوي على مؤشرات. احذف مؤشراته أولًا." };
+    return {
+      ok: false,
+      error: "لا يمكن حذف منظور يحتوي على أهداف. احذف أهدافه أولًا.",
+    };
   const { error } = await supabase.from("dimensions").delete().eq("id", id);
   if (error) return { ok: false, error: "تعذّر الحذف" };
   revalidateAll();
   return { ok: true };
 }
 
-// ===== المؤشرات =====
-export async function addKpi(dimensionId: string): Promise<Result> {
+// ===== الأهداف =====
+export async function addObjective(
+  dimensionId: string,
+  name: string
+): Promise<Result> {
   const { supabase, ok } = await requireAdmin();
   if (!ok) return { ok: false, error: "صلاحية مدير النظام مطلوبة" };
+  if (!name.trim()) return { ok: false, error: "اسم الهدف مطلوب" };
+  const { count } = await supabase
+    .from("objectives")
+    .select("id", { count: "exact", head: true });
+  const { error } = await supabase
+    .from("objectives")
+    .insert({ dimension_id: dimensionId, name: name.trim(), sort_order: (count ?? 0) + 1 });
+  if (error)
+    return {
+      ok: false,
+      error: error.message.includes("duplicate")
+        ? "هذا الهدف موجود ضمن المنظور"
+        : "تعذّر الإضافة",
+    };
+  revalidateAll();
+  return { ok: true };
+}
+
+export async function renameObjective(id: string, name: string): Promise<Result> {
+  const { supabase, ok } = await requireAdmin();
+  if (!ok) return { ok: false, error: "صلاحية مدير النظام مطلوبة" };
+  if (!name.trim()) return { ok: false, error: "اسم الهدف مطلوب" };
+  const { error } = await supabase
+    .from("objectives")
+    .update({ name: name.trim() })
+    .eq("id", id);
+  if (error) return { ok: false, error: "تعذّر الحفظ" };
+  revalidateAll();
+  return { ok: true };
+}
+
+export async function deleteObjective(id: string): Promise<Result> {
+  const { supabase, ok } = await requireAdmin();
+  if (!ok) return { ok: false, error: "صلاحية مدير النظام مطلوبة" };
+  const { count } = await supabase
+    .from("kpis")
+    .select("id", { count: "exact", head: true })
+    .eq("objective_id", id);
+  if ((count ?? 0) > 0)
+    return {
+      ok: false,
+      error: "لا يمكن حذف هدف يحتوي على مؤشرات. احذف مؤشراته أولًا.",
+    };
+  const { error } = await supabase.from("objectives").delete().eq("id", id);
+  if (error) return { ok: false, error: "تعذّر الحذف" };
+  revalidateAll();
+  return { ok: true };
+}
+
+// ===== المؤشرات =====
+export async function addKpi(objectiveId: string): Promise<Result> {
+  const { supabase, ok } = await requireAdmin();
+  if (!ok) return { ok: false, error: "صلاحية مدير النظام مطلوبة" };
+  // اشتقاق المنظور من الهدف
+  const { data: obj } = await supabase
+    .from("objectives")
+    .select("dimension_id")
+    .eq("id", objectiveId)
+    .single();
+  if (!obj) return { ok: false, error: "الهدف غير موجود" };
   const { count } = await supabase
     .from("kpis")
     .select("id", { count: "exact", head: true });
   const { data, error } = await supabase
     .from("kpis")
     .insert({
-      dimension_id: dimensionId,
+      dimension_id: obj.dimension_id,
+      objective_id: objectiveId,
       code: String((count ?? 0) + 1),
       name: "مؤشر جديد",
       unit: "%",
@@ -99,6 +165,7 @@ export async function addKpi(dimensionId: string): Promise<Result> {
 export interface KpiInput {
   name: string;
   description: string | null;
+  objective_id: string | null;
   owner_unit_id: string | null;
   measurement_method: string | null;
   unit: Unit;
@@ -123,11 +190,24 @@ export async function updateKpi(id: string, input: KpiInput): Promise<Result> {
     input.target_q4,
   ]);
 
+  // عند تغيير الهدف، يُحدَّث المنظور تبعًا له
+  let dimensionPatch: { dimension_id?: string } = {};
+  if (input.objective_id) {
+    const { data: obj } = await supabase
+      .from("objectives")
+      .select("dimension_id")
+      .eq("id", input.objective_id)
+      .single();
+    if (obj) dimensionPatch = { dimension_id: obj.dimension_id };
+  }
+
   const { error } = await supabase
     .from("kpis")
     .update({
       name: input.name.trim(),
       description: input.description,
+      objective_id: input.objective_id,
+      ...dimensionPatch,
       owner_unit_id: input.owner_unit_id,
       measurement_method: input.measurement_method,
       unit: input.unit,

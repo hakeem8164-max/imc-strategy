@@ -53,7 +53,8 @@ export default async function KpiDetailPage({
   }));
 
   const meta: { label: string; value: string | null }[] = [
-    { label: "البعد", value: kpi.dimension?.name ?? null },
+    { label: "المنظور", value: kpi.dimension?.name ?? null },
+    { label: "الهدف الاستراتيجي", value: kpi.objective?.name ?? null },
     { label: "المالك", value: kpi.owner_title },
     { label: "دورية القياس", value: kpi.frequency },
     { label: "الوحدة", value: kpi.unit || "—" },

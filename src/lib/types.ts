@@ -10,6 +10,17 @@ export interface Dimension {
   sort_order: number;
 }
 
+// الهدف الاستراتيجي: يندرج تحت المنظور (Dimension) وتندرج تحته المؤشرات
+export interface Objective {
+  id: string;
+  dimension_id: string;
+  code: string | null;
+  name: string;
+  description: string | null;
+  sort_order: number;
+  dimension?: Dimension;
+}
+
 export interface Profile {
   id: string;
   full_name: string | null;
@@ -51,6 +62,7 @@ export interface Kpi {
   id: string;
   code: string;
   dimension_id: string;
+  objective_id: string | null;
   name: string;
   description: string | null;
   owner_title: string | null;
@@ -70,6 +82,7 @@ export interface Kpi {
   is_active: boolean;
   sort_order: number;
   dimension?: Dimension;
+  objective?: Objective | null;
   owner_unit?: OrgUnit | null;
 }
 

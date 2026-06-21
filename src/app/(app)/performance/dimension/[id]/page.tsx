@@ -54,7 +54,7 @@ export default async function DimensionPage({
   const met = withData.filter((r) => r.ratio! >= 100).length;
   const behind = withData.filter((r) => r.ratio! < 75).length;
 
-  // اتجاه البُعد عبر الزمن
+  // اتجاه المنظور عبر الزمن
   const Q = ["ر1", "ر2", "ر3", "ر4"];
   const buckets = new Map<string, { sum: number; n: number; order: number }>();
   for (const e of approved) {
@@ -98,7 +98,7 @@ export default async function DimensionPage({
 
   return (
     <>
-      <Header profile={profile} title={`تحليل البُعد: ${dim.name}`} />
+      <Header profile={profile} title={`تحليل المنظور: ${dim.name}`} />
       <div className="space-y-6">
         <Link
           href="/"
@@ -127,7 +127,7 @@ export default async function DimensionPage({
 
         <div className="card p-5">
           <h3 className="mb-4 text-sm font-bold text-mushar-dark">
-            مؤشرات البُعد
+            مؤشرات المنظور
           </h3>
           <div className="space-y-3">
             {rows.map((r) => (

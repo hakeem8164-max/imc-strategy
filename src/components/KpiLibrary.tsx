@@ -5,8 +5,10 @@ import { useRouter } from "next/navigation";
 import {
   addDimension,
   deleteDimension,
+  addObjective,
+  renameObjective,
+  deleteObjective,
   addKpi,
-  updateKpi,
   toggleKpiActive,
   deleteKpi,
   type KpiInput,
@@ -19,6 +21,7 @@ import {
   computeTotalTarget,
   formatNum,
   type Dimension,
+  type Objective,
   type Kpi,
   type OrgUnit,
   type Aggregation,
@@ -28,28 +31,34 @@ import {
 
 export default function KpiLibrary({
   dimensions,
+  objectives,
   kpis,
   orgUnits,
 }: {
   dimensions: Dimension[];
+  objectives: Objective[];
   kpis: Kpi[];
   orgUnits: OrgUnit[];
 }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
-  const [open, setOpen] = useState<Record<string, boolean>>({});
+  const [openDim, setOpenDim] = useState<Record<string, boolean>>({});
   const [editing, setEditing] = useState<Kpi | null>(null);
 
-  // إضافة بعد
+  // إضافة منظور
   const [showAddDim, setShowAddDim] = useState(false);
   const [dimName, setDimName] = useState("");
   const [dimColor, setDimColor] = useState("#8C341F");
 
+  // إضافة هدف (لكل منظور)
+  const [addingObjFor, setAddingObjFor] = useState<string | null>(null);
+  const [objName, setObjName] = useState("");
+
   const ownerName = (id: string | null) =>
     id ? orgUnits.find((u) => u.id === id)?.name ?? "—" : "—";
 
-  function toggleOpen(id: string) {
-    setOpen((s) => ({ ...s, [id]: !s[id] }));
+  function toggleDim(id: string) {
+    setOpenDim((s) => ({ ...s, [id]: !s[id] }));
   }
 
   function createDim() {
@@ -64,7 +73,7 @@ export default function KpiLibrary({
   }
 
   function removeDim(d: Dimension) {
-    if (confirm(`حذف البعد «${d.name}»؟`)) {
+    if (confirm(`حذف المنظور «${d.name}»؟`)) {
       startTransition(async () => {
         const res = await deleteDimension(d.id);
         if (res.ok) router.refresh();
@@ -73,13 +82,44 @@ export default function KpiLibrary({
     }
   }
 
-  function createKpi(dimId: string) {
+  function createObjective(dimId: string) {
+    if (!objName.trim()) return;
     startTransition(async () => {
-      const res = await addKpi(dimId);
+      const res = await addObjective(dimId, objName);
       if (res.ok) {
-        setOpen((s) => ({ ...s, [dimId]: true }));
+        setObjName("");
+        setAddingObjFor(null);
+        setOpenDim((s) => ({ ...s, [dimId]: true }));
         router.refresh();
       } else alert(res.error);
+    });
+  }
+
+  function editObjective(o: Objective) {
+    const name = prompt("اسم الهدف:", o.name);
+    if (name == null) return;
+    startTransition(async () => {
+      const res = await renameObjective(o.id, name);
+      if (res.ok) router.refresh();
+      else alert(res.error);
+    });
+  }
+
+  function removeObjective(o: Objective) {
+    if (confirm(`حذف الهدف «${o.name}»؟`)) {
+      startTransition(async () => {
+        const res = await deleteObjective(o.id);
+        if (res.ok) router.refresh();
+        else alert(res.error);
+      });
+    }
+  }
+
+  function createKpi(objId: string) {
+    startTransition(async () => {
+      const res = await addKpi(objId);
+      if (res.ok) router.refresh();
+      else alert(res.error);
     });
   }
 
@@ -105,20 +145,20 @@ export default function KpiLibrary({
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <p className="text-sm text-slate-500">
-          {dimensions.length} أبعاد · {kpis.length} مؤشر
+          {dimensions.length} مناظير · {objectives.length} أهداف · {kpis.length} مؤشر
         </p>
         <button onClick={() => setShowAddDim((v) => !v)} className="btn-primary">
-          + بُعد جديد
+          + منظور جديد
         </button>
       </div>
 
       {showAddDim && (
         <div className="card flex flex-wrap items-end gap-2 p-4">
           <div>
-            <label className="label">اسم البعد</label>
+            <label className="label">اسم المنظور</label>
             <input
               className="input"
-              placeholder="مثال: الاستدامة"
+              placeholder="مثال: المنظور المالي"
               value={dimName}
               onChange={(e) => setDimName(e.target.value)}
             />
@@ -141,17 +181,18 @@ export default function KpiLibrary({
         </div>
       )}
 
-      {/* أكورديون الأبعاد */}
+      {/* أكورديون المناظير */}
       <div className="space-y-3">
         {dimensions.map((d) => {
-          const list = kpis.filter((k) => k.dimension_id === d.id);
-          const isOpen = open[d.id];
+          const dimObjectives = objectives.filter((o) => o.dimension_id === d.id);
+          const dimKpiCount = kpis.filter((k) => k.dimension_id === d.id).length;
+          const isOpen = openDim[d.id];
           return (
             <div key={d.id} className="card overflow-hidden">
               <div
                 className="flex cursor-pointer items-center gap-3 px-5 py-4"
                 style={{ backgroundColor: `${d.color}14` }}
-                onClick={() => toggleOpen(d.id)}
+                onClick={() => toggleDim(d.id)}
               >
                 <span
                   className={`text-sm transition-transform ${isOpen ? "rotate-180" : ""}`}
@@ -163,16 +204,20 @@ export default function KpiLibrary({
                   style={{ backgroundColor: d.color }}
                 />
                 <h3 className="font-bold text-mushar-dark">{d.name}</h3>
-                <span className="text-sm text-slate-400">({list.length})</span>
+                <span className="text-xs text-slate-400">
+                  ({dimObjectives.length} أهداف · {dimKpiCount} مؤشر)
+                </span>
                 <div className="mr-auto flex items-center gap-2">
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      createKpi(d.id);
+                      setAddingObjFor(d.id);
+                      setObjName("");
+                      setOpenDim((s) => ({ ...s, [d.id]: true }));
                     }}
                     className="rounded-lg bg-white px-3 py-1.5 text-xs font-semibold text-mushar-primary shadow-sm hover:bg-mushar-pale/40"
                   >
-                    + مؤشر
+                    + هدف
                   </button>
                   <button
                     onClick={(e) => {
@@ -181,75 +226,158 @@ export default function KpiLibrary({
                     }}
                     className="rounded-lg px-2 py-1.5 text-xs font-semibold text-mushar-accent hover:bg-mushar-accent/10"
                   >
-                    حذف البعد
+                    حذف المنظور
                   </button>
                 </div>
               </div>
 
               {isOpen && (
-                <div className="divide-y divide-slate-100">
-                  {list.length === 0 ? (
-                    <p className="px-5 py-6 text-center text-sm text-slate-400">
-                      لا مؤشرات بعد — اضغط «+ مؤشر».
-                    </p>
-                  ) : (
-                    list.map((k) => (
-                      <div
-                        key={k.id}
-                        className={`flex flex-wrap items-center gap-3 px-5 py-3 ${
-                          k.is_active ? "" : "bg-slate-50/60 opacity-70"
-                        }`}
-                      >
-                        <div className="min-w-[200px] flex-1">
-                          <p className="text-sm font-semibold text-mushar-dark">
-                            {k.name}
-                          </p>
-                          <p className="text-xs text-slate-400">
-                            المالك: {ownerName(k.owner_unit_id)} ·{" "}
-                            {k.frequency || "—"} ·{" "}
-                            {POLARITIES.find((p) => p.value === k.polarity)?.label}
-                          </p>
-                        </div>
-                        <div className="text-center">
-                          <p className="text-[11px] text-slate-400">
-                            المستهدف الكلي
-                          </p>
-                          <p className="text-sm font-bold text-mushar-primary">
-                            {k.target_total != null
-                              ? formatNum(k.target_total)
-                              : "—"}
-                            {k.unit}
-                          </p>
-                        </div>
-                        {/* مفتاح التفعيل */}
-                        <button
-                          onClick={() => toggleActive(k)}
-                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
-                            k.is_active ? "bg-emerald-500" : "bg-slate-300"
-                          }`}
-                          title={k.is_active ? "مفعّل" : "موقوف"}
-                        >
-                          <span
-                            className={`inline-block h-5 w-5 transform rounded-full bg-white transition ${
-                              k.is_active ? "-translate-x-0.5" : "-translate-x-5"
-                            }`}
-                          />
-                        </button>
-                        <button
-                          onClick={() => setEditing(k)}
-                          className="btn-ghost px-3 py-1.5 text-xs"
-                        >
-                          تحرير
-                        </button>
-                        <button
-                          onClick={() => removeKpi(k)}
-                          className="rounded-lg px-2 py-1.5 text-xs font-semibold text-mushar-accent hover:bg-mushar-accent/10"
-                        >
-                          حذف
-                        </button>
+                <div className="space-y-3 p-4">
+                  {addingObjFor === d.id && (
+                    <div className="flex flex-wrap items-end gap-2 rounded-xl bg-slate-50 p-3">
+                      <div className="flex-1">
+                        <label className="label">اسم الهدف الجديد</label>
+                        <input
+                          className="input"
+                          placeholder="مثال: تعزيز الاستقرار المالي"
+                          value={objName}
+                          onChange={(e) => setObjName(e.target.value)}
+                          autoFocus
+                        />
                       </div>
-                    ))
+                      <button
+                        onClick={() => createObjective(d.id)}
+                        disabled={pending}
+                        className="btn-primary"
+                      >
+                        حفظ الهدف
+                      </button>
+                      <button
+                        onClick={() => setAddingObjFor(null)}
+                        className="btn-ghost"
+                      >
+                        إلغاء
+                      </button>
+                    </div>
                   )}
+
+                  {dimObjectives.length === 0 && addingObjFor !== d.id && (
+                    <p className="py-4 text-center text-sm text-slate-400">
+                      لا أهداف بعد — اضغط «+ هدف».
+                    </p>
+                  )}
+
+                  {dimObjectives.map((o) => {
+                    const list = kpis.filter((k) => k.objective_id === o.id);
+                    return (
+                      <div
+                        key={o.id}
+                        className="rounded-xl border border-slate-100"
+                      >
+                        <div className="flex flex-wrap items-center gap-2 border-b border-slate-100 bg-slate-50/60 px-4 py-2.5">
+                          <span className="text-xs font-bold text-mushar-accent">
+                            {o.code ?? "هدف"}
+                          </span>
+                          <h4 className="text-sm font-bold text-mushar-dark">
+                            {o.name}
+                          </h4>
+                          <span className="text-xs text-slate-400">
+                            ({list.length} مؤشر)
+                          </span>
+                          <div className="mr-auto flex items-center gap-1">
+                            <button
+                              onClick={() => createKpi(o.id)}
+                              className="rounded-lg bg-white px-2.5 py-1 text-xs font-semibold text-mushar-primary shadow-sm hover:bg-mushar-pale/40"
+                            >
+                              + مؤشر
+                            </button>
+                            <button
+                              onClick={() => editObjective(o)}
+                              className="rounded-lg px-2 py-1 text-xs text-slate-500 hover:bg-slate-100"
+                            >
+                              تعديل
+                            </button>
+                            <button
+                              onClick={() => removeObjective(o)}
+                              className="rounded-lg px-2 py-1 text-xs font-semibold text-mushar-accent hover:bg-mushar-accent/10"
+                            >
+                              حذف
+                            </button>
+                          </div>
+                        </div>
+
+                        {list.length === 0 ? (
+                          <p className="px-4 py-4 text-center text-xs text-slate-400">
+                            لا مؤشرات تحت هذا الهدف — اضغط «+ مؤشر».
+                          </p>
+                        ) : (
+                          <div className="divide-y divide-slate-100">
+                            {list.map((k) => (
+                              <div
+                                key={k.id}
+                                className={`flex flex-wrap items-center gap-3 px-4 py-3 ${
+                                  k.is_active ? "" : "bg-slate-50/60 opacity-70"
+                                }`}
+                              >
+                                <div className="min-w-[200px] flex-1">
+                                  <p className="text-sm font-semibold text-mushar-dark">
+                                    {k.name}
+                                  </p>
+                                  <p className="text-xs text-slate-400">
+                                    المالك: {ownerName(k.owner_unit_id)} ·{" "}
+                                    {k.frequency || "—"} ·{" "}
+                                    {
+                                      POLARITIES.find(
+                                        (p) => p.value === k.polarity
+                                      )?.label
+                                    }
+                                  </p>
+                                </div>
+                                <div className="text-center">
+                                  <p className="text-[11px] text-slate-400">
+                                    المستهدف الكلي
+                                  </p>
+                                  <p className="text-sm font-bold text-mushar-primary">
+                                    {k.target_total != null
+                                      ? formatNum(k.target_total)
+                                      : "—"}
+                                    {k.unit}
+                                  </p>
+                                </div>
+                                <button
+                                  onClick={() => toggleActive(k)}
+                                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
+                                    k.is_active ? "bg-emerald-500" : "bg-slate-300"
+                                  }`}
+                                  title={k.is_active ? "مفعّل" : "موقوف"}
+                                >
+                                  <span
+                                    className={`inline-block h-5 w-5 transform rounded-full bg-white transition ${
+                                      k.is_active
+                                        ? "-translate-x-0.5"
+                                        : "-translate-x-5"
+                                    }`}
+                                  />
+                                </button>
+                                <button
+                                  onClick={() => setEditing(k)}
+                                  className="btn-ghost px-3 py-1.5 text-xs"
+                                >
+                                  تحرير
+                                </button>
+                                <button
+                                  onClick={() => removeKpi(k)}
+                                  className="rounded-lg px-2 py-1.5 text-xs font-semibold text-mushar-accent hover:bg-mushar-accent/10"
+                                >
+                                  حذف
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -257,7 +385,7 @@ export default function KpiLibrary({
         })}
         {dimensions.length === 0 && (
           <div className="card p-10 text-center text-sm text-slate-400">
-            لا توجد أبعاد بعد — أضِف أول بُعد.
+            لا توجد مناظير بعد — أضِف أول منظور.
           </div>
         )}
       </div>
@@ -265,6 +393,8 @@ export default function KpiLibrary({
       {editing && (
         <EditKpiModal
           kpi={editing}
+          objectives={objectives}
+          dimensions={dimensions}
           orgUnits={orgUnits}
           onClose={() => setEditing(null)}
           onSaved={() => {
@@ -279,11 +409,15 @@ export default function KpiLibrary({
 
 function EditKpiModal({
   kpi,
+  objectives,
+  dimensions,
   orgUnits,
   onClose,
   onSaved,
 }: {
   kpi: Kpi;
+  objectives: Objective[];
+  dimensions: Dimension[];
   orgUnits: OrgUnit[];
   onClose: () => void;
   onSaved: () => void;
@@ -291,6 +425,7 @@ function EditKpiModal({
   const [f, setF] = useState<KpiInput>({
     name: kpi.name,
     description: kpi.description,
+    objective_id: kpi.objective_id,
     owner_unit_id: kpi.owner_unit_id,
     measurement_method: kpi.measurement_method,
     unit: kpi.unit,
@@ -307,6 +442,9 @@ function EditKpiModal({
 
   const set = (patch: Partial<KpiInput>) => setF((s) => ({ ...s, ...patch }));
   const numOrNull = (v: string) => (v === "" ? null : Number(v));
+
+  const dimName = (id: string) =>
+    dimensions.find((d) => d.id === id)?.name ?? "";
 
   const total = computeTotalTarget(f.aggregation, [
     f.target_q1,
@@ -337,7 +475,9 @@ function EditKpiModal({
         className="input"
         placeholder="اختياري"
         value={f[key] ?? ""}
-        onChange={(e) => set({ [key]: numOrNull(e.target.value) } as Partial<KpiInput>)}
+        onChange={(e) =>
+          set({ [key]: numOrNull(e.target.value) } as Partial<KpiInput>)
+        }
       />
     </div>
   );
@@ -361,6 +501,23 @@ function EditKpiModal({
               onChange={(e) => set({ name: e.target.value })}
             />
           </div>
+
+          <div>
+            <label className="label">الهدف الاستراتيجي (المنظور)</label>
+            <select
+              className="input"
+              value={f.objective_id ?? ""}
+              onChange={(e) => set({ objective_id: e.target.value || null })}
+            >
+              <option value="">— بدون هدف —</option>
+              {objectives.map((o) => (
+                <option key={o.id} value={o.id}>
+                  {dimName(o.dimension_id)} ← {o.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
           <div>
             <label className="label">الوصف</label>
             <textarea
@@ -462,7 +619,9 @@ function EditKpiModal({
           </div>
 
           <div>
-            <p className="label">مستهدفات الأرباع (اترك أي ربع فارغًا إن لم يكن له مستهدف)</p>
+            <p className="label">
+              مستهدفات الأرباع (اترك أي ربع فارغًا إن لم يكن له مستهدف)
+            </p>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
               {qInput("الربع الأول", "target_q1")}
               {qInput("الربع الثاني", "target_q2")}
@@ -472,7 +631,9 @@ function EditKpiModal({
           </div>
 
           <div className="rounded-xl bg-mushar-pale/30 px-4 py-3">
-            <span className="text-sm text-slate-600">المستهدف الكلي (تلقائي): </span>
+            <span className="text-sm text-slate-600">
+              المستهدف الكلي (تلقائي):{" "}
+            </span>
             <span className="text-lg font-bold text-mushar-primary">
               {total != null ? formatNum(total) : "—"}
               {f.unit}

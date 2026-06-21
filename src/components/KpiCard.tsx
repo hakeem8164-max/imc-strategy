@@ -51,6 +51,12 @@ export default function KpiCard({
         </span>
       </div>
 
+      {kpi.objective?.name && (
+        <p className="-mt-1 text-[11px] font-medium text-slate-400 line-clamp-1">
+          الهدف: {kpi.objective.name}
+        </p>
+      )}
+
       <h3 className="text-sm font-bold leading-relaxed text-mushar-dark line-clamp-2">
         {kpi.name}
       </h3>

@@ -63,7 +63,7 @@ export default async function DashboardPage({
     .sort((a, b) => b[1] - a[1])
     .map(([l]) => l);
 
-  // المؤشرات بعد فلترة البعد/الإدارة
+  // المؤشرات بعد فلترة المنظور/الإدارة
   const kpis = allKpis.filter(
     (k) =>
       (!fDim || k.dimension_id === fDim) &&
@@ -205,7 +205,7 @@ export default async function DashboardPage({
   const improved = [...movers].sort((a, b) => b.delta! - a.delta!).filter((r) => r.delta! > 0).slice(0, 4);
   const declined = [...movers].sort((a, b) => a.delta! - b.delta!).filter((r) => r.delta! < 0).slice(0, 4);
 
-  // اتجاه الأداء عبر الزمن (متأثّر بفلاتر البعد/الإدارة)
+  // اتجاه الأداء عبر الزمن (متأثّر بفلاتر المنظور/الإدارة)
   const Q_NAMES = ["ر1", "ر2", "ر3", "ر4"];
   const allowed = new Set(kpis.map((k) => k.id));
   const buckets = new Map<string, { sum: number; n: number; order: number }>();
@@ -239,10 +239,10 @@ export default async function DashboardPage({
     if (overallDelta !== null && overallDelta !== 0)
       insights.push(`الأداء العام ${overallDelta > 0 ? "ارتفع" : "انخفض"} ${Math.abs(overallDelta)} نقطة عن الفترة السابقة (إلى ${overall}%).`);
     if (sortedDims.length > 0)
-      insights.push(`أعلى بُعد: «${sortedDims[0].name}» بنسبة ${sortedDims[0].score}%.`);
+      insights.push(`أعلى منظور: «${sortedDims[0].name}» بنسبة ${sortedDims[0].score}%.`);
     if (sortedDims.length > 1) {
       const w = sortedDims[sortedDims.length - 1];
-      insights.push(`أضعف بُعد: «${w.name}» بنسبة ${w.score}% — يحتاج متابعة.`);
+      insights.push(`أضعف منظور: «${w.name}» بنسبة ${w.score}% — يحتاج متابعة.`);
     }
     if (improved.length > 0) insights.push(`أكبر تحسّن: «${improved[0].name}» (+${improved[0].delta} نقطة).`);
     if (declined.length > 0) insights.push(`أكبر تراجع: «${declined[0].name}» (${declined[0].delta} نقطة).`);
@@ -370,7 +370,7 @@ export default async function DashboardPage({
       {dimAgg.length > 0 && (
         <div>
           <h2 className="mb-3 text-base font-bold text-mushar-dark">
-            تحليل الأبعاد (انقر للتعمّق)
+            تحليل المناظير (انقر للتعمّق)
           </h2>
           <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-4">
             {dimAgg.map((d) => {

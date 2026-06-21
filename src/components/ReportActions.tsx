@@ -23,7 +23,7 @@ export default function ReportActions({
   function exportCsv() {
     const headers = [
       "المؤشر",
-      "البُعد",
+      "المنظور",
       "الإدارة",
       "القيمة",
       "المستهدف",

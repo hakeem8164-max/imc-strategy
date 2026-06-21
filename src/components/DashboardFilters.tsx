@@ -51,7 +51,7 @@ export default function DashboardFilters({
         value={dim}
         onChange={(e) => setParam("dim", e.target.value)}
       >
-        <option value="">كل الأبعاد</option>
+        <option value="">كل المناظير</option>
         {dimensions.map((d) => (
           <option key={d.id} value={d.id}>
             {d.name}

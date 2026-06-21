@@ -4,6 +4,7 @@ import StatCard from "@/components/StatCard";
 import {
   getProfile,
   getDimensions,
+  getObjectives,
   getKpis,
   getLatestEntries,
   getApprovedEntries,
@@ -19,9 +20,10 @@ export default async function KpisPage() {
   const profile = await getProfile();
   if (!profile) redirect("/login");
 
-  const [dimensions, kpis, latest, approved, orgUnits, bands] =
+  const [dimensions, objectives, kpis, latest, approved, orgUnits, bands] =
     await Promise.all([
       getDimensions(),
+      getObjectives(),
       getKpis(),
       getLatestEntries(),
       getApprovedEntries(),
@@ -80,6 +82,7 @@ export default async function KpisPage() {
         <KpiBrowser
           kpis={marked}
           dimensions={dimensions}
+          objectives={objectives}
           series={series}
           periods={periods}
           orgUnits={orgUnits}

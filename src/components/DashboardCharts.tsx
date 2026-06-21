@@ -24,7 +24,7 @@ export function DimensionBarChart({ data }: { data: DimensionDatum[] }) {
   return (
     <div className="card p-5">
       <h3 className="mb-4 text-sm font-bold text-mushar-dark">
-        عدد المؤشرات حسب البعد
+        عدد المؤشرات حسب المنظور
       </h3>
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={data} margin={{ top: 8, right: 8, left: 8, bottom: 8 }}>

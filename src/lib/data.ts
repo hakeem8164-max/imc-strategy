@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import type {
   Dimension,
+  Objective,
   Kpi,
   KpiEntry,
   Profile,
@@ -91,11 +92,21 @@ export async function getDimensions(): Promise<Dimension[]> {
   return (data as Dimension[]) ?? [];
 }
 
+/** الأهداف الاستراتيجية مع منظورها */
+export async function getObjectives(): Promise<Objective[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("objectives")
+    .select("*, dimension:dimensions(*)")
+    .order("sort_order");
+  return (data as Objective[]) ?? [];
+}
+
 export async function getKpis(): Promise<Kpi[]> {
   const supabase = await createClient();
   const { data } = await supabase
     .from("kpis")
-    .select("*, dimension:dimensions(*), owner_unit:org_units(*)")
+    .select("*, dimension:dimensions(*), objective:objectives(*), owner_unit:org_units(*)")
     .eq("is_active", true)
     .order("sort_order");
   return (data as Kpi[]) ?? [];
@@ -105,7 +116,7 @@ export async function getAllKpis(): Promise<Kpi[]> {
   const supabase = await createClient();
   const { data } = await supabase
     .from("kpis")
-    .select("*, dimension:dimensions(*), owner_unit:org_units(*)")
+    .select("*, dimension:dimensions(*), objective:objectives(*), owner_unit:org_units(*)")
     .order("sort_order");
   return (data as Kpi[]) ?? [];
 }
@@ -114,7 +125,7 @@ export async function getKpiById(id: string): Promise<Kpi | null> {
   const supabase = await createClient();
   const { data } = await supabase
     .from("kpis")
-    .select("*, dimension:dimensions(*), owner_unit:org_units(*)")
+    .select("*, dimension:dimensions(*), objective:objectives(*), owner_unit:org_units(*)")
     .eq("id", id)
     .single();
   return (data as Kpi) ?? null;

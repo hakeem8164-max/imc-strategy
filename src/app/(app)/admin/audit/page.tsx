@@ -14,7 +14,8 @@ const ACTION_STYLE: Record<string, string> = {
 };
 const ENTITY_LABEL: Record<string, string> = {
   kpis: "مؤشر",
-  dimensions: "بُعد",
+  dimensions: "منظور",
+  objectives: "هدف",
   kpi_entries: "قياس",
   org_units: "وحدة تنظيمية",
   org_unit_types: "نوع وحدة",

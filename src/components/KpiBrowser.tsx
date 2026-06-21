@@ -11,7 +11,7 @@ import {
   TrendingDown,
   Minus,
 } from "lucide-react";
-import type { Dimension, Kpi, OrgUnit } from "@/lib/types";
+import type { Dimension, Objective, Kpi, OrgUnit } from "@/lib/types";
 import { achievementRatio } from "@/lib/period";
 import { bandFor, type Band } from "@/lib/bands";
 import { formatValue } from "@/lib/format";
@@ -37,6 +37,7 @@ type Meta = {
 export default function KpiBrowser({
   kpis,
   dimensions,
+  objectives = [],
   series = {},
   periods = [],
   orgUnits = [],
@@ -44,6 +45,7 @@ export default function KpiBrowser({
 }: {
   kpis: Kpi[];
   dimensions: Dimension[];
+  objectives?: Objective[];
   series?: Record<string, Point[]>;
   periods?: string[];
   orgUnits?: OrgUnit[];
@@ -51,6 +53,7 @@ export default function KpiBrowser({
 }) {
   const [q, setQ] = useState("");
   const [dim, setDim] = useState("all");
+  const [obj, setObj] = useState("all");
   const [unit, setUnit] = useState("all");
   const [freq, setFreq] = useState("all");
   const [status, setStatus] = useState("all");
@@ -114,9 +117,19 @@ export default function KpiBrowser({
     return orgUnits.filter((u) => ids.has(u.id));
   }, [kpis, orgUnits]);
 
+  // أهداف المنظور المختار (أو كلها)
+  const objOptions = useMemo(
+    () =>
+      dim === "all"
+        ? objectives
+        : objectives.filter((o) => o.dimension_id === dim),
+    [objectives, dim]
+  );
+
   const filtered = useMemo(() => {
     return kpis.filter((k) => {
       if (dim !== "all" && k.dimension_id !== dim) return false;
+      if (obj !== "all" && k.objective_id !== obj) return false;
       if (unit !== "all" && k.owner_unit_id !== unit) return false;
       if (freq !== "all" && k.frequency !== freq) return false;
       if (type !== "all" && k.unit !== type) return false;
@@ -128,16 +141,18 @@ export default function KpiBrowser({
         return (
           k.name.includes(t) ||
           (k.code ?? "").includes(t) ||
+          (k.objective?.name ?? "").includes(t) ||
           (k.owner_unit?.name ?? "").includes(t) ||
           (k.owner_title ?? "").includes(t)
         );
       }
       return true;
     });
-  }, [kpis, dim, unit, freq, type, status, trend, onlyMine, q, meta, mineIds]);
+  }, [kpis, dim, obj, unit, freq, type, status, trend, onlyMine, q, meta, mineIds]);
 
   const active =
     dim !== "all" ||
+    obj !== "all" ||
     unit !== "all" ||
     freq !== "all" ||
     type !== "all" ||
@@ -150,6 +165,7 @@ export default function KpiBrowser({
   function reset() {
     setQ("");
     setDim("all");
+    setObj("all");
     setUnit("all");
     setFreq("all");
     setStatus("all");
@@ -162,9 +178,20 @@ export default function KpiBrowser({
   const grouped = useMemo(
     () =>
       dimensions
-        .map((d) => ({ d, list: filtered.filter((k) => k.dimension_id === d.id) }))
-        .filter((g) => g.list.length > 0),
-    [dimensions, filtered]
+        .map((d) => {
+          const dimKpis = filtered.filter((k) => k.dimension_id === d.id);
+          const objs = objectives
+            .filter((o) => o.dimension_id === d.id)
+            .map((o) => ({
+              o,
+              list: dimKpis.filter((k) => k.objective_id === o.id),
+            }))
+            .filter((g) => g.list.length > 0);
+          const orphan = dimKpis.filter((k) => !k.objective_id);
+          return { d, objs, orphan, total: dimKpis.length };
+        })
+        .filter((g) => g.total > 0),
+    [dimensions, objectives, filtered]
   );
 
   const selCls = "input py-2 text-sm";
@@ -178,11 +205,24 @@ export default function KpiBrowser({
           value={q}
           onChange={(e) => setQ(e.target.value)}
         />
-        <div className="grid grid-cols-2 gap-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7">
-          <select className={selCls} value={dim} onChange={(e) => setDim(e.target.value)}>
-            <option value="all">كل الأبعاد</option>
+        <div className="grid grid-cols-2 gap-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-8">
+          <select
+            className={selCls}
+            value={dim}
+            onChange={(e) => {
+              setDim(e.target.value);
+              setObj("all");
+            }}
+          >
+            <option value="all">كل المناظير</option>
             {dimensions.map((d) => (
               <option key={d.id} value={d.id}>{d.name}</option>
+            ))}
+          </select>
+          <select className={selCls} value={obj} onChange={(e) => setObj(e.target.value)}>
+            <option value="all">كل الأهداف</option>
+            {objOptions.map((o) => (
+              <option key={o.id} value={o.id}>{o.name}</option>
             ))}
           </select>
           <select className={selCls} value={unit} onChange={(e) => setUnit(e.target.value)}>
@@ -284,24 +324,58 @@ export default function KpiBrowser({
       ) : view === "table" ? (
         <TableView rows={filtered} meta={meta} />
       ) : (
-        <div className="space-y-6">
-          {grouped.map(({ d, list }) => (
+        <div className="space-y-8">
+          {grouped.map(({ d, objs, orphan, total }) => (
             <section key={d.id}>
               <div className="mb-3 flex items-center gap-2">
                 <span className="h-4 w-1.5 rounded-full" style={{ backgroundColor: d.color }} />
-                <h2 className="text-sm font-bold text-mushar-dark">{d.name}</h2>
-                <span className="text-xs text-slate-400">({list.length})</span>
+                <h2 className="text-base font-bold text-mushar-dark">{d.name}</h2>
+                <span className="text-xs text-slate-400">({total})</span>
                 <div className="mr-2 h-px flex-1 bg-slate-100" />
               </div>
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {list.map((k) => (
-                  <KpiCard
-                    key={k.id}
-                    kpi={k}
-                    value={meta[k.id]?.value ?? null}
-                    prevValue={meta[k.id]?.prev ?? null}
-                  />
+              <div className="space-y-5">
+                {objs.map(({ o, list }) => (
+                  <div key={o.id}>
+                    <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-600">
+                      {o.code && (
+                        <span className="text-xs font-bold text-mushar-accent">
+                          {o.code}
+                        </span>
+                      )}
+                      {o.name}
+                      <span className="text-xs font-normal text-slate-400">
+                        ({list.length})
+                      </span>
+                    </h3>
+                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                      {list.map((k) => (
+                        <KpiCard
+                          key={k.id}
+                          kpi={k}
+                          value={meta[k.id]?.value ?? null}
+                          prevValue={meta[k.id]?.prev ?? null}
+                        />
+                      ))}
+                    </div>
+                  </div>
                 ))}
+                {orphan.length > 0 && (
+                  <div>
+                    <h3 className="mb-2 text-sm font-semibold text-slate-600">
+                      مؤشرات دون هدف
+                    </h3>
+                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                      {orphan.map((k) => (
+                        <KpiCard
+                          key={k.id}
+                          kpi={k}
+                          value={meta[k.id]?.value ?? null}
+                          prevValue={meta[k.id]?.prev ?? null}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </section>
           ))}
@@ -331,7 +405,8 @@ function TableView({
         <thead className="bg-slate-50 text-right text-xs text-slate-500">
           <tr>
             <th className="px-4 py-3 font-semibold">المؤشر</th>
-            <th className="px-4 py-3 font-semibold">البعد</th>
+            <th className="px-4 py-3 font-semibold">المنظور</th>
+            <th className="px-4 py-3 font-semibold">الهدف</th>
             <th className="px-4 py-3 font-semibold">الإدارة</th>
             <th className="px-4 py-3 font-semibold">الدورية</th>
             <th className="px-4 py-3 font-semibold">آخر قيمة</th>
@@ -364,6 +439,7 @@ function TableView({
                     {k.dimension?.name ?? "—"}
                   </span>
                 </td>
+                <td className="px-4 py-3 text-slate-500">{k.objective?.name ?? "—"}</td>
                 <td className="px-4 py-3 text-slate-500">{k.owner_unit?.name ?? "—"}</td>
                 <td className="px-4 py-3 text-slate-500">{k.frequency ?? "—"}</td>
                 <td className="px-4 py-3">

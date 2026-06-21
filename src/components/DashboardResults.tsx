@@ -113,7 +113,7 @@ export function DimensionRadar({
   return (
     <div className="card p-5">
       <h3 className="mb-2 text-sm font-bold text-mushar-dark">
-        تحقّق الأبعاد (نظرة متوازنة)
+        تحقّق المناظير (نظرة متوازنة)
       </h3>
       <ResponsiveContainer width="100%" height={300}>
         <RadarChart data={data} outerRadius="72%">
@@ -200,7 +200,7 @@ export function PerformanceTrend({
 
 export function DimensionBars({
   data,
-  title = "نسبة التحقّق حسب البُعد",
+  title = "نسبة التحقّق حسب المنظور",
 }: {
   data: { name: string; score: number }[];
   title?: string;
