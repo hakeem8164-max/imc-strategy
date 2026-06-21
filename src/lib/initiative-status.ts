@@ -43,3 +43,12 @@ export function computeAutoStatus(opts: {
   }
   return "in_progress";
 }
+
+/** الوزن المنجَز = مجموع (وزن المعلم × نسبة إنجازه) ÷ 100 */
+export function achievedWeight(
+  milestones: { weight: number; progress: number }[]
+): number {
+  return Math.round(
+    milestones.reduce((a, m) => a + (m.weight ?? 0) * (m.progress ?? 0), 0) / 100
+  );
+}

@@ -24,7 +24,7 @@ import {
 } from "@/app/(app)/initiatives/actions";
 import type { Objective, Profile, OrgUnit } from "@/lib/types";
 import type { KpiInitiative } from "@/lib/data";
-import { computeAutoStatus, AUTO_STATUS } from "@/lib/initiative-status";
+import { computeAutoStatus, AUTO_STATUS, achievedWeight } from "@/lib/initiative-status";
 
 const YEARS = Array.from({ length: 11 }, (_, i) => 2025 + i);
 
@@ -443,10 +443,9 @@ function InitiativeCard({
   const deliverables = i.deliverables ?? [];
 
   const totalWeight = milestones.reduce((a, m) => a + (m.weight ?? 0), 0);
-  const doneWeight = milestones
-    .filter((m) => m.done)
-    .reduce((a, m) => a + (m.weight ?? 0), 0);
-  const allDone = milestones.length > 0 && milestones.every((m) => m.done);
+  const doneWeight = achievedWeight(milestones);
+  const allDone =
+    milestones.length > 0 && milestones.every((m) => (m.progress ?? 0) >= 100);
   const delDone = deliverables.filter((d) => d.done).length;
 
   // تواريخ المبادرة الفعلية (المُدخلة أو المشتقّة من المعالم)
@@ -656,7 +655,7 @@ function MilestonesSection({
               {m.weight}%
             </span>
             <StatusBadge
-              done={m.done}
+              done={(m.progress ?? 0) >= 100}
               start_date={m.start_date}
               due_date={m.due_date}
             />

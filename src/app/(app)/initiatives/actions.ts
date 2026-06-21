@@ -173,9 +173,27 @@ export async function toggleMilestone(
   if (!user) return { ok: false, error: "غير مصرّح" };
   const { error } = await supabase
     .from("kpi_initiative_milestones")
-    .update({ done })
+    .update({ done, progress: done ? 100 : 0 })
     .eq("id", id);
   if (error) return { ok: false, error: "تعذّر التحديث" };
+  revalidatePath("/initiatives");
+  return { ok: true };
+}
+
+/** تحديث نسبة إنجاز المعلم (0–100%)؛ 100% = مكتمل */
+export async function setMilestoneProgress(
+  id: string,
+  progress: number
+): Promise<Result> {
+  const { supabase, user } = await uid();
+  if (!user) return { ok: false, error: "غير مصرّح" };
+  const p = Math.max(0, Math.min(100, Math.round(progress || 0)));
+  const { error } = await supabase
+    .from("kpi_initiative_milestones")
+    .update({ progress: p, done: p >= 100 })
+    .eq("id", id);
+  if (error) return { ok: false, error: "تعذّر التحديث" };
+  revalidatePath("/initiatives/follow-up");
   revalidatePath("/initiatives");
   return { ok: true };
 }

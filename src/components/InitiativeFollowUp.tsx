@@ -13,13 +13,13 @@ import {
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import {
-  toggleMilestone,
+  setMilestoneProgress,
   toggleDeliverable,
   addInitiativeUpdate,
   deleteInitiativeUpdate,
 } from "@/app/(app)/initiatives/actions";
 import { submitChange } from "@/app/(app)/change-requests/actions";
-import { computeAutoStatus, AUTO_STATUS } from "@/lib/initiative-status";
+import { computeAutoStatus, AUTO_STATUS, achievedWeight } from "@/lib/initiative-status";
 import type { KpiInitiative } from "@/lib/data";
 
 function fmt(d: string | null) {
@@ -38,7 +38,7 @@ function Gantt({ milestones }: { milestones: NonNullable<KpiInitiative["mileston
   const max = Math.max(...dated.map((m) => +new Date(m.due_date!)));
   const span = Math.max(max - min, 1);
   return (
-    <div dir="ltr" className="space-y-1.5">
+    <div dir="rtl" className="space-y-1.5">
       {milestones.map((m) => {
         const has = m.start_date && m.due_date;
         const left = has ? ((+new Date(m.start_date!) - min) / span) * 100 : 0;
@@ -46,21 +46,26 @@ function Gantt({ milestones }: { milestones: NonNullable<KpiInitiative["mileston
           ? Math.max(((+new Date(m.due_date!) - +new Date(m.start_date!)) / span) * 100, 2)
           : 0;
         const color = AUTO_STATUS[
-          computeAutoStatus({ done: m.done, start_date: m.start_date, due_date: m.due_date })
+          computeAutoStatus({ done: (m.progress ?? 0) >= 100, start_date: m.start_date, due_date: m.due_date })
         ].color;
         return (
           <div key={m.id} className="grid grid-cols-[150px_1fr] items-center gap-2">
-            <span dir="rtl" className="truncate text-[11px] text-slate-600" title={m.title}>
+            <span className="truncate text-[11px] text-slate-600" title={m.title}>
               {m.title}
             </span>
             <div className="relative h-5 rounded bg-slate-100">
               {has && (
                 <div
-                  className="absolute top-0 flex h-5 items-center justify-center rounded text-[10px] font-bold text-white"
-                  style={{ left: `${left}%`, width: `${width}%`, backgroundColor: color }}
-                  title={`${fmt(m.start_date)} → ${fmt(m.due_date)} (${m.weight}%)`}
+                  className="absolute top-0 h-5 overflow-hidden rounded"
+                  style={{ insetInlineStart: `${left}%`, width: `${width}%`, backgroundColor: `${color}33` }}
+                  title={`${fmt(m.start_date)} → ${fmt(m.due_date)} · ${m.progress ?? 0}% · وزن ${m.weight}%`}
                 >
-                  {m.weight}%
+                  <div
+                    className="flex h-full items-center justify-center text-[10px] font-bold text-white"
+                    style={{ width: `${m.progress ?? 0}%`, backgroundColor: color }}
+                  >
+                    {width > 7 ? `${m.progress ?? 0}%` : ""}
+                  </div>
                 </div>
               )}
             </div>
@@ -69,7 +74,7 @@ function Gantt({ milestones }: { milestones: NonNullable<KpiInitiative["mileston
       })}
       <div className="grid grid-cols-[150px_1fr] gap-2">
         <span />
-        <div className="flex justify-between text-[10px] text-slate-400">
+        <div className="flex flex-row-reverse justify-between text-[10px] text-slate-400">
           <span>{new Date(min).toLocaleDateString("en-CA")}</span>
           <span>{new Date(max).toLocaleDateString("en-CA")}</span>
         </div>
@@ -113,8 +118,8 @@ function FollowCard({ i, canManage }: { i: KpiInitiative; canManage: boolean }) 
   const milestones = i.milestones ?? [];
   const deliverables = i.deliverables ?? [];
   const updates = i.updates ?? [];
-  const doneWeight = milestones.filter((m) => m.done).reduce((a, m) => a + (m.weight ?? 0), 0);
-  const allDone = milestones.length > 0 && milestones.every((m) => m.done);
+  const doneWeight = achievedWeight(milestones);
+  const allDone = milestones.length > 0 && milestones.every((m) => (m.progress ?? 0) >= 100);
   const completed = !!i.completed_at;
   const status = AUTO_STATUS[
     computeAutoStatus({
@@ -227,23 +232,15 @@ function FollowCard({ i, canManage }: { i: KpiInitiative; canManage: boolean }) 
         <Gantt milestones={milestones} />
       </div>
 
-      {/* تحديث الإنجاز عبر المعالم */}
+      {/* تحديث الإنجاز عبر المعالم (نسبة 0–100% لكل معلم) */}
       {canManage && !completed && (
         <div>
-          <h4 className="mb-2 text-sm font-bold text-mushar-dark">تحديث إنجاز المعالم</h4>
+          <h4 className="mb-2 text-sm font-bold text-mushar-dark">
+            تحديث نسبة إنجاز المعالم
+          </h4>
           <div className="grid gap-1.5 sm:grid-cols-2">
             {milestones.map((m) => (
-              <label key={m.id} className="flex items-center gap-2 rounded-lg bg-slate-50 px-3 py-1.5 text-xs">
-                <input
-                  type="checkbox"
-                  checked={m.done}
-                  onChange={(e) => run(() => toggleMilestone(m.id, e.target.checked))}
-                  className="h-4 w-4 accent-mushar-primary"
-                />
-                <span className={m.done ? "text-slate-400 line-through" : "text-mushar-dark"}>
-                  {m.title} ({m.weight}%)
-                </span>
-              </label>
+              <MilestoneProgressRow key={m.id} id={m.id} title={m.title} weight={m.weight} progress={m.progress ?? 0} onSaved={() => router.refresh()} />
             ))}
           </div>
         </div>
@@ -390,6 +387,54 @@ function FollowCard({ i, canManage }: { i: KpiInitiative; canManage: boolean }) 
           )
         ) : null}
       </div>
+    </div>
+  );
+}
+
+function MilestoneProgressRow({
+  id,
+  title,
+  weight,
+  progress,
+  onSaved,
+}: {
+  id: string;
+  title: string;
+  weight: number;
+  progress: number;
+  onSaved: () => void;
+}) {
+  const [val, setVal] = useState(String(progress));
+  const [, startTransition] = useTransition();
+  const done = (progress ?? 0) >= 100;
+
+  function commit() {
+    const n = Math.max(0, Math.min(100, Math.round(Number(val) || 0)));
+    setVal(String(n));
+    if (n === progress) return;
+    startTransition(async () => {
+      const res = await setMilestoneProgress(id, n);
+      if (res.ok) onSaved();
+      else alert(res.error);
+    });
+  }
+
+  return (
+    <div className="flex items-center gap-2 rounded-lg bg-slate-50 px-3 py-1.5 text-xs">
+      <span className={`flex-1 truncate ${done ? "text-emerald-700" : "text-mushar-dark"}`} title={title}>
+        {title} <span className="text-slate-400">· وزن {weight}%</span>
+      </span>
+      <input
+        type="number"
+        min={0}
+        max={100}
+        value={val}
+        onChange={(e) => setVal(e.target.value)}
+        onBlur={commit}
+        onKeyDown={(e) => e.key === "Enter" && (e.target as HTMLInputElement).blur()}
+        className="input w-16 py-1 text-center text-xs"
+      />
+      <span className="text-slate-400">%</span>
     </div>
   );
 }

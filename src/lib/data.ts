@@ -502,6 +502,7 @@ export interface KpiMilestone {
   initiative_id: string;
   title: string;
   done: boolean;
+  progress: number;
   weight: number;
   start_date: string | null;
   due_date: string | null;
