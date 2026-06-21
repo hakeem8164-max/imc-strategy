@@ -7,11 +7,11 @@ export type AutoStatus =
   | "done";
 
 export const AUTO_STATUS: Record<AutoStatus, { label: string; color: string }> = {
-  not_started: { label: "لم يبدأ", color: "#64748b" },
-  in_progress: { label: "قيد التنفيذ", color: "#2563eb" },
-  late: { label: "متأخر", color: "#D97706" },
-  stalled: { label: "متعثر", color: "#A11249" },
-  done: { label: "منجز", color: "#16a34a" },
+  not_started: { label: "لم يبدأ", color: "#94A3B8" },
+  in_progress: { label: "قيد التنفيذ", color: "#16A34A" },
+  late: { label: "متأخر", color: "#EAB308" },
+  stalled: { label: "متعثر", color: "#DC2626" },
+  done: { label: "منجز", color: "#0D9488" },
 };
 
 // متأخر حتى أسبوعين، وبعدها متعثر

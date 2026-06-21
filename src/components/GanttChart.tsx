@@ -100,21 +100,26 @@ export default function GanttChart({
               );
             })}
           </div>
-          {/* أرقام الأسابيع 1–4 */}
+          {/* أرقام الأسابيع بالنسبة للسنة */}
           <div className="relative h-5 border-b border-slate-200">
             {months.map((mo, idx) => {
               const left = pos(mo.start);
               const w = pos(mo.next) - left;
-              return [0, 1, 2, 3].map((k) => (
-                <div
-                  key={`${idx}-${k}`}
-                  className={`absolute top-0 flex h-5 items-center justify-center text-[9px] text-slate-400 ${k === 0 ? "border-l border-slate-200" : "border-l border-dashed border-slate-100"}`}
-                  style={{ insetInlineStart: `${left + (w * k) / 4}%`, width: `${w / 4}%` }}
-                  title={`${MONTHS_AR[mo.m]} - أسبوع ${k + 1}`}
-                >
-                  {k + 1}
-                </div>
-              ));
+              return [0, 1, 2, 3].map((k) => {
+                const segStart = mo.start + ((mo.next - mo.start) * k) / 4;
+                const jan1 = +new Date(new Date(segStart).getFullYear(), 0, 1);
+                const week = Math.floor((segStart - jan1) / (7 * 86400000)) + 1;
+                return (
+                  <div
+                    key={`${idx}-${k}`}
+                    className={`absolute top-0 flex h-5 items-center justify-center text-[9px] text-slate-400 ${k === 0 ? "border-l border-slate-200" : "border-l border-dashed border-slate-100"}`}
+                    style={{ insetInlineStart: `${left + (w * k) / 4}%`, width: `${w / 4}%` }}
+                    title={`أسبوع ${week} من ${new Date(segStart).getFullYear()}`}
+                  >
+                    {week}
+                  </div>
+                );
+              });
             })}
           </div>
 
