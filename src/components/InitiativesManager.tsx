@@ -84,10 +84,12 @@ export default function InitiativesManager({
 
   const filledMs = ms.filter((m) => m.title.trim());
   const weightSum = filledMs.reduce((a, m) => a + (Number(m.weight) || 0), 0);
+  const allMsWeighted = filledMs.every((m) => Number(m.weight) > 0);
   const valid =
     !!objectiveId &&
     !!title.trim() &&
     filledMs.length >= 5 &&
+    allMsWeighted &&
     weightSum === 100;
 
   function resetForm() {
@@ -309,9 +311,9 @@ export default function InitiativesManager({
                   />
                   <button
                     onClick={() => setMs((s) => s.filter((_, i) => i !== idx))}
-                    className="rounded-lg px-2 text-xs text-mushar-accent hover:bg-mushar-accent/10"
-                    title="حذف الصف"
-                    disabled={ms.length <= 1}
+                    className="rounded-lg px-2 text-xs text-mushar-accent hover:bg-mushar-accent/10 disabled:cursor-not-allowed disabled:opacity-30"
+                    title={ms.length <= 5 ? "الحد الأدنى 5 معالم" : "حذف الصف"}
+                    disabled={ms.length <= 5}
                   >
                     ✕
                   </button>
@@ -376,8 +378,8 @@ export default function InitiativesManager({
           )}
           {!valid && (
             <p className="text-[11px] text-amber-700">
-              للحفظ: اختر الهدف، اكتب العنوان، وأدخل 5 معالم على الأقل بمجموع
-              أوزان 100%.
+              للحفظ: اختر الهدف، اكتب العنوان، وأدخل 5 معالم على الأقل، لكل معلَم
+              وزن أكبر من صفر، ومجموع الأوزان 100%.
             </p>
           )}
 
@@ -591,6 +593,10 @@ function MilestonesSection({
 
   function add() {
     if (!title.trim()) return;
+    if (!(Number(weight) > 0)) {
+      alert("لكل معلَم وزن أكبر من صفر.");
+      return;
+    }
     startTransition(async () => {
       const res = await addMilestone({
         initiative_id: initiativeId,
@@ -657,8 +663,15 @@ function MilestonesSection({
             </span>
             {canManage && (
               <button
-                onClick={() => act(() => deleteMilestone(m.id))}
-                className="mr-auto text-mushar-accent hover:underline"
+                onClick={() => {
+                  if (milestones.length <= 5) {
+                    alert("لا يمكن النزول تحت 5 معالم.");
+                    return;
+                  }
+                  act(() => deleteMilestone(m.id));
+                }}
+                className="mr-auto text-mushar-accent hover:underline disabled:opacity-30"
+                disabled={milestones.length <= 5}
               >
                 حذف
               </button>

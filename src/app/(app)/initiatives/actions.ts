@@ -40,6 +40,8 @@ export async function createInitiative(input: {
   const ms = input.milestones.filter((m) => m.title.trim());
   if (ms.length < 5)
     return { ok: false, error: "يلزم 5 معالم على الأقل." };
+  if (ms.some((m) => !(Math.round(m.weight || 0) > 0)))
+    return { ok: false, error: "كل معلَم يجب أن يكون له وزن أكبر من صفر." };
   const sum = ms.reduce((a, m) => a + Math.round(m.weight || 0), 0);
   if (sum !== 100)
     return {
@@ -160,6 +162,8 @@ export async function addMilestone(input: {
   const { supabase, user } = await uid();
   if (!user) return { ok: false, error: "غير مصرّح" };
   if (!input.title.trim()) return { ok: false, error: "اكتب عنوان المعلَم" };
+  if (!(Math.round(input.weight || 0) > 0))
+    return { ok: false, error: "لكل معلَم وزن أكبر من صفر." };
   const weight = Math.max(0, Math.min(100, Math.round(input.weight || 0)));
   const { error } = await supabase.from("kpi_initiative_milestones").insert({
     initiative_id: input.initiative_id,
