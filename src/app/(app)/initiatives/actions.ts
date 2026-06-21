@@ -237,3 +237,36 @@ export async function deleteDeliverable(id: string): Promise<Result> {
   revalidatePath("/initiatives");
   return { ok: true };
 }
+
+// ===== تحديثات/تحديات المتابعة =====
+export async function addInitiativeUpdate(input: {
+  initiative_id: string;
+  kind: "update" | "challenge";
+  body: string;
+}): Promise<Result> {
+  const { supabase, user } = await uid();
+  if (!user) return { ok: false, error: "غير مصرّح" };
+  if (!input.body.trim()) return { ok: false, error: "اكتب النص" };
+  const { error } = await supabase.from("kpi_initiative_updates").insert({
+    initiative_id: input.initiative_id,
+    kind: input.kind,
+    body: input.body.trim(),
+    created_by: user.id,
+  });
+  if (error) return { ok: false, error: "تعذّر الحفظ" };
+  revalidatePath("/initiatives/follow-up");
+  revalidatePath("/initiatives");
+  return { ok: true };
+}
+
+export async function deleteInitiativeUpdate(id: string): Promise<Result> {
+  const { supabase, user } = await uid();
+  if (!user) return { ok: false, error: "غير مصرّح" };
+  const { error } = await supabase
+    .from("kpi_initiative_updates")
+    .delete()
+    .eq("id", id);
+  if (error) return { ok: false, error: "تعذّر الحذف" };
+  revalidatePath("/initiatives/follow-up");
+  return { ok: true };
+}

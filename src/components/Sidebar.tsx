@@ -21,6 +21,7 @@ import {
   ScrollText,
   Landmark,
   Rocket,
+  GanttChartSquare,
   GitPullRequestArrow,
   ChevronDown,
   X,
@@ -48,6 +49,12 @@ const PERFORMANCE_NAV: Item[] = [
     href: "/initiatives",
     label: "المبادرات",
     icon: Rocket,
+    roles: ["admin", "executive", "owner"],
+  },
+  {
+    href: "/initiatives/follow-up",
+    label: "متابعة المبادرات",
+    icon: GanttChartSquare,
     roles: ["admin", "executive", "owner"],
   },
   {

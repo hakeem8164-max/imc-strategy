@@ -518,6 +518,17 @@ export interface KpiDeliverable {
   created_at: string;
 }
 
+export interface KpiInitiativeProgressUpdate {
+  id: string;
+  initiative_id: string;
+  kind: "update" | "challenge";
+  body: string;
+  progress: number | null;
+  created_by: string | null;
+  created_at: string;
+  author?: { full_name: string | null } | null;
+}
+
 export interface KpiInitiative {
   id: string;
   kpi_id: string | null;
@@ -531,12 +542,17 @@ export interface KpiInitiative {
   progress: number;
   start_date: string | null;
   due_date: string | null;
+  lessons_learned: string | null;
+  completed_at: string | null;
+  completion_doc_url: string | null;
+  completion_doc_name: string | null;
   created_by: string | null;
   created_at: string;
   owner?: { full_name: string | null } | null;
   owner_unit?: { id: string; name: string } | null;
   milestones?: KpiMilestone[];
   deliverables?: KpiDeliverable[];
+  updates?: KpiInitiativeProgressUpdate[];
   kpi?: { id: string; name: string } | null;
   objective?: { id: string; name: string; code: string | null } | null;
 }
@@ -547,7 +563,7 @@ export async function getAllInitiatives(): Promise<KpiInitiative[]> {
   const { data } = await supabase
     .from("kpi_initiatives")
     .select(
-      "*, owner:profiles!kpi_initiatives_owner_user_id_fkey(full_name), owner_unit:org_units(id,name), kpi:kpis(id,name), objective:objectives(id,name,code), milestones:kpi_initiative_milestones(*), deliverables:kpi_initiative_deliverables(*)"
+      "*, owner:profiles!kpi_initiatives_owner_user_id_fkey(full_name), owner_unit:org_units(id,name), kpi:kpis(id,name), objective:objectives(id,name,code), milestones:kpi_initiative_milestones(*), deliverables:kpi_initiative_deliverables(*), updates:kpi_initiative_updates(*, author:profiles!kpi_initiative_updates_created_by_fkey(full_name))"
     )
     .order("created_at", { ascending: false });
   const list = (data as KpiInitiative[]) ?? [];
@@ -555,6 +571,8 @@ export async function getAllInitiatives(): Promise<KpiInitiative[]> {
     if (i.milestones) i.milestones.sort((a, b) => a.sort_order - b.sort_order);
     if (i.deliverables)
       i.deliverables.sort((a, b) => a.sort_order - b.sort_order);
+    if (i.updates)
+      i.updates.sort((a, b) => b.created_at.localeCompare(a.created_at));
   }
   return list;
 }
