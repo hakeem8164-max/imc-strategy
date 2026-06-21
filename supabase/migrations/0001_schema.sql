@@ -11,7 +11,7 @@ create table if not exists public.dimensions (
   id uuid primary key default gen_random_uuid(),
   name text not null unique,
   slug text not null unique,
-  color text not null default '#056073',
+  color text not null default '#8C341F',
   sort_order int not null default 0,
   created_at timestamptz not null default now()
 );

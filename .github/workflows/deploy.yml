@@ -21,8 +21,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-      SUPABASE_URL: https://zmdckeemxrtjcbkexfde.supabase.co
-      SUPABASE_ANON_KEY: sb_publishable_K8r0s-2YDAAPWUy1kREAhA_-geZwis4
+      SUPABASE_URL: https://zidjrhzvqmdphpaauzdr.supabase.co
+      SUPABASE_ANON_KEY: sb_publishable_5AnQ_HbcdH9JBOfgYsgd_A_h-9ZCHFw
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -46,20 +46,18 @@ jobs:
         run: |
           set -euo pipefail
           # اسم المشروع يجب أن يكون بأحرف صغيرة
-          vercel project add musharkpi --token "$VERCEL_TOKEN" || true
-          vercel link --yes --project musharkpi --token "$VERCEL_TOKEN"
+          vercel project add imc-strategy --token "$VERCEL_TOKEN" || true
+          vercel link --yes --project imc-strategy --token "$VERCEL_TOKEN"
 
       - name: Make deployment public (disable protection)
         continue-on-error: true
         run: |
-          # معرّفات المشروع/الفريق ثابتة لهذا المشروع
-          PROJECT_ID="prj_XVViMzT855KmBooh2PgRCdbfYeHK"
-          TEAM_ID="team_7URrydLmyX8Dmp6LOJcpg76X"
-          # محاولة قراءة المعرّفات من ربط CLI إن وُجد (أكثر دقة)
-          if [ -f .vercel/project.json ]; then
-            PROJECT_ID=$(python3 -c "import json;print(json.load(open('.vercel/project.json'))['projectId'])")
-            TEAM_ID=$(python3 -c "import json;print(json.load(open('.vercel/project.json'))['orgId'])")
+          # تُقرأ معرّفات المشروع/الفريق من ربط CLI الناتج عن خطوة vercel link
+          if [ ! -f .vercel/project.json ]; then
+            echo "تخطّي: لا يوجد .vercel/project.json"; exit 0
           fi
+          PROJECT_ID=$(python3 -c "import json;print(json.load(open('.vercel/project.json'))['projectId'])")
+          TEAM_ID=$(python3 -c "import json;print(json.load(open('.vercel/project.json'))['orgId'])")
           curl -sS -X PATCH \
             "https://api.vercel.com/v9/projects/$PROJECT_ID?teamId=$TEAM_ID" \
             -H "Authorization: Bearer $VERCEL_TOKEN" \

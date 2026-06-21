@@ -2,14 +2,14 @@
 -- =================================================================
 
 insert into public.dimensions (name, slug, color, sort_order) values
-  ('مالي', 'financial', '#056073', 1),
-  ('العملاء والموردين', 'customers-suppliers', '#67C5B9', 2),
-  ('تطوير الأعمال', 'business-dev', '#1A6B7B', 3),
-  ('الشراكات', 'partnerships', '#A11249', 4),
-  ('العمليات', 'operations', '#0B2F38', 5),
-  ('الموارد البشرية', 'hr', '#2E8B9E', 6),
-  ('البنية التقنية', 'tech', '#596C9E', 7),
-  ('الحوكمة', 'governance', '#570A27', 8)
+  ('مالي', 'financial', '#8C341F', 1),
+  ('العملاء والموردين', 'customers-suppliers', '#BD9258', 2),
+  ('تطوير الأعمال', 'business-dev', '#C77B3E', 3),
+  ('الشراكات', 'partnerships', '#6B8E23', 4),
+  ('العمليات', 'operations', '#2E7D6B', 5),
+  ('الموارد البشرية', 'hr', '#4A6E8A', 6),
+  ('البنية التقنية', 'tech', '#7A3B57', 7),
+  ('الحوكمة', 'governance', '#5A2114', 8)
 on conflict (name) do update set color=excluded.color, sort_order=excluded.sort_order, slug=excluded.slug;
 
 -- المؤشرات
