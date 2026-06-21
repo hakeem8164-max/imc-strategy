@@ -28,8 +28,8 @@ import type { Role } from "@/lib/types";
 type Item = { href: string; label: string; icon: LucideIcon; roles?: Role[] };
 
 const NAV: Item[] = [
-  { href: "/", label: "لوحة القيادة", icon: LayoutDashboard },
-  { href: "/kpis", label: "التوجهات الاستراتيجية", icon: ClipboardList },
+  { href: "/", label: "لوحة الأداء التنفيذية", icon: LayoutDashboard },
+  { href: "/kpis", label: "لوحة الأداء التفصيلية", icon: ClipboardList },
   {
     href: "/my-tasks",
     label: "مهامّي",
@@ -117,7 +117,7 @@ function NavLinks({
 
       {perfItems.length > 0 && (
         <CollapsibleGroup
-          label="مؤشرات الأداء"
+          label="التوجهات الاستراتيجية"
           icon={Target}
           items={perfItems}
           pathname={pathname}

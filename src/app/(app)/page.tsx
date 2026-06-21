@@ -260,7 +260,7 @@ export default async function DashboardPage({
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-extrabold text-mushar-dark">لوحة القيادة</h1>
+        <h1 className="text-xl font-extrabold text-mushar-dark">لوحة الأداء التنفيذية</h1>
         <PrintButton />
       </div>
 

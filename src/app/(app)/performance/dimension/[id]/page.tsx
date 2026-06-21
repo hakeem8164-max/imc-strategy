@@ -104,7 +104,7 @@ export default async function DimensionPage({
           href="/"
           className="inline-flex items-center gap-1 text-sm font-medium text-mushar-primary hover:underline"
         >
-          → العودة إلى لوحة القيادة
+          → العودة إلى لوحة الأداء التنفيذية
         </Link>
 
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
