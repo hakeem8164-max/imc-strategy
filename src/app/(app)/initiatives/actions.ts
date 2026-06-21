@@ -288,3 +288,49 @@ export async function deleteInitiativeUpdate(id: string): Promise<Result> {
   revalidatePath("/initiatives/follow-up");
   return { ok: true };
 }
+
+/** إغلاق/إعادة فتح تحديث أو تحدٍّ */
+export async function setUpdateResolved(
+  id: string,
+  resolved: boolean
+): Promise<Result> {
+  const { supabase, user } = await uid();
+  if (!user) return { ok: false, error: "غير مصرّح" };
+  const { error } = await supabase
+    .from("kpi_initiative_updates")
+    .update({ resolved, resolved_at: resolved ? new Date().toISOString() : null })
+    .eq("id", id);
+  if (error) return { ok: false, error: "تعذّر التحديث" };
+  revalidatePath("/initiatives/follow-up");
+  return { ok: true };
+}
+
+/** رد/تحديث على عنصر متابعة */
+export async function addUpdateReply(input: {
+  update_id: string;
+  body: string;
+}): Promise<Result> {
+  const { supabase, user } = await uid();
+  if (!user) return { ok: false, error: "غير مصرّح" };
+  if (!input.body.trim()) return { ok: false, error: "اكتب الرد" };
+  const { error } = await supabase.from("kpi_initiative_update_replies").insert({
+    update_id: input.update_id,
+    body: input.body.trim(),
+    created_by: user.id,
+  });
+  if (error) return { ok: false, error: "تعذّر الحفظ" };
+  revalidatePath("/initiatives/follow-up");
+  return { ok: true };
+}
+
+export async function deleteUpdateReply(id: string): Promise<Result> {
+  const { supabase, user } = await uid();
+  if (!user) return { ok: false, error: "غير مصرّح" };
+  const { error } = await supabase
+    .from("kpi_initiative_update_replies")
+    .delete()
+    .eq("id", id);
+  if (error) return { ok: false, error: "تعذّر الحذف" };
+  revalidatePath("/initiatives/follow-up");
+  return { ok: true };
+}

@@ -519,15 +519,27 @@ export interface KpiDeliverable {
   created_at: string;
 }
 
+export interface KpiInitiativeUpdateReply {
+  id: string;
+  update_id: string;
+  body: string;
+  created_by: string | null;
+  created_at: string;
+  author?: { full_name: string | null } | null;
+}
+
 export interface KpiInitiativeProgressUpdate {
   id: string;
   initiative_id: string;
   kind: "update" | "challenge";
   body: string;
   progress: number | null;
+  resolved: boolean;
+  resolved_at: string | null;
   created_by: string | null;
   created_at: string;
   author?: { full_name: string | null } | null;
+  replies?: KpiInitiativeUpdateReply[];
 }
 
 export interface KpiInitiative {
@@ -564,7 +576,7 @@ export async function getAllInitiatives(): Promise<KpiInitiative[]> {
   const { data } = await supabase
     .from("kpi_initiatives")
     .select(
-      "*, owner:profiles!kpi_initiatives_owner_user_id_fkey(full_name), owner_unit:org_units(id,name), kpi:kpis(id,name), objective:objectives(id,name,code), milestones:kpi_initiative_milestones(*), deliverables:kpi_initiative_deliverables(*), updates:kpi_initiative_updates(*, author:profiles!kpi_initiative_updates_created_by_fkey(full_name))"
+      "*, owner:profiles!kpi_initiatives_owner_user_id_fkey(full_name), owner_unit:org_units(id,name), kpi:kpis(id,name), objective:objectives(id,name,code), milestones:kpi_initiative_milestones(*), deliverables:kpi_initiative_deliverables(*), updates:kpi_initiative_updates(*, author:profiles!kpi_initiative_updates_created_by_fkey(full_name), replies:kpi_initiative_update_replies(*, author:profiles!kpi_initiative_update_replies_created_by_fkey(full_name)))"
     )
     .order("created_at", { ascending: false });
   const list = (data as KpiInitiative[]) ?? [];
@@ -572,8 +584,12 @@ export async function getAllInitiatives(): Promise<KpiInitiative[]> {
     if (i.milestones) i.milestones.sort((a, b) => a.sort_order - b.sort_order);
     if (i.deliverables)
       i.deliverables.sort((a, b) => a.sort_order - b.sort_order);
-    if (i.updates)
+    if (i.updates) {
       i.updates.sort((a, b) => b.created_at.localeCompare(a.created_at));
+      for (const u of i.updates)
+        if (u.replies)
+          u.replies.sort((a, b) => a.created_at.localeCompare(b.created_at));
+    }
   }
   return list;
 }

@@ -17,11 +17,24 @@ import {
   toggleDeliverable,
   addInitiativeUpdate,
   deleteInitiativeUpdate,
+  setUpdateResolved,
+  addUpdateReply,
+  deleteUpdateReply,
 } from "@/app/(app)/initiatives/actions";
 import { submitChange } from "@/app/(app)/change-requests/actions";
 import { computeAutoStatus, AUTO_STATUS, achievedWeight } from "@/lib/initiative-status";
 import GanttChart, { type GanttRow } from "@/components/GanttChart";
-import type { KpiInitiative } from "@/lib/data";
+import type { KpiInitiative, KpiInitiativeProgressUpdate } from "@/lib/data";
+
+function dt(s: string) {
+  return new Date(s).toLocaleString("ar", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
 
 function MilestoneGantt({ milestones }: { milestones: NonNullable<KpiInitiative["milestones"]> }) {
   const rows: GanttRow[] = milestones
@@ -242,29 +255,9 @@ function FollowCard({ i, canManage }: { i: KpiInitiative; canManage: boolean }) 
         <h4 className="mb-2 flex items-center gap-1.5 text-sm font-bold text-mushar-dark">
           <MessageSquare size={14} className="text-mushar-primary" /> التحديثات والتحديات
         </h4>
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           {updates.map((u) => (
-            <div key={u.id} className="flex items-start gap-2 rounded-lg bg-slate-50 px-3 py-2 text-xs">
-              {u.kind === "challenge" ? (
-                <AlertTriangle size={14} className="mt-0.5 shrink-0 text-amber-600" />
-              ) : (
-                <MessageSquare size={14} className="mt-0.5 shrink-0 text-slate-400" />
-              )}
-              <div className="flex-1">
-                <p className="text-mushar-dark">{u.body}</p>
-                <p className="text-[10px] text-slate-400">
-                  {u.author?.full_name ?? "—"} · {new Date(u.created_at).toLocaleDateString("ar")}
-                </p>
-              </div>
-              {canManage && (
-                <button
-                  onClick={() => run(() => deleteInitiativeUpdate(u.id))}
-                  className="text-mushar-accent hover:underline"
-                >
-                  حذف
-                </button>
-              )}
-            </div>
+            <UpdateItem key={u.id} u={u} canManage={canManage} onChange={() => router.refresh()} />
           ))}
           {updates.length === 0 && <p className="text-xs text-slate-400">لا تحديثات بعد.</p>}
         </div>
@@ -400,6 +393,139 @@ function MilestoneProgressRow({
         className="input w-16 py-1 text-center text-xs"
       />
       <span className="text-slate-400">%</span>
+    </div>
+  );
+}
+
+function UpdateItem({
+  u,
+  canManage,
+  onChange,
+}: {
+  u: KpiInitiativeProgressUpdate;
+  canManage: boolean;
+  onChange: () => void;
+}) {
+  const [, startTransition] = useTransition();
+  const [reply, setReply] = useState("");
+  const [showReply, setShowReply] = useState(false);
+  const replies = u.replies ?? [];
+  const isChallenge = u.kind === "challenge";
+
+  function act(fn: () => Promise<{ ok: boolean; error?: string }>) {
+    startTransition(async () => {
+      const res = await fn();
+      if (res.ok) onChange();
+      else alert(res.error);
+    });
+  }
+
+  function sendReply() {
+    if (!reply.trim()) return;
+    act(async () => {
+      const res = await addUpdateReply({ update_id: u.id, body: reply });
+      if (res.ok) {
+        setReply("");
+        setShowReply(false);
+      }
+      return res;
+    });
+  }
+
+  return (
+    <div
+      className={`rounded-lg border px-3 py-2 text-xs ${
+        u.resolved ? "border-emerald-200 bg-emerald-50/50" : isChallenge ? "border-amber-200 bg-amber-50/40" : "border-slate-200 bg-slate-50"
+      }`}
+    >
+      <div className="flex items-start gap-2">
+        {isChallenge ? (
+          <AlertTriangle size={14} className="mt-0.5 shrink-0 text-amber-600" />
+        ) : (
+          <MessageSquare size={14} className="mt-0.5 shrink-0 text-slate-400" />
+        )}
+        <div className="flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="rounded bg-white px-1.5 py-0.5 text-[10px] font-semibold text-slate-500">
+              {isChallenge ? "تحدٍّ" : "تحديث"}
+            </span>
+            {u.resolved && (
+              <span className="inline-flex items-center gap-1 rounded bg-emerald-100 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-700">
+                <CheckCircle2 size={11} /> مكتمل
+              </span>
+            )}
+          </div>
+          <p className={`mt-1 ${u.resolved ? "text-slate-500 line-through" : "text-mushar-dark"}`}>
+            {u.body}
+          </p>
+          <p className="text-[10px] text-slate-400">
+            {u.author?.full_name ?? "—"} · {dt(u.created_at)}
+          </p>
+        </div>
+      </div>
+
+      {/* الردود/التحديثات المتسلسلة */}
+      {replies.length > 0 && (
+        <div className="mt-2 space-y-1.5 border-r-2 border-slate-200 pr-3">
+          {replies.map((r) => (
+            <div key={r.id} className="text-[11px]">
+              <p className="text-slate-700">{r.body}</p>
+              <p className="flex items-center gap-2 text-[10px] text-slate-400">
+                <span>
+                  {r.author?.full_name ?? "—"} · {dt(r.created_at)}
+                </span>
+                {canManage && (
+                  <button
+                    onClick={() => act(() => deleteUpdateReply(r.id))}
+                    className="text-mushar-accent hover:underline"
+                  >
+                    حذف
+                  </button>
+                )}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* أزرار */}
+      {canManage && (
+        <div className="mt-2 flex flex-wrap items-center gap-3 border-t border-slate-100 pt-2 text-[11px]">
+          <button
+            onClick={() => setShowReply((v) => !v)}
+            className="font-semibold text-mushar-primary hover:underline"
+          >
+            رد/تحديث
+          </button>
+          <button
+            onClick={() => act(() => setUpdateResolved(u.id, !u.resolved))}
+            className="font-semibold text-emerald-700 hover:underline"
+          >
+            {u.resolved ? "إعادة فتح" : "إكمال/إغلاق"}
+          </button>
+          <button
+            onClick={() => act(() => deleteInitiativeUpdate(u.id))}
+            className="mr-auto text-mushar-accent hover:underline"
+          >
+            حذف
+          </button>
+        </div>
+      )}
+
+      {showReply && canManage && (
+        <div className="mt-2 flex gap-2">
+          <input
+            className="input py-1.5 text-xs"
+            placeholder="اكتب رداً أو تحديثاً…"
+            value={reply}
+            onChange={(e) => setReply(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && sendReply()}
+          />
+          <button onClick={sendReply} className="btn-primary shrink-0 py-1.5 text-xs">
+            إرسال
+          </button>
+        </div>
+      )}
     </div>
   );
 }
