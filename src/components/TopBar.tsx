@@ -29,7 +29,7 @@ export default function TopBar({
   }
 
   return (
-    <header className="sticky top-0 z-30 bg-mushar-dark text-white print:hidden">
+    <header className="sticky top-0 z-30 bg-gradient-to-l from-mushar-dark via-mushar-primary to-mushar-dark text-white shadow-sm print:hidden">
       <div className="mx-auto flex max-w-[1500px] items-center justify-between gap-4 px-5 py-3">
         {/* يمين: زر القائمة (جوال) + الشعار واسم المنصة */}
         <div className="flex items-center gap-2 sm:gap-3">
@@ -43,10 +43,10 @@ export default function TopBar({
           <Image
             src="/mushar-logo-light.png"
             alt="المساجد المتكاملة"
-            width={84}
-            height={50}
+            width={300}
+            height={170}
             priority
-            className="h-auto w-[64px] sm:w-[78px]"
+            className="h-auto w-[120px] sm:w-[150px]"
           />
           <div className="border-r border-white/15 pr-3">
             <h1 className="text-sm font-extrabold leading-tight sm:text-base">

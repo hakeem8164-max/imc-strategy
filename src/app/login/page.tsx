@@ -38,18 +38,10 @@ export default function LoginPage() {
             <Image
               src="/mushar-logo.png"
               alt="المساجد المتكاملة"
-              width={150}
-              height={90}
+              width={300}
+              height={170}
               priority
-              className="h-auto w-[150px] dark:hidden"
-            />
-            <Image
-              src="/mushar-logo-light.png"
-              alt="المساجد المتكاملة"
-              width={150}
-              height={90}
-              priority
-              className="hidden h-auto w-[150px] dark:block"
+              className="h-auto w-[180px]"
             />
             <div className="text-center">
               <h1 className="text-xl font-bold text-mushar-dark">
