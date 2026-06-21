@@ -509,7 +509,8 @@ export interface KpiMilestone {
 
 export interface KpiInitiative {
   id: string;
-  kpi_id: string;
+  kpi_id: string | null;
+  objective_id: string | null;
   title: string;
   description: string | null;
   owner_user_id: string | null;
@@ -522,6 +523,19 @@ export interface KpiInitiative {
   owner?: { full_name: string | null } | null;
   milestones?: KpiMilestone[];
   kpi?: { id: string; name: string } | null;
+  objective?: { id: string; name: string; code: string | null } | null;
+}
+
+/** كل المبادرات (لصفحة المبادرات الموحّدة) */
+export async function getAllInitiatives(): Promise<KpiInitiative[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("kpi_initiatives")
+    .select(
+      "*, owner:profiles!kpi_initiatives_owner_user_id_fkey(full_name), kpi:kpis(id,name), objective:objectives(id,name,code)"
+    )
+    .order("created_at", { ascending: false });
+  return (data as KpiInitiative[]) ?? [];
 }
 
 export async function getInitiativesForKpi(

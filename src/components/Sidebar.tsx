@@ -20,6 +20,7 @@ import {
   KeyRound,
   ScrollText,
   Landmark,
+  Rocket,
   ChevronDown,
   X,
   type LucideIcon,
@@ -42,6 +43,12 @@ const NAV: Item[] = [
 
 const PERFORMANCE_NAV: Item[] = [
   { href: "/admin/library", label: "الأهداف الاستراتيجية", icon: BookOpen, roles: ["admin"] },
+  {
+    href: "/initiatives",
+    label: "المبادرات",
+    icon: Rocket,
+    roles: ["admin", "executive", "owner"],
+  },
   {
     href: "/performance/review",
     label: "المراجعة والاعتماد",
