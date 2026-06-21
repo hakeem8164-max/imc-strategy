@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import Header from "@/components/Header";
 import InitiativeFollowUp from "@/components/InitiativeFollowUp";
+import MasterGantt from "@/components/MasterGantt";
 import { getProfile, getAllInitiatives } from "@/lib/data";
 
 export default async function InitiativeFollowUpPage() {
@@ -25,6 +26,14 @@ export default async function InitiativeFollowUpPage() {
             ليُعتمد عبر السلسلة.
           </p>
         </div>
+        {initiatives.length > 0 && (
+          <div className="card p-5">
+            <h2 className="mb-3 text-sm font-bold text-mushar-dark">
+              مخطط جانت الرئيسي — كل المبادرات
+            </h2>
+            <MasterGantt initiatives={initiatives} />
+          </div>
+        )}
         <InitiativeFollowUp initiatives={initiatives} canManage={canManage} />
       </div>
     </>
