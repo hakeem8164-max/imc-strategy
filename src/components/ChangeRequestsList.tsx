@@ -2,10 +2,21 @@
 
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Check, X, Clock } from "lucide-react";
+import { Check, X, Clock, Paperclip } from "lucide-react";
 import { reviewChange } from "@/app/(app)/change-requests/actions";
+import { createClient } from "@/lib/supabase/client";
 import type { Profile } from "@/lib/types";
 import type { ChangeRequest } from "@/lib/data";
+
+type Meta = {
+  reason?: string;
+  impact?: string | null;
+  attachment_url?: string | null;
+  attachment_name?: string | null;
+  field_label?: string | null;
+  current_value?: string | null;
+  new_value?: string | null;
+};
 
 const ENTITY: Record<string, string> = {
   objective: "هدف",
@@ -68,6 +79,15 @@ export default function ChangeRequestsList({
   );
   const history = requests;
 
+  async function openDoc(path: string) {
+    const supabase = createClient();
+    const { data } = await supabase.storage
+      .from("kpi-docs")
+      .createSignedUrl(path, 120);
+    if (data?.signedUrl) window.open(data.signedUrl, "_blank");
+    else alert("تعذّر فتح المرفق");
+  }
+
   function review(cr: ChangeRequest, decision: "approve" | "reject") {
     let note: string | null = null;
     if (decision === "reject") {
@@ -99,13 +119,56 @@ export default function ChangeRequestsList({
           </span>
         </div>
         <h3 className="text-sm font-bold text-mushar-dark">{cr.title}</h3>
-        {summary(cr) && (
-          <p className="text-xs text-slate-500">{summary(cr)}</p>
-        )}
+
+        {(() => {
+          const meta = (cr.payload?.__meta ?? {}) as Meta;
+          const extra = summary(cr);
+          return (
+            <div className="space-y-1.5 text-xs">
+              {(meta.current_value || meta.new_value) && (
+                <div className="rounded-lg bg-slate-50 px-3 py-2">
+                  {meta.field_label && (
+                    <span className="font-semibold text-slate-500">
+                      {meta.field_label}:{" "}
+                    </span>
+                  )}
+                  <span className="text-slate-400 line-through">
+                    {meta.current_value || "—"}
+                  </span>
+                  <span className="mx-1 text-slate-400">←</span>
+                  <span className="font-semibold text-mushar-dark">
+                    {meta.new_value || "—"}
+                  </span>
+                </div>
+              )}
+              {extra && <p className="text-slate-500">{extra}</p>}
+              {meta.reason && (
+                <p className="text-slate-600">
+                  <span className="font-semibold">السبب:</span> {meta.reason}
+                </p>
+              )}
+              {meta.impact && (
+                <p className="text-slate-600">
+                  <span className="font-semibold">الأثر:</span> {meta.impact}
+                </p>
+              )}
+              {meta.attachment_url && (
+                <button
+                  onClick={() => openDoc(meta.attachment_url!)}
+                  className="inline-flex items-center gap-1 font-semibold text-mushar-primary hover:underline"
+                >
+                  <Paperclip size={12} />
+                  {meta.attachment_name || "المرفق"}
+                </button>
+              )}
+            </div>
+          );
+        })()}
+
         <div className="flex flex-wrap gap-x-4 text-[11px] text-slate-400">
           <span>مُقدِّم الطلب: {cr.requester?.full_name ?? "—"}</span>
           <span>{new Date(cr.created_at).toLocaleDateString("ar")}</span>
-          {cr.review_note && <span>ملاحظة: {cr.review_note}</span>}
+          {cr.review_note && <span>ملاحظة المراجعة: {cr.review_note}</span>}
         </div>
         {act && (
           <div className="flex gap-2 border-t border-slate-100 pt-2">
