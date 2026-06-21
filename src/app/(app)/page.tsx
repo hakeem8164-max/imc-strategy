@@ -356,7 +356,7 @@ export default async function DashboardPage({
         <UnitBenchmark data={unitStats} bands={bands} />
       ) : (
         <div className="card flex items-center justify-center p-5 text-sm text-slate-400">
-          أسنِد المؤشرات لإدارات (من مكتبة المؤشرات) لعرض مقارنة أداء الإدارات
+          أسنِد المؤشرات لإدارات (من الأهداف الاستراتيجية) لعرض مقارنة أداء الإدارات
         </div>
       )}
 

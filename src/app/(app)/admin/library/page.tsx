@@ -23,7 +23,7 @@ export default async function LibraryPage() {
 
   return (
     <>
-      <Header profile={profile} title="مكتبة المؤشرات" />
+      <Header profile={profile} title="الأهداف الاستراتيجية" />
       <div className="space-y-4">
         <div className="card p-5">
           <p className="text-sm leading-relaxed text-slate-500">

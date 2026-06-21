@@ -62,7 +62,7 @@ export default async function KpisPage() {
 
   return (
     <>
-      <Header profile={profile} title="المؤشرات التفصيلية" />
+      <Header profile={profile} title="التوجهات الاستراتيجية" />
       <div className="space-y-6">
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           <StatCard label="إجمالي المؤشرات" value={kpis.length} accent="#8C341F" />

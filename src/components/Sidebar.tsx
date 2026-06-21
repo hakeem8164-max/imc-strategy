@@ -29,7 +29,7 @@ type Item = { href: string; label: string; icon: LucideIcon; roles?: Role[] };
 
 const NAV: Item[] = [
   { href: "/", label: "لوحة القيادة", icon: LayoutDashboard },
-  { href: "/kpis", label: "المؤشرات التفصيلية", icon: ClipboardList },
+  { href: "/kpis", label: "التوجهات الاستراتيجية", icon: ClipboardList },
   {
     href: "/my-tasks",
     label: "مهامّي",
@@ -39,7 +39,7 @@ const NAV: Item[] = [
 ];
 
 const PERFORMANCE_NAV: Item[] = [
-  { href: "/admin/library", label: "مكتبة المؤشرات", icon: BookOpen, roles: ["admin"] },
+  { href: "/admin/library", label: "الأهداف الاستراتيجية", icon: BookOpen, roles: ["admin"] },
   {
     href: "/performance/review",
     label: "المراجعة والاعتماد",
