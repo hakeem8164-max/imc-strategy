@@ -1,0 +1,174 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --mushar-primary: #056073;
+  --mushar-dark: #0b2f38;
+  --mushar-mint: #67c5b9;
+  --mushar-pale: #d1f1ed;
+  --mushar-accent: #a11249;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  background: #f4f7f8;
+  color: #0b2f38;
+}
+
+html.dark,
+html.dark body {
+  background: #0b1416;
+  color: #e6eef0;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* تمرير لطيف */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: #c7d6da;
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #9fb6bc;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #2b3d44;
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #3a4f57;
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-mushar-primary px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-mushar-dark disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-mushar-pale bg-white px-4 py-2.5 text-sm font-semibold text-mushar-dark transition hover:bg-mushar-pale/40;
+  }
+  .input {
+    @apply w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-mushar-dark outline-none transition focus:border-mushar-primary focus:ring-2 focus:ring-mushar-pale;
+  }
+  .label {
+    @apply mb-1.5 block text-sm font-medium text-slate-600;
+  }
+  .card {
+    @apply rounded-2xl border border-slate-100 bg-white shadow-card;
+  }
+}
+
+/* ===== الوضع الليلي ===== */
+/* الأسطح المركزية */
+.dark .card {
+  background-color: #13232a;
+  border-color: #24343b;
+}
+.dark .btn-ghost {
+  background-color: #13232a;
+  border-color: #2b3d44;
+  color: #e6eef0;
+}
+.dark .btn-ghost:hover {
+  background-color: #1b2d34;
+}
+.dark .input {
+  background-color: #0f1d22;
+  border-color: #2b3d44;
+  color: #e6eef0;
+}
+.dark .input::placeholder {
+  color: #6b7c84;
+}
+.dark .label {
+  color: #aab8c0;
+}
+
+/* الخلفيات الشائعة */
+.dark .bg-white {
+  background-color: #13232a;
+}
+.dark .bg-slate-50,
+.dark .bg-slate-50\/60,
+.dark .bg-slate-50\/80 {
+  background-color: #16252b;
+}
+.dark .bg-slate-100 {
+  background-color: #1c2d34;
+}
+.dark .hover\:bg-slate-50:hover {
+  background-color: #18282f;
+}
+.dark .hover\:bg-slate-100:hover {
+  background-color: #1f3037;
+}
+
+/* النصوص الشائعة */
+.dark .text-mushar-dark {
+  color: #e6eef0;
+}
+.dark .text-slate-700 {
+  color: #d6e0e6;
+}
+.dark .text-slate-600 {
+  color: #c3ced6;
+}
+.dark .text-slate-500 {
+  color: #aab8c0;
+}
+.dark .text-slate-400 {
+  color: #8896a0;
+}
+.dark .text-slate-300 {
+  color: #5f6f78;
+}
+
+/* الحدود الشائعة */
+.dark .border-slate-100 {
+  border-color: #233238;
+}
+.dark .border-slate-200 {
+  border-color: #2a3a41;
+}
+
+/* ===== الطباعة (التقرير التنفيذي) — تبقى فاتحة دائمًا ===== */
+@media print {
+  html,
+  body,
+  html.dark,
+  html.dark body {
+    background: #fff !important;
+    color: #0b2f38 !important;
+  }
+  .card,
+  .dark .card {
+    background: #fff !important;
+    border-color: #e2e8f0 !important;
+    box-shadow: none !important;
+  }
+  .dark .text-mushar-dark {
+    color: #0b2f38 !important;
+  }
+  .dark .text-slate-600,
+  .dark .text-slate-500,
+  .dark .text-slate-400 {
+    color: #475569 !important;
+  }
+  .dark .border-slate-100 {
+    border-color: #f1f5f9 !important;
+  }
+  .dark .border-slate-200 {
+    border-color: #e2e8f0 !important;
+  }
+  section {
+    break-inside: avoid;
+  }
+}

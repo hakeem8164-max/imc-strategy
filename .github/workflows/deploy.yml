@@ -1,0 +1,91 @@
+name: Deploy to Vercel
+
+# ينشر المنصة تلقائيًا إلى Vercel عند كل دفعة إلى main.
+# المتطلب الوحيد: إضافة سرّ VERCEL_TOKEN في:
+#   GitHub repo → Settings → Secrets and variables → Actions → New repository secret
+# أنشئ التوكن من: https://vercel.com/account/tokens
+#
+# مفاتيح Supabase أدناه عامة وآمنة للنشر (مفتاح publishable/anon، والحماية عبر RLS).
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: vercel-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      SUPABASE_URL: https://zmdckeemxrtjcbkexfde.supabase.co
+      SUPABASE_ANON_KEY: sb_publishable_K8r0s-2YDAAPWUy1kREAhA_-geZwis4
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+
+      - name: Verify token is set
+        run: |
+          if [ -z "$VERCEL_TOKEN" ]; then
+            echo "::error::سرّ VERCEL_TOKEN غير مضبوط. أضِفه في Settings → Secrets and variables → Actions."
+            exit 1
+          fi
+
+      - name: Create and link Vercel project
+        run: |
+          set -euo pipefail
+          # اسم المشروع يجب أن يكون بأحرف صغيرة
+          vercel project add musharkpi --token "$VERCEL_TOKEN" || true
+          vercel link --yes --project musharkpi --token "$VERCEL_TOKEN"
+
+      - name: Make deployment public (disable protection)
+        continue-on-error: true
+        run: |
+          # معرّفات المشروع/الفريق ثابتة لهذا المشروع
+          PROJECT_ID="prj_XVViMzT855KmBooh2PgRCdbfYeHK"
+          TEAM_ID="team_7URrydLmyX8Dmp6LOJcpg76X"
+          # محاولة قراءة المعرّفات من ربط CLI إن وُجد (أكثر دقة)
+          if [ -f .vercel/project.json ]; then
+            PROJECT_ID=$(python3 -c "import json;print(json.load(open('.vercel/project.json'))['projectId'])")
+            TEAM_ID=$(python3 -c "import json;print(json.load(open('.vercel/project.json'))['orgId'])")
+          fi
+          curl -sS -X PATCH \
+            "https://api.vercel.com/v9/projects/$PROJECT_ID?teamId=$TEAM_ID" \
+            -H "Authorization: Bearer $VERCEL_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{"ssoProtection": null, "passwordProtection": null, "framework": "nextjs"}' \
+            -o /dev/null -w "تعطيل الحماية: HTTP %{http_code}\n" || true
+
+      - name: Deploy to production
+        run: |
+          set -euo pipefail
+          vercel deploy --prod \
+            --token "$VERCEL_TOKEN" \
+            --build-env NEXT_PUBLIC_SUPABASE_URL="$SUPABASE_URL" \
+            --build-env NEXT_PUBLIC_SUPABASE_ANON_KEY="$SUPABASE_ANON_KEY" \
+            --env NEXT_PUBLIC_SUPABASE_URL="$SUPABASE_URL" \
+            --env NEXT_PUBLIC_SUPABASE_ANON_KEY="$SUPABASE_ANON_KEY" \
+            > deploy-output.txt 2> deploy-error.txt || { cat deploy-error.txt; exit 1; }
+          cat deploy-error.txt
+          URL=$(grep -Eo 'https://[a-zA-Z0-9.-]+\.vercel\.app' deploy-output.txt | tail -1)
+          echo "DEPLOY_URL=$URL" >> "$GITHUB_ENV"
+          echo "تم النشر على: $URL"
+
+      - name: Deployment summary
+        run: |
+          echo "### ✅ تم النشر على Vercel" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "رابط الإنتاج: ${DEPLOY_URL:-راجع سجل خطوة النشر}" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "> تذكير: أضِف هذا الرابط في Supabase → Authentication → URL Configuration (Site URL + Redirect URLs)." >> "$GITHUB_STEP_SUMMARY"
