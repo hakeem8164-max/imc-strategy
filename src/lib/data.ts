@@ -601,3 +601,42 @@ export async function getMyInitiatives(userId: string): Promise<KpiInitiative[]>
     .order("due_date", { ascending: true, nullsFirst: false });
   return (data as KpiInitiative[]) ?? [];
 }
+
+// ===== طلبات التغيير =====
+export type ChangeEntity = "objective" | "initiative" | "kpi" | "target";
+export type ChangeAction = "create" | "update" | "delete";
+export type ChangeStatus =
+  | "pending_manager"
+  | "pending_officer"
+  | "pending_executive"
+  | "approved"
+  | "rejected";
+
+export interface ChangeRequest {
+  id: string;
+  entity_type: ChangeEntity;
+  action: ChangeAction;
+  entity_id: string | null;
+  title: string;
+  payload: Record<string, unknown>;
+  status: ChangeStatus;
+  requested_by: string | null;
+  requester_unit_id: string | null;
+  reviewed_by: string | null;
+  review_note: string | null;
+  created_at: string;
+  updated_at: string;
+  requester?: { full_name: string | null } | null;
+  reviewer?: { full_name: string | null } | null;
+}
+
+export async function getChangeRequests(): Promise<ChangeRequest[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("change_requests")
+    .select(
+      "*, requester:profiles!change_requests_requested_by_fkey(full_name), reviewer:profiles!change_requests_reviewed_by_fkey(full_name)"
+    )
+    .order("created_at", { ascending: false });
+  return (data as ChangeRequest[]) ?? [];
+}

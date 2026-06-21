@@ -133,6 +133,7 @@ export default function InitiativesManager({
       if (res.ok) {
         resetForm();
         setShowForm(false);
+        alert("تم رفع طلب إنشاء المبادرة. سيظهر بعد اعتماده النهائي.");
         router.refresh();
       } else setErr(res.error || "خطأ");
     });
@@ -469,7 +470,8 @@ function InitiativeCard({
   }
 
   function remove() {
-    if (confirm(`حذف المبادرة «${i.title}»؟`)) run(() => removeInitiative(i.id));
+    if (confirm(`رفع طلب حذف المبادرة «${i.title}»؟`))
+      run(() => removeInitiative(i.id, i.title));
   }
 
   return (

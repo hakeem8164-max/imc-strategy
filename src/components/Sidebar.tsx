@@ -21,6 +21,7 @@ import {
   ScrollText,
   Landmark,
   Rocket,
+  GitPullRequestArrow,
   ChevronDown,
   X,
   type LucideIcon,
@@ -48,6 +49,12 @@ const PERFORMANCE_NAV: Item[] = [
     label: "المبادرات",
     icon: Rocket,
     roles: ["admin", "executive", "owner"],
+  },
+  {
+    href: "/change-requests",
+    label: "طلبات التغيير",
+    icon: GitPullRequestArrow,
+    roles: ["admin", "executive", "owner", "employee"],
   },
   {
     href: "/performance/review",

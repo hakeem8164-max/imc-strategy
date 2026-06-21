@@ -49,58 +49,38 @@ export async function createInitiative(input: {
       error: `مجموع أوزان المعالم يجب أن يساوي 100% (الحالي ${sum}%).`,
     };
 
-  const { data: created, error } = await supabase
-    .from("kpi_initiatives")
-    .insert({
-      objective_id: input.objective_id,
-      title: input.title.trim(),
-      description: input.description?.trim() || null,
-      owner_unit_id: input.owner_unit_id || null,
-      owner_user_id: input.owner_user_id || null,
-      start_year: input.start_year || null,
-      start_date: input.start_date || null,
-      due_date: input.due_date || null,
-      created_by: user.id,
-    })
-    .select("id")
-    .single();
-  if (error || !created)
-    return {
-      ok: false,
-      error: "تعذّر الحفظ — صلاحية إنشاء المبادرات للمدير/التنفيذي.",
-    };
-
-  const initId = created.id as string;
-
-  const msRows = ms.map((m, idx) => ({
-    initiative_id: initId,
-    title: m.title.trim(),
-    weight: Math.max(0, Math.min(100, Math.round(m.weight || 0))),
-    start_date: m.start_date || null,
-    due_date: m.due_date || null,
-    sort_order: idx + 1,
-  }));
-  const { error: msErr } = await supabase
-    .from("kpi_initiative_milestones")
-    .insert(msRows);
-  if (msErr) {
-    // تراجع: احذف المبادرة حتى لا تبقى ناقصة
-    await supabase.from("kpi_initiatives").delete().eq("id", initId);
-    return { ok: false, error: "تعذّر حفظ المعالم." };
-  }
-
-  const dels = input.deliverables.filter((d) => d.title.trim());
-  if (dels.length) {
-    await supabase.from("kpi_initiative_deliverables").insert(
-      dels.map((d, idx) => ({
-        initiative_id: initId,
-        title: d.title.trim(),
-        sort_order: idx + 1,
-      }))
-    );
-  }
+  // يُرفع كطلب تغيير ويخضع لسلسلة الاعتماد (يُطبَّق فورًا إن كان الرافع الرئيس التنفيذي)
+  const payload = {
+    objective_id: input.objective_id,
+    title: input.title.trim(),
+    description: input.description?.trim() || null,
+    owner_unit_id: input.owner_unit_id || null,
+    owner_user_id: input.owner_user_id || null,
+    start_year: input.start_year || null,
+    start_date: input.start_date || null,
+    due_date: input.due_date || null,
+    milestones: ms.map((m) => ({
+      title: m.title.trim(),
+      weight: Math.max(0, Math.min(100, Math.round(m.weight || 0))),
+      start_date: m.start_date || null,
+      due_date: m.due_date || null,
+    })),
+    deliverables: input.deliverables
+      .filter((d) => d.title.trim())
+      .map((d) => ({ title: d.title.trim() })),
+  };
+  const { error } = await supabase.rpc("submit_change_request", {
+    p_entity_type: "initiative",
+    p_action: "create",
+    p_entity_id: null,
+    p_title: `إنشاء مبادرة: ${input.title.trim()}`,
+    p_payload: payload,
+  });
+  if (error)
+    return { ok: false, error: "تعذّر رفع الطلب — تأكد من صلاحيتك." };
 
   revalidatePath("/initiatives");
+  revalidatePath("/change-requests");
   revalidatePath("/");
   return { ok: true };
 }
@@ -138,15 +118,22 @@ export async function setInitiativeStatus(
   return { ok: true };
 }
 
-export async function removeInitiative(id: string): Promise<Result> {
+export async function removeInitiative(
+  id: string,
+  title?: string
+): Promise<Result> {
   const { supabase, user } = await uid();
   if (!user) return { ok: false, error: "غير مصرّح" };
-  const { error } = await supabase
-    .from("kpi_initiatives")
-    .delete()
-    .eq("id", id);
-  if (error) return { ok: false, error: "تعذّر الحذف" };
+  const { error } = await supabase.rpc("submit_change_request", {
+    p_entity_type: "initiative",
+    p_action: "delete",
+    p_entity_id: id,
+    p_title: `حذف مبادرة${title ? `: ${title}` : ""}`,
+    p_payload: {},
+  });
+  if (error) return { ok: false, error: "تعذّر رفع الطلب" };
   revalidatePath("/initiatives");
+  revalidatePath("/change-requests");
   return { ok: true };
 }
 
