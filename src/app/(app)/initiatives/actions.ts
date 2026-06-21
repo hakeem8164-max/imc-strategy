@@ -14,11 +14,14 @@ async function uid() {
   return { supabase, user };
 }
 
+// ===== المبادرة =====
 export async function createInitiative(input: {
   objective_id: string;
   title: string;
   description: string | null;
+  owner_unit_id: string | null;
   owner_user_id: string | null;
+  start_year: number | null;
   start_date: string | null;
   due_date: string | null;
 }): Promise<Result> {
@@ -31,7 +34,9 @@ export async function createInitiative(input: {
     objective_id: input.objective_id,
     title: input.title.trim(),
     description: input.description?.trim() || null,
+    owner_unit_id: input.owner_unit_id || null,
     owner_user_id: input.owner_user_id || null,
+    start_year: input.start_year || null,
     start_date: input.start_date || null,
     due_date: input.due_date || null,
     created_by: user.id,
@@ -48,18 +53,31 @@ export async function createInitiative(input: {
 
 export async function setInitiativeStatus(
   id: string,
-  status: InitiativeStatus,
-  progress?: number
+  status: InitiativeStatus
 ): Promise<Result> {
   const { supabase, user } = await uid();
   if (!user) return { ok: false, error: "غير مصرّح" };
-  const upd: Record<string, unknown> = { status };
-  if (progress != null)
-    upd.progress = Math.max(0, Math.min(100, Math.round(progress)));
-  else if (status === "done") upd.progress = 100;
+
+  // شرط الانتقال للتنفيذ/الإكمال: 5 معالم على الأقل ومجموع أوزانها 100%
+  if (status === "in_progress" || status === "done") {
+    const { data: ms } = await supabase
+      .from("kpi_initiative_milestones")
+      .select("weight")
+      .eq("initiative_id", id);
+    const list = (ms as { weight: number }[]) ?? [];
+    if (list.length < 5)
+      return { ok: false, error: "يلزم 5 معالم على الأقل قبل بدء التنفيذ." };
+    const sum = list.reduce((a, m) => a + (m.weight ?? 0), 0);
+    if (sum !== 100)
+      return {
+        ok: false,
+        error: `مجموع أوزان المعالم يجب أن يساوي 100% (الحالي ${sum}%).`,
+      };
+  }
+
   const { error } = await supabase
     .from("kpi_initiatives")
-    .update(upd)
+    .update({ status })
     .eq("id", id);
   if (error) return { ok: false, error: "تعذّر التحديث" };
   revalidatePath("/initiatives");
@@ -71,6 +89,105 @@ export async function removeInitiative(id: string): Promise<Result> {
   if (!user) return { ok: false, error: "غير مصرّح" };
   const { error } = await supabase
     .from("kpi_initiatives")
+    .delete()
+    .eq("id", id);
+  if (error) return { ok: false, error: "تعذّر الحذف" };
+  revalidatePath("/initiatives");
+  return { ok: true };
+}
+
+// ===== المعالم =====
+export async function addMilestone(input: {
+  initiative_id: string;
+  title: string;
+  weight: number;
+  start_date: string | null;
+  due_date: string | null;
+  sort_order: number;
+}): Promise<Result> {
+  const { supabase, user } = await uid();
+  if (!user) return { ok: false, error: "غير مصرّح" };
+  if (!input.title.trim()) return { ok: false, error: "اكتب عنوان المعلَم" };
+  const weight = Math.max(0, Math.min(100, Math.round(input.weight || 0)));
+  const { error } = await supabase.from("kpi_initiative_milestones").insert({
+    initiative_id: input.initiative_id,
+    title: input.title.trim(),
+    weight,
+    start_date: input.start_date || null,
+    due_date: input.due_date || null,
+    sort_order: input.sort_order,
+  });
+  if (error) return { ok: false, error: "تعذّر إضافة المعلَم" };
+  revalidatePath("/initiatives");
+  return { ok: true };
+}
+
+export async function toggleMilestone(
+  id: string,
+  done: boolean
+): Promise<Result> {
+  const { supabase, user } = await uid();
+  if (!user) return { ok: false, error: "غير مصرّح" };
+  const { error } = await supabase
+    .from("kpi_initiative_milestones")
+    .update({ done })
+    .eq("id", id);
+  if (error) return { ok: false, error: "تعذّر التحديث" };
+  revalidatePath("/initiatives");
+  return { ok: true };
+}
+
+export async function deleteMilestone(id: string): Promise<Result> {
+  const { supabase, user } = await uid();
+  if (!user) return { ok: false, error: "غير مصرّح" };
+  const { error } = await supabase
+    .from("kpi_initiative_milestones")
+    .delete()
+    .eq("id", id);
+  if (error) return { ok: false, error: "تعذّر الحذف" };
+  revalidatePath("/initiatives");
+  return { ok: true };
+}
+
+// ===== المخرجات =====
+export async function addDeliverable(input: {
+  initiative_id: string;
+  title: string;
+  sort_order: number;
+}): Promise<Result> {
+  const { supabase, user } = await uid();
+  if (!user) return { ok: false, error: "غير مصرّح" };
+  if (!input.title.trim()) return { ok: false, error: "اكتب المخرج" };
+  const { error } = await supabase.from("kpi_initiative_deliverables").insert({
+    initiative_id: input.initiative_id,
+    title: input.title.trim(),
+    sort_order: input.sort_order,
+  });
+  if (error) return { ok: false, error: "تعذّر إضافة المخرج" };
+  revalidatePath("/initiatives");
+  return { ok: true };
+}
+
+export async function toggleDeliverable(
+  id: string,
+  done: boolean
+): Promise<Result> {
+  const { supabase, user } = await uid();
+  if (!user) return { ok: false, error: "غير مصرّح" };
+  const { error } = await supabase
+    .from("kpi_initiative_deliverables")
+    .update({ done })
+    .eq("id", id);
+  if (error) return { ok: false, error: "تعذّر التحديث" };
+  revalidatePath("/initiatives");
+  return { ok: true };
+}
+
+export async function deleteDeliverable(id: string): Promise<Result> {
+  const { supabase, user } = await uid();
+  if (!user) return { ok: false, error: "غير مصرّح" };
+  const { error } = await supabase
+    .from("kpi_initiative_deliverables")
     .delete()
     .eq("id", id);
   if (error) return { ok: false, error: "تعذّر الحذف" };

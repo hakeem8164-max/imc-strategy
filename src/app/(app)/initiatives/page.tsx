@@ -6,16 +6,18 @@ import {
   getAllObjectives,
   getAllInitiatives,
   getUsers,
+  getOrgUnits,
 } from "@/lib/data";
 
 export default async function InitiativesPage() {
   const profile = await getProfile();
   if (!profile) redirect("/login");
 
-  const [objectives, initiatives, users] = await Promise.all([
+  const [objectives, initiatives, users, orgUnits] = await Promise.all([
     getAllObjectives(),
     getAllInitiatives(),
     getUsers(),
+    getOrgUnits(),
   ]);
 
   const canManage =
@@ -35,6 +37,7 @@ export default async function InitiativesPage() {
         <InitiativesManager
           objectives={objectives}
           users={users}
+          orgUnits={orgUnits}
           initiatives={initiatives}
           canManage={canManage}
         />

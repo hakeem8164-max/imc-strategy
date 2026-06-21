@@ -502,7 +502,18 @@ export interface KpiMilestone {
   initiative_id: string;
   title: string;
   done: boolean;
+  weight: number;
+  start_date: string | null;
   due_date: string | null;
+  sort_order: number;
+  created_at: string;
+}
+
+export interface KpiDeliverable {
+  id: string;
+  initiative_id: string;
+  title: string;
+  done: boolean;
   sort_order: number;
   created_at: string;
 }
@@ -514,6 +525,8 @@ export interface KpiInitiative {
   title: string;
   description: string | null;
   owner_user_id: string | null;
+  owner_unit_id: string | null;
+  start_year: number | null;
   status: InitiativeStatus;
   progress: number;
   start_date: string | null;
@@ -521,7 +534,9 @@ export interface KpiInitiative {
   created_by: string | null;
   created_at: string;
   owner?: { full_name: string | null } | null;
+  owner_unit?: { id: string; name: string } | null;
   milestones?: KpiMilestone[];
+  deliverables?: KpiDeliverable[];
   kpi?: { id: string; name: string } | null;
   objective?: { id: string; name: string; code: string | null } | null;
 }
@@ -532,10 +547,16 @@ export async function getAllInitiatives(): Promise<KpiInitiative[]> {
   const { data } = await supabase
     .from("kpi_initiatives")
     .select(
-      "*, owner:profiles!kpi_initiatives_owner_user_id_fkey(full_name), kpi:kpis(id,name), objective:objectives(id,name,code)"
+      "*, owner:profiles!kpi_initiatives_owner_user_id_fkey(full_name), owner_unit:org_units(id,name), kpi:kpis(id,name), objective:objectives(id,name,code), milestones:kpi_initiative_milestones(*), deliverables:kpi_initiative_deliverables(*)"
     )
     .order("created_at", { ascending: false });
-  return (data as KpiInitiative[]) ?? [];
+  const list = (data as KpiInitiative[]) ?? [];
+  for (const i of list) {
+    if (i.milestones) i.milestones.sort((a, b) => a.sort_order - b.sort_order);
+    if (i.deliverables)
+      i.deliverables.sort((a, b) => a.sort_order - b.sort_order);
+  }
+  return list;
 }
 
 export async function getInitiativesForKpi(
