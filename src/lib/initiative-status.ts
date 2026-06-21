@@ -8,7 +8,7 @@ export type AutoStatus =
 
 export const AUTO_STATUS: Record<AutoStatus, { label: string; color: string }> = {
   not_started: { label: "لم يبدأ", color: "#94A3B8" },
-  in_progress: { label: "قيد التنفيذ", color: "#16A34A" },
+  in_progress: { label: "وفق المخطط", color: "#16A34A" },
   late: { label: "متأخر", color: "#EAB308" },
   stalled: { label: "متعثر", color: "#DC2626" },
   done: { label: "منجز", color: "#0D9488" },
