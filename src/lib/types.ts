@@ -8,6 +8,7 @@ export interface Dimension {
   slug: string;
   color: string;
   sort_order: number;
+  in_plan: boolean;
 }
 
 // الهدف الاستراتيجي: يندرج تحت المنظور (Dimension) وتندرج تحته المؤشرات

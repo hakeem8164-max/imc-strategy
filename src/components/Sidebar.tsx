@@ -19,6 +19,7 @@ import {
   Users,
   KeyRound,
   ScrollText,
+  Landmark,
   ChevronDown,
   X,
   type LucideIcon,
@@ -30,6 +31,7 @@ type Item = { href: string; label: string; icon: LucideIcon; roles?: Role[] };
 const NAV: Item[] = [
   { href: "/", label: "لوحة الأداء التنفيذية", icon: LayoutDashboard },
   { href: "/kpis", label: "لوحة الأداء التفصيلية", icon: ClipboardList },
+  { href: "/awqaf", label: "أهداف الوقفين", icon: Landmark },
   {
     href: "/my-tasks",
     label: "مهامّي",

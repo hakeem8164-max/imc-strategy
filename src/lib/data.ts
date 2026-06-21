@@ -83,7 +83,19 @@ export async function getProfile(): Promise<Profile | null> {
   return (data as Profile) ?? null;
 }
 
+/** مناظير الخطة فقط (تُستثنى المناظير المستقلة مثل أهداف الوقفين) */
 export async function getDimensions(): Promise<Dimension[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("dimensions")
+    .select("*")
+    .eq("in_plan", true)
+    .order("sort_order");
+  return (data as Dimension[]) ?? [];
+}
+
+/** كل المناظير بما فيها المستقلة (للإدارة) */
+export async function getAllDimensions(): Promise<Dimension[]> {
   const supabase = await createClient();
   const { data } = await supabase
     .from("dimensions")
@@ -92,8 +104,20 @@ export async function getDimensions(): Promise<Dimension[]> {
   return (data as Dimension[]) ?? [];
 }
 
-/** الأهداف الاستراتيجية مع منظورها */
+/** أهداف الخطة فقط مع منظورها */
 export async function getObjectives(): Promise<Objective[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("objectives")
+    .select("*, dimension:dimensions(*)")
+    .order("sort_order");
+  return ((data as Objective[]) ?? []).filter(
+    (o) => o.dimension?.in_plan !== false
+  );
+}
+
+/** كل الأهداف بما فيها المستقلة (للإدارة) */
+export async function getAllObjectives(): Promise<Objective[]> {
   const supabase = await createClient();
   const { data } = await supabase
     .from("objectives")
@@ -102,6 +126,39 @@ export async function getObjectives(): Promise<Objective[]> {
   return (data as Objective[]) ?? [];
 }
 
+// ===== أهداف الوقفين (منظور مستقل خارج الخطة) =====
+export async function getEndowmentDimension(): Promise<Dimension | null> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("dimensions")
+    .select("*")
+    .eq("slug", "awqaf")
+    .maybeSingle();
+  return (data as Dimension) ?? null;
+}
+
+export async function getEndowmentObjectives(): Promise<Objective[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("objectives")
+    .select("*, dimension:dimensions(*)")
+    .order("sort_order");
+  return ((data as Objective[]) ?? []).filter(
+    (o) => o.dimension?.in_plan === false
+  );
+}
+
+export async function getEndowmentKpis(): Promise<Kpi[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("kpis")
+    .select("*, dimension:dimensions(*), objective:objectives(*), owner_unit:org_units(*)")
+    .eq("is_active", true)
+    .order("sort_order");
+  return ((data as Kpi[]) ?? []).filter((k) => k.dimension?.in_plan === false);
+}
+
+/** مؤشرات الخطة النشطة فقط (تُستثنى المؤشرات المستقلة مثل أهداف الوقفين) */
 export async function getKpis(): Promise<Kpi[]> {
   const supabase = await createClient();
   const { data } = await supabase
@@ -109,7 +166,7 @@ export async function getKpis(): Promise<Kpi[]> {
     .select("*, dimension:dimensions(*), objective:objectives(*), owner_unit:org_units(*)")
     .eq("is_active", true)
     .order("sort_order");
-  return (data as Kpi[]) ?? [];
+  return ((data as Kpi[]) ?? []).filter((k) => k.dimension?.in_plan !== false);
 }
 
 export async function getAllKpis(): Promise<Kpi[]> {

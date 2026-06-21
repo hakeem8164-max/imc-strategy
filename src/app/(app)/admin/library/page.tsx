@@ -3,8 +3,8 @@ import Header from "@/components/Header";
 import KpiLibrary from "@/components/KpiLibrary";
 import {
   getProfile,
-  getDimensions,
-  getObjectives,
+  getAllDimensions,
+  getAllObjectives,
   getAllKpis,
   getOrgUnits,
 } from "@/lib/data";
@@ -15,8 +15,8 @@ export default async function LibraryPage() {
   if (profile.role !== "admin") redirect("/");
 
   const [dimensions, objectives, kpis, orgUnits] = await Promise.all([
-    getDimensions(),
-    getObjectives(),
+    getAllDimensions(),
+    getAllObjectives(),
     getAllKpis(),
     getOrgUnits(),
   ]);
