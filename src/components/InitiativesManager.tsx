@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
   Plus,
@@ -14,7 +14,6 @@ import {
 } from "lucide-react";
 import {
   createInitiative,
-  setInitiativeStatus,
   removeInitiative,
   addMilestone,
   toggleMilestone,
@@ -24,16 +23,33 @@ import {
   deleteDeliverable,
 } from "@/app/(app)/initiatives/actions";
 import type { Objective, Profile, OrgUnit } from "@/lib/types";
-import type { KpiInitiative, InitiativeStatus } from "@/lib/data";
-
-const STATUS: Record<InitiativeStatus, { label: string; color: string }> = {
-  planned: { label: "مخطّطة", color: "#64748b" },
-  in_progress: { label: "قيد التنفيذ", color: "#2563eb" },
-  done: { label: "مكتملة", color: "#16a34a" },
-  cancelled: { label: "ملغاة", color: "#A11249" },
-};
+import type { KpiInitiative } from "@/lib/data";
+import { computeAutoStatus, AUTO_STATUS } from "@/lib/initiative-status";
 
 const YEARS = Array.from({ length: 11 }, (_, i) => 2025 + i);
+
+type MsRow = { title: string; weight: string; start: string; due: string };
+type DelRow = { title: string };
+
+function StatusBadge({
+  done,
+  start_date,
+  due_date,
+}: {
+  done: boolean;
+  start_date: string | null;
+  due_date: string | null;
+}) {
+  const s = AUTO_STATUS[computeAutoStatus({ done, start_date, due_date })];
+  return (
+    <span
+      className="shrink-0 rounded-md px-2 py-0.5 text-[11px] font-bold"
+      style={{ backgroundColor: `${s.color}1a`, color: s.color }}
+    >
+      {s.label}
+    </span>
+  );
+}
 
 export default function InitiativesManager({
   objectives,
@@ -61,6 +77,18 @@ export default function InitiativesManager({
   const [startYear, setStartYear] = useState("");
   const [start, setStart] = useState("");
   const [due, setDue] = useState("");
+  const [ms, setMs] = useState<MsRow[]>(
+    Array.from({ length: 5 }, () => ({ title: "", weight: "", start: "", due: "" }))
+  );
+  const [dels, setDels] = useState<DelRow[]>([{ title: "" }, { title: "" }]);
+
+  const filledMs = ms.filter((m) => m.title.trim());
+  const weightSum = filledMs.reduce((a, m) => a + (Number(m.weight) || 0), 0);
+  const valid =
+    !!objectiveId &&
+    !!title.trim() &&
+    filledMs.length >= 5 &&
+    weightSum === 100;
 
   function resetForm() {
     setObjectiveId("");
@@ -71,7 +99,13 @@ export default function InitiativesManager({
     setStartYear("");
     setStart("");
     setDue("");
+    setMs(Array.from({ length: 5 }, () => ({ title: "", weight: "", start: "", due: "" })));
+    setDels([{ title: "" }, { title: "" }]);
     setErr(null);
+  }
+
+  function updateMs(idx: number, patch: Partial<MsRow>) {
+    setMs((s) => s.map((m, i) => (i === idx ? { ...m, ...patch } : m)));
   }
 
   function save() {
@@ -86,6 +120,13 @@ export default function InitiativesManager({
         start_year: startYear ? Number(startYear) : null,
         start_date: start || null,
         due_date: due || null,
+        milestones: filledMs.map((m) => ({
+          title: m.title,
+          weight: Number(m.weight) || 0,
+          start_date: m.start || null,
+          due_date: m.due || null,
+        })),
+        deliverables: dels.filter((d) => d.title.trim()),
       });
       if (res.ok) {
         resetForm();
@@ -142,7 +183,7 @@ export default function InitiativesManager({
             <div className="sm:col-span-2">
               <label className="label">الوصف</label>
               <textarea
-                className="input min-h-[70px]"
+                className="input min-h-[60px]"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
               />
@@ -214,10 +255,130 @@ export default function InitiativesManager({
             </div>
           </div>
 
+          {/* المعالم */}
+          <div className="rounded-xl border border-slate-200 p-3">
+            <div className="mb-2 flex flex-wrap items-center gap-2">
+              <Flag size={15} className="text-mushar-primary" />
+              <h4 className="text-sm font-bold text-mushar-dark">
+                المعالم (5 على الأقل)
+              </h4>
+              <span
+                className={`rounded-md px-2 py-0.5 text-[11px] font-semibold ${
+                  filledMs.length >= 5 && weightSum === 100
+                    ? "bg-emerald-50 text-emerald-700"
+                    : "bg-amber-50 text-amber-700"
+                }`}
+              >
+                {filledMs.length} معلَم · مجموع الأوزان {weightSum}%
+              </span>
+            </div>
+            <div className="space-y-2">
+              {ms.map((m, idx) => (
+                <div
+                  key={idx}
+                  className="grid grid-cols-2 gap-2 sm:grid-cols-[1fr_80px_130px_130px_auto]"
+                >
+                  <input
+                    className="input py-1.5 text-xs"
+                    placeholder={`المعلَم ${idx + 1}`}
+                    value={m.title}
+                    onChange={(e) => updateMs(idx, { title: e.target.value })}
+                  />
+                  <input
+                    type="number"
+                    min={0}
+                    max={100}
+                    className="input py-1.5 text-xs"
+                    placeholder="الوزن %"
+                    value={m.weight}
+                    onChange={(e) => updateMs(idx, { weight: e.target.value })}
+                  />
+                  <input
+                    type="date"
+                    className="input py-1.5 text-xs"
+                    title="تاريخ البداية"
+                    value={m.start}
+                    onChange={(e) => updateMs(idx, { start: e.target.value })}
+                  />
+                  <input
+                    type="date"
+                    className="input py-1.5 text-xs"
+                    title="تاريخ النهاية"
+                    value={m.due}
+                    onChange={(e) => updateMs(idx, { due: e.target.value })}
+                  />
+                  <button
+                    onClick={() => setMs((s) => s.filter((_, i) => i !== idx))}
+                    className="rounded-lg px-2 text-xs text-mushar-accent hover:bg-mushar-accent/10"
+                    title="حذف الصف"
+                    disabled={ms.length <= 1}
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={() =>
+                setMs((s) => [...s, { title: "", weight: "", start: "", due: "" }])
+              }
+              className="btn-ghost mt-2 py-1.5 text-xs"
+            >
+              + صف معلَم
+            </button>
+          </div>
+
+          {/* المخرجات */}
+          <div className="rounded-xl border border-slate-200 p-3">
+            <div className="mb-2 flex items-center gap-2">
+              <PackageCheck size={15} className="text-mushar-primary" />
+              <h4 className="text-sm font-bold text-mushar-dark">
+                المخرجات (كل مخرج على حدة)
+              </h4>
+            </div>
+            <div className="space-y-2">
+              {dels.map((d, idx) => (
+                <div key={idx} className="flex gap-2">
+                  <input
+                    className="input py-1.5 text-xs"
+                    placeholder={`المخرج ${idx + 1}`}
+                    value={d.title}
+                    onChange={(e) =>
+                      setDels((s) =>
+                        s.map((x, i) =>
+                          i === idx ? { title: e.target.value } : x
+                        )
+                      )
+                    }
+                  />
+                  <button
+                    onClick={() => setDels((s) => s.filter((_, i) => i !== idx))}
+                    className="rounded-lg px-2 text-xs text-mushar-accent hover:bg-mushar-accent/10"
+                    disabled={dels.length <= 1}
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={() => setDels((s) => [...s, { title: "" }])}
+              className="btn-ghost mt-2 py-1.5 text-xs"
+            >
+              + مخرج
+            </button>
+          </div>
+
           {err && (
             <div className="rounded-lg bg-mushar-accent/10 px-3 py-2.5 text-sm text-mushar-accent">
               {err}
             </div>
+          )}
+          {!valid && (
+            <p className="text-[11px] text-amber-700">
+              للحفظ: اختر الهدف، اكتب العنوان، وأدخل 5 معالم على الأقل بمجموع
+              أوزان 100%.
+            </p>
           )}
 
           <div className="flex justify-end gap-2">
@@ -230,7 +391,11 @@ export default function InitiativesManager({
             >
               إلغاء
             </button>
-            <button onClick={save} disabled={pending} className="btn-primary">
+            <button
+              onClick={save}
+              disabled={pending || !valid}
+              className="btn-primary disabled:opacity-50"
+            >
               {pending ? "جارٍ الحفظ…" : "حفظ المبادرة"}
             </button>
           </div>
@@ -270,7 +435,6 @@ function InitiativeCard({
   const [, startTransition] = useTransition();
   const [open, setOpen] = useState(false);
 
-  const st = STATUS[i.status];
   const obj = i.objective;
   const milestones = i.milestones ?? [];
   const deliverables = i.deliverables ?? [];
@@ -279,8 +443,14 @@ function InitiativeCard({
   const doneWeight = milestones
     .filter((m) => m.done)
     .reduce((a, m) => a + (m.weight ?? 0), 0);
-  const milestonesValid = milestones.length >= 5 && totalWeight === 100;
+  const allDone = milestones.length > 0 && milestones.every((m) => m.done);
   const delDone = deliverables.filter((d) => d.done).length;
+
+  // تواريخ المبادرة الفعلية (المُدخلة أو المشتقّة من المعالم)
+  const msStarts = milestones.map((m) => m.start_date).filter(Boolean) as string[];
+  const msDues = milestones.map((m) => m.due_date).filter(Boolean) as string[];
+  const effStart = i.start_date ?? msStarts.sort()[0] ?? null;
+  const effDue = i.due_date ?? msDues.sort().slice(-1)[0] ?? null;
 
   const managerName =
     i.owner?.full_name ??
@@ -294,10 +464,6 @@ function InitiativeCard({
       if (res.ok) router.refresh();
       else alert(res.error);
     });
-  }
-
-  function changeStatus(status: InitiativeStatus) {
-    run(() => setInitiativeStatus(i.id, status));
   }
 
   function remove() {
@@ -314,12 +480,11 @@ function InitiativeCard({
             {obj.name}
           </span>
         )}
-        <span
-          className="shrink-0 rounded-md px-2 py-0.5 text-[11px] font-bold"
-          style={{ backgroundColor: `${st.color}1a`, color: st.color }}
-        >
-          {st.label}
-        </span>
+        <StatusBadge
+          done={allDone || doneWeight === 100}
+          start_date={effStart}
+          due_date={effDue}
+        />
       </div>
 
       <h3 className="text-sm font-bold leading-relaxed text-mushar-dark">
@@ -341,10 +506,9 @@ function InitiativeCard({
         <span className="inline-flex items-center gap-1">
           <User size={12} /> {managerName ?? "—"}
         </span>
-        {i.due_date && <span>الاستحقاق: {i.due_date}</span>}
+        {effDue && <span>الاستحقاق: {effDue}</span>}
       </div>
 
-      {/* الإنجاز الموزون حسب المعالم */}
       <div>
         <div className="mb-1 flex justify-between text-[11px] text-slate-400">
           <span>الإنجاز (حسب أوزان المعالم)</span>
@@ -352,22 +516,15 @@ function InitiativeCard({
         </div>
         <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
           <div
-            className="h-full rounded-full"
-            style={{ width: `${Math.min(doneWeight, 100)}%`, backgroundColor: st.color }}
+            className="h-full rounded-full bg-mushar-primary"
+            style={{ width: `${Math.min(doneWeight, 100)}%` }}
           />
         </div>
       </div>
 
-      {/* ملخص + للمزيد */}
       <div className="flex flex-wrap items-center gap-2 text-[11px]">
-        <span
-          className={`rounded-md px-2 py-0.5 font-semibold ${
-            milestonesValid
-              ? "bg-emerald-50 text-emerald-700"
-              : "bg-amber-50 text-amber-700"
-          }`}
-        >
-          المعالم: {milestones.length}/5 · الأوزان {totalWeight}%
+        <span className="rounded-md bg-slate-50 px-2 py-0.5 font-semibold text-slate-600">
+          المعالم: {milestones.length} · الأوزان {totalWeight}%
         </span>
         <span className="inline-flex items-center gap-1 rounded-md bg-slate-50 px-2 py-0.5 font-semibold text-slate-600">
           <PackageCheck size={12} /> المخرجات: {delDone}/{deliverables.length}
@@ -389,7 +546,6 @@ function InitiativeCard({
           <MilestonesSection
             initiativeId={i.id}
             milestones={milestones}
-            totalWeight={totalWeight}
             canManage={canManage}
             onChange={() => router.refresh()}
           />
@@ -403,24 +559,12 @@ function InitiativeCard({
       )}
 
       {canManage && (
-        <div className="flex items-center justify-between gap-2 border-t border-slate-100 pt-3">
-          <select
-            className="input py-1.5 text-xs"
-            value={i.status}
-            onChange={(e) => changeStatus(e.target.value as InitiativeStatus)}
-          >
-            {(Object.keys(STATUS) as InitiativeStatus[]).map((s) => (
-              <option key={s} value={s}>
-                {STATUS[s].label}
-              </option>
-            ))}
-          </select>
+        <div className="flex justify-end border-t border-slate-100 pt-3">
           <button
             onClick={remove}
-            className="rounded-lg px-2 py-1.5 text-xs font-semibold text-mushar-accent hover:bg-mushar-accent/10"
-            title="حذف المبادرة"
+            className="inline-flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-semibold text-mushar-accent hover:bg-mushar-accent/10"
           >
-            <Trash2 size={15} />
+            <Trash2 size={14} /> حذف المبادرة
           </button>
         </div>
       )}
@@ -431,13 +575,11 @@ function InitiativeCard({
 function MilestonesSection({
   initiativeId,
   milestones,
-  totalWeight,
   canManage,
   onChange,
 }: {
   initiativeId: string;
-  milestones: KpiInitiative["milestones"];
-  totalWeight: number;
+  milestones: NonNullable<KpiInitiative["milestones"]>;
   canManage: boolean;
   onChange: () => void;
 }) {
@@ -446,7 +588,6 @@ function MilestonesSection({
   const [weight, setWeight] = useState("");
   const [start, setStart] = useState("");
   const [due, setDue] = useState("");
-  const list = milestones ?? [];
 
   function add() {
     if (!title.trim()) return;
@@ -457,7 +598,7 @@ function MilestonesSection({
         weight: weight ? Number(weight) : 0,
         start_date: start || null,
         due_date: due || null,
-        sort_order: list.length + 1,
+        sort_order: milestones.length + 1,
       });
       if (res.ok) {
         setTitle("");
@@ -469,17 +610,9 @@ function MilestonesSection({
     });
   }
 
-  function toggle(id: string, done: boolean) {
+  function act(fn: () => Promise<{ ok: boolean; error?: string }>) {
     startTransition(async () => {
-      const res = await toggleMilestone(id, done);
-      if (res.ok) onChange();
-      else alert(res.error);
-    });
-  }
-
-  function remove(id: string) {
-    startTransition(async () => {
-      const res = await deleteMilestone(id);
+      const res = await fn();
       if (res.ok) onChange();
       else alert(res.error);
     });
@@ -490,21 +623,9 @@ function MilestonesSection({
       <div className="mb-2 flex items-center gap-2">
         <Flag size={14} className="text-mushar-primary" />
         <h4 className="text-sm font-bold text-mushar-dark">المعالم</h4>
-        <span
-          className={`rounded-md px-2 py-0.5 text-[11px] font-semibold ${
-            list.length >= 5 && totalWeight === 100
-              ? "bg-emerald-50 text-emerald-700"
-              : "bg-amber-50 text-amber-700"
-          }`}
-        >
-          {list.length} معلَم · مجموع الأوزان {totalWeight}%
-          {list.length < 5 ? " · الحد الأدنى 5" : ""}
-          {totalWeight !== 100 ? " · يجب 100%" : ""}
-        </span>
       </div>
-
       <div className="space-y-1.5">
-        {list.map((m) => (
+        {milestones.map((m) => (
           <div
             key={m.id}
             className="flex flex-wrap items-center gap-2 rounded-lg bg-slate-50 px-3 py-2 text-xs"
@@ -513,7 +634,7 @@ function MilestonesSection({
               type="checkbox"
               checked={m.done}
               disabled={!canManage}
-              onChange={(e) => toggle(m.id, e.target.checked)}
+              onChange={(e) => act(() => toggleMilestone(m.id, e.target.checked))}
               className="h-4 w-4 accent-mushar-primary"
             />
             <span
@@ -526,12 +647,17 @@ function MilestonesSection({
             <span className="rounded bg-white px-1.5 py-0.5 font-bold text-mushar-primary">
               {m.weight}%
             </span>
+            <StatusBadge
+              done={m.done}
+              start_date={m.start_date}
+              due_date={m.due_date}
+            />
             <span className="text-slate-400">
               {m.start_date ?? "؟"} → {m.due_date ?? "؟"}
             </span>
             {canManage && (
               <button
-                onClick={() => remove(m.id)}
+                onClick={() => act(() => deleteMilestone(m.id))}
                 className="mr-auto text-mushar-accent hover:underline"
               >
                 حذف
@@ -539,8 +665,8 @@ function MilestonesSection({
             )}
           </div>
         ))}
-        {list.length === 0 && (
-          <p className="text-xs text-slate-400">لا معالم بعد.</p>
+        {milestones.length === 0 && (
+          <p className="text-xs text-slate-400">لا معالم.</p>
         )}
       </div>
 
@@ -564,14 +690,12 @@ function MilestonesSection({
           <input
             type="date"
             className="input py-1.5 text-xs"
-            title="تاريخ البداية"
             value={start}
             onChange={(e) => setStart(e.target.value)}
           />
           <input
             type="date"
             className="input py-1.5 text-xs"
-            title="تاريخ النهاية"
             value={due}
             onChange={(e) => setDue(e.target.value)}
           />
@@ -594,42 +718,31 @@ function DeliverablesSection({
   onChange,
 }: {
   initiativeId: string;
-  deliverables: KpiInitiative["deliverables"];
+  deliverables: NonNullable<KpiInitiative["deliverables"]>;
   canManage: boolean;
   onChange: () => void;
 }) {
   const [, startTransition] = useTransition();
   const [title, setTitle] = useState("");
-  const list = deliverables ?? [];
+
+  function act(fn: () => Promise<{ ok: boolean; error?: string }>) {
+    startTransition(async () => {
+      const res = await fn();
+      if (res.ok) onChange();
+      else alert(res.error);
+    });
+  }
 
   function add() {
     if (!title.trim()) return;
-    startTransition(async () => {
+    act(async () => {
       const res = await addDeliverable({
         initiative_id: initiativeId,
         title,
-        sort_order: list.length + 1,
+        sort_order: deliverables.length + 1,
       });
-      if (res.ok) {
-        setTitle("");
-        onChange();
-      } else alert(res.error);
-    });
-  }
-
-  function toggle(id: string, done: boolean) {
-    startTransition(async () => {
-      const res = await toggleDeliverable(id, done);
-      if (res.ok) onChange();
-      else alert(res.error);
-    });
-  }
-
-  function remove(id: string) {
-    startTransition(async () => {
-      const res = await deleteDeliverable(id);
-      if (res.ok) onChange();
-      else alert(res.error);
+      if (res.ok) setTitle("");
+      return res;
     });
   }
 
@@ -639,12 +752,12 @@ function DeliverablesSection({
         <PackageCheck size={14} className="text-mushar-primary" />
         <h4 className="text-sm font-bold text-mushar-dark">المخرجات</h4>
         <span className="text-[11px] text-slate-400">
-          المنجز {list.filter((d) => d.done).length} من {list.length}
+          المنجز {deliverables.filter((d) => d.done).length} من{" "}
+          {deliverables.length}
         </span>
       </div>
-
       <div className="space-y-1.5">
-        {list.map((d) => (
+        {deliverables.map((d) => (
           <div
             key={d.id}
             className="flex items-center gap-2 rounded-lg bg-slate-50 px-3 py-2 text-xs"
@@ -653,21 +766,19 @@ function DeliverablesSection({
               type="checkbox"
               checked={d.done}
               disabled={!canManage}
-              onChange={(e) => toggle(d.id, e.target.checked)}
+              onChange={(e) => act(() => toggleDeliverable(d.id, e.target.checked))}
               className="h-4 w-4 accent-emerald-600"
             />
             <span
               className={`font-medium ${
-                d.done
-                  ? "text-emerald-700 line-through"
-                  : "text-mushar-dark"
+                d.done ? "text-emerald-700 line-through" : "text-mushar-dark"
               }`}
             >
               {d.title}
             </span>
             {canManage && (
               <button
-                onClick={() => remove(d.id)}
+                onClick={() => act(() => deleteDeliverable(d.id))}
                 className="mr-auto text-mushar-accent hover:underline"
               >
                 حذف
@@ -675,8 +786,8 @@ function DeliverablesSection({
             )}
           </div>
         ))}
-        {list.length === 0 && (
-          <p className="text-xs text-slate-400">لا مخرجات بعد.</p>
+        {deliverables.length === 0 && (
+          <p className="text-xs text-slate-400">لا مخرجات.</p>
         )}
       </div>
 
@@ -684,7 +795,7 @@ function DeliverablesSection({
         <div className="mt-2 flex gap-2">
           <input
             className="input py-1.5 text-xs"
-            placeholder="أضف مخرجًا (كل مخرج على حدة)"
+            placeholder="أضف مخرجًا"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && add()}

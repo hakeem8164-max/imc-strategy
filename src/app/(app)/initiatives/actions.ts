@@ -24,28 +24,80 @@ export async function createInitiative(input: {
   start_year: number | null;
   start_date: string | null;
   due_date: string | null;
+  milestones: {
+    title: string;
+    weight: number;
+    start_date: string | null;
+    due_date: string | null;
+  }[];
+  deliverables: { title: string }[];
 }): Promise<Result> {
   const { supabase, user } = await uid();
   if (!user) return { ok: false, error: "غير مصرّح" };
   if (!input.objective_id) return { ok: false, error: "اختر الهدف المرتبط" };
   if (!input.title.trim()) return { ok: false, error: "اكتب عنوان المبادرة" };
 
-  const { error } = await supabase.from("kpi_initiatives").insert({
-    objective_id: input.objective_id,
-    title: input.title.trim(),
-    description: input.description?.trim() || null,
-    owner_unit_id: input.owner_unit_id || null,
-    owner_user_id: input.owner_user_id || null,
-    start_year: input.start_year || null,
-    start_date: input.start_date || null,
-    due_date: input.due_date || null,
-    created_by: user.id,
-  });
-  if (error)
+  const ms = input.milestones.filter((m) => m.title.trim());
+  if (ms.length < 5)
+    return { ok: false, error: "يلزم 5 معالم على الأقل." };
+  const sum = ms.reduce((a, m) => a + Math.round(m.weight || 0), 0);
+  if (sum !== 100)
+    return {
+      ok: false,
+      error: `مجموع أوزان المعالم يجب أن يساوي 100% (الحالي ${sum}%).`,
+    };
+
+  const { data: created, error } = await supabase
+    .from("kpi_initiatives")
+    .insert({
+      objective_id: input.objective_id,
+      title: input.title.trim(),
+      description: input.description?.trim() || null,
+      owner_unit_id: input.owner_unit_id || null,
+      owner_user_id: input.owner_user_id || null,
+      start_year: input.start_year || null,
+      start_date: input.start_date || null,
+      due_date: input.due_date || null,
+      created_by: user.id,
+    })
+    .select("id")
+    .single();
+  if (error || !created)
     return {
       ok: false,
       error: "تعذّر الحفظ — صلاحية إنشاء المبادرات للمدير/التنفيذي.",
     };
+
+  const initId = created.id as string;
+
+  const msRows = ms.map((m, idx) => ({
+    initiative_id: initId,
+    title: m.title.trim(),
+    weight: Math.max(0, Math.min(100, Math.round(m.weight || 0))),
+    start_date: m.start_date || null,
+    due_date: m.due_date || null,
+    sort_order: idx + 1,
+  }));
+  const { error: msErr } = await supabase
+    .from("kpi_initiative_milestones")
+    .insert(msRows);
+  if (msErr) {
+    // تراجع: احذف المبادرة حتى لا تبقى ناقصة
+    await supabase.from("kpi_initiatives").delete().eq("id", initId);
+    return { ok: false, error: "تعذّر حفظ المعالم." };
+  }
+
+  const dels = input.deliverables.filter((d) => d.title.trim());
+  if (dels.length) {
+    await supabase.from("kpi_initiative_deliverables").insert(
+      dels.map((d, idx) => ({
+        initiative_id: initId,
+        title: d.title.trim(),
+        sort_order: idx + 1,
+      }))
+    );
+  }
+
   revalidatePath("/initiatives");
   revalidatePath("/");
   return { ok: true };
