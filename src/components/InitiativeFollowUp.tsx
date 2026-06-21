@@ -20,67 +20,32 @@ import {
 } from "@/app/(app)/initiatives/actions";
 import { submitChange } from "@/app/(app)/change-requests/actions";
 import { computeAutoStatus, AUTO_STATUS, achievedWeight } from "@/lib/initiative-status";
+import GanttChart, { type GanttRow } from "@/components/GanttChart";
 import type { KpiInitiative } from "@/lib/data";
 
-function fmt(d: string | null) {
-  return d ? new Date(d).toLocaleDateString("en-CA") : "؟";
-}
-
-function Gantt({ milestones }: { milestones: NonNullable<KpiInitiative["milestones"]> }) {
-  const dated = milestones.filter((m) => m.start_date && m.due_date);
-  if (dated.length === 0)
+function MilestoneGantt({ milestones }: { milestones: NonNullable<KpiInitiative["milestones"]> }) {
+  const rows: GanttRow[] = milestones
+    .filter((m) => m.start_date && m.due_date)
+    .map((m) => ({
+      id: m.id,
+      title: m.title,
+      start: +new Date(m.start_date!),
+      due: +new Date(m.due_date!),
+      progress: m.progress ?? 0,
+      color:
+        AUTO_STATUS[
+          computeAutoStatus({
+            done: (m.progress ?? 0) >= 100,
+            start_date: m.start_date,
+            due_date: m.due_date,
+          })
+        ].color,
+    }));
+  if (rows.length === 0)
     return (
-      <p className="text-xs text-slate-400">
-        لا تواريخ كافية في المعالم لعرض المخطط.
-      </p>
+      <p className="text-xs text-slate-400">لا تواريخ كافية في المعالم لعرض المخطط.</p>
     );
-  const min = Math.min(...dated.map((m) => +new Date(m.start_date!)));
-  const max = Math.max(...dated.map((m) => +new Date(m.due_date!)));
-  const span = Math.max(max - min, 1);
-  return (
-    <div dir="rtl" className="space-y-1.5">
-      {milestones.map((m) => {
-        const has = m.start_date && m.due_date;
-        const left = has ? ((+new Date(m.start_date!) - min) / span) * 100 : 0;
-        const width = has
-          ? Math.max(((+new Date(m.due_date!) - +new Date(m.start_date!)) / span) * 100, 2)
-          : 0;
-        const color = AUTO_STATUS[
-          computeAutoStatus({ done: (m.progress ?? 0) >= 100, start_date: m.start_date, due_date: m.due_date })
-        ].color;
-        return (
-          <div key={m.id} className="grid grid-cols-[150px_1fr] items-center gap-2">
-            <span className="truncate text-[11px] text-slate-600" title={m.title}>
-              {m.title}
-            </span>
-            <div className="relative h-5 rounded bg-slate-100">
-              {has && (
-                <div
-                  className="absolute top-0 h-5 overflow-hidden rounded"
-                  style={{ insetInlineStart: `${left}%`, width: `${width}%`, backgroundColor: `${color}33` }}
-                  title={`${fmt(m.start_date)} → ${fmt(m.due_date)} · ${m.progress ?? 0}% · وزن ${m.weight}%`}
-                >
-                  <div
-                    className="flex h-full items-center justify-center text-[10px] font-bold text-white"
-                    style={{ width: `${m.progress ?? 0}%`, backgroundColor: color }}
-                  >
-                    {width > 7 ? `${m.progress ?? 0}%` : ""}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        );
-      })}
-      <div className="grid grid-cols-[150px_1fr] gap-2">
-        <span />
-        <div className="flex flex-row-reverse justify-between text-[10px] text-slate-400">
-          <span>{new Date(min).toLocaleDateString("en-CA")}</span>
-          <span>{new Date(max).toLocaleDateString("en-CA")}</span>
-        </div>
-      </div>
-    </div>
-  );
+  return <GanttChart rows={rows} />;
 }
 
 export default function InitiativeFollowUp({
@@ -229,7 +194,7 @@ function FollowCard({ i, canManage }: { i: KpiInitiative; canManage: boolean }) 
         <h4 className="mb-2 flex items-center gap-1.5 text-sm font-bold text-mushar-dark">
           <Flag size={14} className="text-mushar-primary" /> مخطط جانت للمعالم
         </h4>
-        <Gantt milestones={milestones} />
+        <MilestoneGantt milestones={milestones} />
       </div>
 
       {/* تحديث الإنجاز عبر المعالم (نسبة 0–100% لكل معلم) */}
