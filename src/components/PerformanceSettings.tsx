@@ -24,7 +24,7 @@ export default function PerformanceSettings({
   // إضافة شطر
   const [label, setLabel] = useState("");
   const [minPct, setMinPct] = useState<number>(0);
-  const [color, setColor] = useState("#056073");
+  const [color, setColor] = useState("#8C341F");
 
   // الخيارات
   const [days, setDays] = useState(dueSoonDays);

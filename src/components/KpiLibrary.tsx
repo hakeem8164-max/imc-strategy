@@ -43,7 +43,7 @@ export default function KpiLibrary({
   // إضافة بعد
   const [showAddDim, setShowAddDim] = useState(false);
   const [dimName, setDimName] = useState("");
-  const [dimColor, setDimColor] = useState("#056073");
+  const [dimColor, setDimColor] = useState("#8C341F");
 
   const ownerName = (id: string | null) =>
     id ? orgUnits.find((u) => u.id === id)?.name ?? "—" : "—";

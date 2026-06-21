@@ -37,7 +37,7 @@ export default function OrgStructureManager({
 
   // نموذج إضافة نوع
   const [typeName, setTypeName] = useState("");
-  const [typeColorVal, setTypeColorVal] = useState("#056073");
+  const [typeColorVal, setTypeColorVal] = useState("#8C341F");
   const [typeMsg, setTypeMsg] = useState<string | null>(null);
 
   const byParent = (pid: string | null) =>

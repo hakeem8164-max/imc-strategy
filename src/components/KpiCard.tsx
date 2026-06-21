@@ -40,8 +40,8 @@ export default function KpiCard({
         <span
           className="rounded-md px-2 py-0.5 text-[11px] font-semibold"
           style={{
-            backgroundColor: `${kpi.dimension?.color ?? "#056073"}1a`,
-            color: kpi.dimension?.color ?? "#056073",
+            backgroundColor: `${kpi.dimension?.color ?? "#8C341F"}1a`,
+            color: kpi.dimension?.color ?? "#8C341F",
           }}
         >
           {kpi.dimension?.name ?? "—"}

@@ -122,8 +122,8 @@ export function DimensionRadar({
           <PolarRadiusAxis domain={[0, 100]} tick={{ fontSize: 9, fill: "#94a3b8" }} />
           <Radar
             dataKey="score"
-            stroke="#056073"
-            fill="#056073"
+            stroke="#8C341F"
+            fill="#8C341F"
             fillOpacity={0.35}
           />
           <Tooltip
@@ -158,8 +158,8 @@ export function PerformanceTrend({
           <AreaChart data={data} margin={{ top: 8, right: 16, left: 8, bottom: 8 }}>
             <defs>
               <linearGradient id="trendFill" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#056073" stopOpacity={0.35} />
-                <stop offset="100%" stopColor="#056073" stopOpacity={0.02} />
+                <stop offset="0%" stopColor="#8C341F" stopOpacity={0.35} />
+                <stop offset="100%" stopColor="#8C341F" stopOpacity={0.02} />
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="#eef2f4" />
@@ -185,10 +185,10 @@ export function PerformanceTrend({
             <Area
               type="monotone"
               dataKey="score"
-              stroke="#056073"
+              stroke="#8C341F"
               strokeWidth={2.5}
               fill="url(#trendFill)"
-              dot={{ r: 4, fill: "#056073" }}
+              dot={{ r: 4, fill: "#8C341F" }}
               activeDot={{ r: 6 }}
             />
           </AreaChart>

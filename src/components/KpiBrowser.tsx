@@ -357,8 +357,8 @@ function TableView({
                   <span
                     className="rounded-md px-2 py-0.5 text-[11px] font-semibold"
                     style={{
-                      backgroundColor: `${k.dimension?.color ?? "#056073"}1a`,
-                      color: k.dimension?.color ?? "#056073",
+                      backgroundColor: `${k.dimension?.color ?? "#8C341F"}1a`,
+                      color: k.dimension?.color ?? "#8C341F",
                     }}
                   >
                     {k.dimension?.name ?? "—"}

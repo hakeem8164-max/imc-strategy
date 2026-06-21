@@ -47,17 +47,17 @@ export default function HistoryChart({
         {baseline != null && (
           <ReferenceLine
             y={baseline}
-            stroke="#A11249"
+            stroke="#BD9258"
             strokeDasharray="5 4"
-            label={{ value: "خط الأساس", fontSize: 11, fill: "#A11249" }}
+            label={{ value: "خط الأساس", fontSize: 11, fill: "#BD9258" }}
           />
         )}
         <Line
           type="monotone"
           dataKey="value"
-          stroke="#056073"
+          stroke="#8C341F"
           strokeWidth={2.5}
-          dot={{ r: 4, fill: "#056073" }}
+          dot={{ r: 4, fill: "#8C341F" }}
           activeDot={{ r: 6 }}
         />
       </LineChart>

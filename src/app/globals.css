@@ -3,11 +3,11 @@
 @tailwind utilities;
 
 :root {
-  --mushar-primary: #056073;
-  --mushar-dark: #0b2f38;
-  --mushar-mint: #67c5b9;
-  --mushar-pale: #d1f1ed;
-  --mushar-accent: #a11249;
+  --mushar-primary: #8C341F;
+  --mushar-dark: #5A2114;
+  --mushar-mint: #BD9258;
+  --mushar-pale: #F3E6D6;
+  --mushar-accent: #BD9258;
 }
 
 html,
@@ -15,7 +15,7 @@ body {
   padding: 0;
   margin: 0;
   background: #f4f7f8;
-  color: #0b2f38;
+  color: #5A2114;
 }
 
 html.dark,
@@ -146,7 +146,7 @@ html.dark body {
   html.dark,
   html.dark body {
     background: #fff !important;
-    color: #0b2f38 !important;
+    color: #5A2114 !important;
   }
   .card,
   .dark .card {
@@ -155,7 +155,7 @@ html.dark body {
     box-shadow: none !important;
   }
   .dark .text-mushar-dark {
-    color: #0b2f38 !important;
+    color: #5A2114 !important;
   }
   .dark .text-slate-600,
   .dark .text-slate-500,

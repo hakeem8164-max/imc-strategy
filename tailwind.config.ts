@@ -9,25 +9,25 @@ const config: Config = {
     extend: {
       colors: {
         mushar: {
-          // هوية مشار اللونية المستخرجة من ثيم العرض
-          DEFAULT: "#056073",
-          primary: "#056073",
-          dark: "#0B2F38",
-          teal: "#1A6B7B",
-          mint: "#67C5B9",
-          light: "#8EDDD2",
-          pale: "#D1F1ED",
-          cream: "#F7F8EB",
-          accent: "#A11249",
-          accentDark: "#570A27",
+          // هوية شركة المساجد المتكاملة: أساسي طوبي #8C341F + ثانوي ذهبي #BD9258
+          DEFAULT: "#8C341F",
+          primary: "#8C341F",
+          dark: "#5A2114",
+          teal: "#A8452A",
+          mint: "#BD9258",
+          light: "#D9BB91",
+          pale: "#F3E6D6",
+          cream: "#FBF7F1",
+          accent: "#BD9258",
+          accentDark: "#8A6A3E",
         },
       },
       fontFamily: {
         sans: ["var(--font-cairo)", "Tahoma", "Arial", "sans-serif"],
       },
       boxShadow: {
-        card: "0 1px 3px rgba(11,47,56,0.08), 0 1px 2px rgba(11,47,56,0.06)",
-        cardHover: "0 8px 24px rgba(11,47,56,0.12)",
+        card: "0 1px 3px rgba(90,33,20,0.08), 0 1px 2px rgba(90,33,20,0.06)",
+        cardHover: "0 8px 24px rgba(90,33,20,0.12)",
       },
     },
   },

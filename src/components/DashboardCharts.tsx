@@ -44,8 +44,8 @@ export function DimensionBarChart({ data }: { data: DimensionDatum[] }) {
               n === "count" ? "إجمالي المؤشرات" : "تم إدخال بيانات",
             ]}
           />
-          <Bar dataKey="count" radius={[6, 6, 0, 0]} fill="#D1F1ED" />
-          <Bar dataKey="withData" radius={[6, 6, 0, 0]} fill="#056073" />
+          <Bar dataKey="count" radius={[6, 6, 0, 0]} fill="#F3E6D6" />
+          <Bar dataKey="withData" radius={[6, 6, 0, 0]} fill="#8C341F" />
         </BarChart>
       </ResponsiveContainer>
     </div>
