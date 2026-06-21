@@ -17,6 +17,14 @@ export const AUTO_STATUS: Record<AutoStatus, { label: string; color: string }> =
 // متأخر حتى أسبوعين، وبعدها متعثر
 export const LATE_LIMIT_DAYS = 14;
 
+export type Severity = "low" | "medium" | "high" | "critical";
+export const SEVERITY: Record<Severity, { label: string; color: string }> = {
+  low: { label: "منخفض", color: "#64748B" },
+  medium: { label: "متوسط", color: "#EAB308" },
+  high: { label: "عالي", color: "#F97316" },
+  critical: { label: "حرج", color: "#DC2626" },
+};
+
 function toDay(s: string): number {
   const [y, m, d] = s.split("-").map(Number);
   return Date.UTC(y, (m ?? 1) - 1, d ?? 1);

@@ -22,7 +22,13 @@ import {
   deleteUpdateReply,
 } from "@/app/(app)/initiatives/actions";
 import { submitChange } from "@/app/(app)/change-requests/actions";
-import { computeAutoStatus, AUTO_STATUS, achievedWeight } from "@/lib/initiative-status";
+import {
+  computeAutoStatus,
+  AUTO_STATUS,
+  achievedWeight,
+  SEVERITY,
+  type Severity,
+} from "@/lib/initiative-status";
 import GanttChart, { type GanttRow } from "@/components/GanttChart";
 import type { KpiInitiative, KpiInitiativeProgressUpdate } from "@/lib/data";
 
@@ -88,6 +94,7 @@ function FollowCard({ i, canManage }: { i: KpiInitiative; canManage: boolean }) 
   const supabase = createClient();
   const [, startTransition] = useTransition();
   const [note, setNote] = useState("");
+  const [severity, setSeverity] = useState<Severity>("medium");
   const [showComplete, setShowComplete] = useState(false);
   const [lessons, setLessons] = useState("");
   const [file, setFile] = useState<File | null>(null);
@@ -118,7 +125,12 @@ function FollowCard({ i, canManage }: { i: KpiInitiative; canManage: boolean }) 
   function addNote(kind: "update" | "challenge") {
     if (!note.trim()) return;
     run(async () => {
-      const res = await addInitiativeUpdate({ initiative_id: i.id, kind, body: note });
+      const res = await addInitiativeUpdate({
+        initiative_id: i.id,
+        kind,
+        body: note,
+        severity: kind === "challenge" ? severity : null,
+      });
       if (res.ok) setNote("");
       return res;
     });
@@ -168,7 +180,7 @@ function FollowCard({ i, canManage }: { i: KpiInitiative; canManage: boolean }) 
   }
 
   return (
-    <div className="card space-y-4 p-5">
+    <div id={i.id} className="card space-y-4 scroll-mt-24 p-5">
       {/* رأس */}
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div className="space-y-1">
@@ -269,10 +281,23 @@ function FollowCard({ i, canManage }: { i: KpiInitiative; canManage: boolean }) 
               value={note}
               onChange={(e) => setNote(e.target.value)}
             />
-            <div className="flex gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <button onClick={() => addNote("update")} className="btn-ghost py-1.5 text-xs">
                 + تحديث
               </button>
+              <span className="mx-1 h-5 w-px bg-slate-200" />
+              <label className="text-[11px] text-slate-500">خطورة التحدّي:</label>
+              <select
+                className="input w-28 py-1.5 text-xs"
+                value={severity}
+                onChange={(e) => setSeverity(e.target.value as Severity)}
+              >
+                {(Object.keys(SEVERITY) as Severity[]).map((s) => (
+                  <option key={s} value={s}>
+                    {SEVERITY[s].label}
+                  </option>
+                ))}
+              </select>
               <button
                 onClick={() => addNote("challenge")}
                 className="rounded-lg bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-700 hover:bg-amber-100"
@@ -449,6 +474,17 @@ function UpdateItem({
             <span className="rounded bg-white px-1.5 py-0.5 text-[10px] font-semibold text-slate-500">
               {isChallenge ? "تحدٍّ" : "تحديث"}
             </span>
+            {isChallenge && u.severity && (
+              <span
+                className="rounded px-1.5 py-0.5 text-[10px] font-bold"
+                style={{
+                  backgroundColor: `${SEVERITY[u.severity].color}1a`,
+                  color: SEVERITY[u.severity].color,
+                }}
+              >
+                {SEVERITY[u.severity].label}
+              </span>
+            )}
             {u.resolved && (
               <span className="inline-flex items-center gap-1 rounded bg-emerald-100 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-700">
                 <CheckCircle2 size={11} /> مكتمل

@@ -261,19 +261,45 @@ export async function addInitiativeUpdate(input: {
   initiative_id: string;
   kind: "update" | "challenge";
   body: string;
+  severity?: "low" | "medium" | "high" | "critical" | null;
 }): Promise<Result> {
   const { supabase, user } = await uid();
   if (!user) return { ok: false, error: "غير مصرّح" };
   if (!input.body.trim()) return { ok: false, error: "اكتب النص" };
+  const severity = input.kind === "challenge" ? input.severity ?? "medium" : null;
   const { error } = await supabase.from("kpi_initiative_updates").insert({
     initiative_id: input.initiative_id,
     kind: input.kind,
     body: input.body.trim(),
+    severity,
     created_by: user.id,
   });
   if (error) return { ok: false, error: "تعذّر الحفظ" };
+
+  // تنبيه القيادة عند تحدٍّ حرِج
+  if (severity === "critical") {
+    const { data: init } = await supabase
+      .from("kpi_initiatives")
+      .select("title")
+      .eq("id", input.initiative_id)
+      .single();
+    const { data: leaders } = await supabase
+      .from("profiles")
+      .select("id")
+      .in("role", ["admin", "executive"]);
+    const title = (init as { title?: string } | null)?.title ?? "مبادرة";
+    const rows = ((leaders as { id: string }[]) ?? []).map((l) => ({
+      user_id: l.id,
+      title: "تحدٍّ حرِج",
+      body: `تحدٍّ حرِج على المبادرة: ${title}`,
+      link: "/initiatives/follow-up",
+    }));
+    if (rows.length) await supabase.from("notifications").insert(rows);
+  }
+
   revalidatePath("/initiatives/follow-up");
   revalidatePath("/initiatives");
+  revalidatePath("/");
   return { ok: true };
 }
 

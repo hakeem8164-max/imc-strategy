@@ -534,12 +534,34 @@ export interface KpiInitiativeProgressUpdate {
   kind: "update" | "challenge";
   body: string;
   progress: number | null;
+  severity: "low" | "medium" | "high" | "critical" | null;
   resolved: boolean;
   resolved_at: string | null;
   created_by: string | null;
   created_at: string;
   author?: { full_name: string | null } | null;
   replies?: KpiInitiativeUpdateReply[];
+}
+
+export interface CriticalChallenge {
+  id: string;
+  initiative_id: string;
+  body: string;
+  created_at: string;
+  initiative?: { id: string; title: string } | null;
+}
+
+/** التحديات الحرجة المفتوحة (لعرضها في لوحة الأداء التنفيذية) */
+export async function getCriticalChallenges(): Promise<CriticalChallenge[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("kpi_initiative_updates")
+    .select("id, initiative_id, body, created_at, initiative:kpi_initiatives(id,title)")
+    .eq("kind", "challenge")
+    .eq("severity", "critical")
+    .eq("resolved", false)
+    .order("created_at", { ascending: false });
+  return (data as unknown as CriticalChallenge[]) ?? [];
 }
 
 export interface KpiInitiative {

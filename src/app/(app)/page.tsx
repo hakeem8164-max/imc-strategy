@@ -22,6 +22,7 @@ import {
   getDueKpis,
   getBands,
   getOpenDecisions,
+  getCriticalChallenges,
 } from "@/lib/data";
 import { achievementRatio } from "@/lib/period";
 import { bandFor, type Band } from "@/lib/bands";
@@ -40,16 +41,25 @@ export default async function DashboardPage({
   const fDim = searchParams?.dim ?? "";
   const fUnit = searchParams?.unit ?? "";
 
-  const [dimensions, allKpis, approved, dueItems, bands, orgUnits, openDecisions] =
-    await Promise.all([
-      getDimensions(),
-      getKpis(),
-      getApprovedEntries(),
-      getDueKpis(profile),
-      getBands(),
-      getOrgUnits(),
-      getOpenDecisions(),
-    ]);
+  const [
+    dimensions,
+    allKpis,
+    approved,
+    dueItems,
+    bands,
+    orgUnits,
+    openDecisions,
+    criticalChallenges,
+  ] = await Promise.all([
+    getDimensions(),
+    getKpis(),
+    getApprovedEntries(),
+    getDueKpis(profile),
+    getBands(),
+    getOrgUnits(),
+    getOpenDecisions(),
+    getCriticalChallenges(),
+  ]);
 
   // سلاسل القياسات المعتمدة + قائمة الفترات
   const series: Record<string, { label: string; value: number }[]> = {};
@@ -321,6 +331,29 @@ export default async function DashboardPage({
               </li>
             ))}
           </ul>
+        </div>
+      )}
+
+      {criticalChallenges.length > 0 && (
+        <div className="rounded-2xl border border-red-200 bg-red-50 p-4">
+          <h2 className="mb-2 flex items-center gap-2 text-sm font-bold text-red-700">
+            <span className="inline-block h-2 w-2 rounded-full bg-red-600" />
+            تحدّيات حرِجة ({criticalChallenges.length})
+          </h2>
+          <div className="space-y-1.5">
+            {criticalChallenges.map((c) => (
+              <Link
+                key={c.id}
+                href={`/initiatives/follow-up#${c.initiative_id}`}
+                className="flex items-center justify-between gap-2 rounded-lg bg-white px-3 py-2 text-xs hover:bg-red-100/40"
+              >
+                <span className="font-medium text-mushar-dark">
+                  {c.initiative?.title ?? "مبادرة"}: {c.body}
+                </span>
+                <span className="shrink-0 font-semibold text-red-600">عرض ←</span>
+              </Link>
+            ))}
+          </div>
         </div>
       )}
 
