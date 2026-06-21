@@ -2,13 +2,17 @@ import { redirect } from "next/navigation";
 import Header from "@/components/Header";
 import InitiativeFollowUp from "@/components/InitiativeFollowUp";
 import MasterGantt from "@/components/MasterGantt";
-import { getProfile, getAllInitiatives } from "@/lib/data";
+import { getProfile, getAllInitiatives, getUsers } from "@/lib/data";
 
 export default async function InitiativeFollowUpPage() {
   const profile = await getProfile();
   if (!profile) redirect("/login");
 
-  const initiatives = await getAllInitiatives();
+  const [initiatives, users] = await Promise.all([
+    getAllInitiatives(),
+    getUsers(),
+  ]);
+  const mentionUsers = users.map((u) => ({ id: u.id, full_name: u.full_name }));
   const canManage =
     profile.role === "admin" ||
     profile.role === "executive" ||
@@ -34,7 +38,7 @@ export default async function InitiativeFollowUpPage() {
             <MasterGantt initiatives={initiatives} />
           </div>
         )}
-        <InitiativeFollowUp initiatives={initiatives} canManage={canManage} />
+        <InitiativeFollowUp initiatives={initiatives} canManage={canManage} users={mentionUsers} />
       </div>
     </>
   );

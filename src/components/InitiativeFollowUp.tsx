@@ -15,6 +15,7 @@ import { createClient } from "@/lib/supabase/client";
 import {
   setMilestoneProgress,
   toggleDeliverable,
+  setDeliverableDoc,
   addInitiativeUpdate,
   deleteInitiativeUpdate,
   setUpdateResolved,
@@ -40,6 +41,83 @@ function dt(s: string) {
     hour: "2-digit",
     minute: "2-digit",
   });
+}
+
+type MentionUser = { id: string; full_name: string | null };
+
+function MentionBox({
+  value,
+  onChange,
+  onMention,
+  users,
+  placeholder,
+  multiline,
+  onEnter,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  onMention: (id: string) => void;
+  users: MentionUser[];
+  placeholder?: string;
+  multiline?: boolean;
+  onEnter?: () => void;
+}) {
+  const [q, setQ] = useState<string | null>(null);
+
+  function handle(val: string) {
+    onChange(val);
+    const m = val.match(/@([^\s@]*)$/);
+    setQ(m ? m[1] : null);
+  }
+  const matches =
+    q !== null
+      ? users
+          .filter((u) => (u.full_name ?? "").includes(q) && u.full_name)
+          .slice(0, 6)
+      : [];
+
+  function pick(u: MentionUser) {
+    onChange(value.replace(/@([^\s@]*)$/, `@${u.full_name} `));
+    onMention(u.id);
+    setQ(null);
+  }
+
+  return (
+    <div className="relative flex-1">
+      {multiline ? (
+        <textarea
+          className="input min-h-[50px] text-xs"
+          placeholder={placeholder}
+          value={value}
+          onChange={(e) => handle(e.target.value)}
+        />
+      ) : (
+        <input
+          className="input py-1.5 text-xs"
+          placeholder={placeholder}
+          value={value}
+          onChange={(e) => handle(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && matches.length === 0 && onEnter) onEnter();
+          }}
+        />
+      )}
+      {matches.length > 0 && (
+        <div className="absolute z-30 mt-1 w-56 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-lg">
+          {matches.map((u) => (
+            <button
+              key={u.id}
+              type="button"
+              onClick={() => pick(u)}
+              className="block w-full px-3 py-2 text-right text-xs hover:bg-mushar-pale/40"
+            >
+              @{u.full_name}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 function MilestoneGantt({ milestones }: { milestones: NonNullable<KpiInitiative["milestones"]> }) {
@@ -70,9 +148,11 @@ function MilestoneGantt({ milestones }: { milestones: NonNullable<KpiInitiative[
 export default function InitiativeFollowUp({
   initiatives,
   canManage,
+  users,
 }: {
   initiatives: KpiInitiative[];
   canManage: boolean;
+  users: MentionUser[];
 }) {
   if (initiatives.length === 0)
     return (
@@ -83,17 +163,26 @@ export default function InitiativeFollowUp({
   return (
     <div className="space-y-4">
       {initiatives.map((i) => (
-        <FollowCard key={i.id} i={i} canManage={canManage} />
+        <FollowCard key={i.id} i={i} canManage={canManage} users={users} />
       ))}
     </div>
   );
 }
 
-function FollowCard({ i, canManage }: { i: KpiInitiative; canManage: boolean }) {
+function FollowCard({
+  i,
+  canManage,
+  users,
+}: {
+  i: KpiInitiative;
+  canManage: boolean;
+  users: MentionUser[];
+}) {
   const router = useRouter();
   const supabase = createClient();
   const [, startTransition] = useTransition();
   const [note, setNote] = useState("");
+  const [noteMentions, setNoteMentions] = useState<string[]>([]);
   const [severity, setSeverity] = useState<Severity>("medium");
   const [showComplete, setShowComplete] = useState(false);
   const [lessons, setLessons] = useState("");
@@ -130,8 +219,12 @@ function FollowCard({ i, canManage }: { i: KpiInitiative; canManage: boolean }) 
         kind,
         body: note,
         severity: kind === "challenge" ? severity : null,
+        mention_user_ids: noteMentions,
       });
-      if (res.ok) setNote("");
+      if (res.ok) {
+        setNote("");
+        setNoteMentions([]);
+      }
       return res;
     });
   }
@@ -245,18 +338,13 @@ function FollowCard({ i, canManage }: { i: KpiInitiative; canManage: boolean }) 
           </h4>
           <div className="grid gap-1.5 sm:grid-cols-2">
             {deliverables.map((d) => (
-              <label key={d.id} className="flex items-center gap-2 rounded-lg bg-slate-50 px-3 py-1.5 text-xs">
-                <input
-                  type="checkbox"
-                  checked={d.done}
-                  disabled={!canManage || completed}
-                  onChange={(e) => run(() => toggleDeliverable(d.id, e.target.checked))}
-                  className="h-4 w-4 accent-emerald-600"
-                />
-                <span className={d.done ? "text-emerald-700 line-through" : "text-mushar-dark"}>
-                  {d.title}
-                </span>
-              </label>
+              <DeliverableRow
+                key={d.id}
+                d={d}
+                canManage={canManage}
+                completed={completed}
+                onChange={() => router.refresh()}
+              />
             ))}
           </div>
         </div>
@@ -267,19 +355,17 @@ function FollowCard({ i, canManage }: { i: KpiInitiative; canManage: boolean }) 
         <h4 className="mb-2 flex items-center gap-1.5 text-sm font-bold text-mushar-dark">
           <MessageSquare size={14} className="text-mushar-primary" /> التحديثات والتحديات
         </h4>
-        <div className="space-y-2">
-          {updates.map((u) => (
-            <UpdateItem key={u.id} u={u} canManage={canManage} onChange={() => router.refresh()} />
-          ))}
-          {updates.length === 0 && <p className="text-xs text-slate-400">لا تحديثات بعد.</p>}
-        </div>
+
+        {/* صندوق الإضافة في الأعلى */}
         {canManage && !completed && (
-          <div className="mt-2 space-y-2">
-            <textarea
-              className="input min-h-[50px] text-xs"
-              placeholder="اكتب تحديثًا أو تحديًا…"
+          <div className="mb-3 space-y-2 rounded-xl border border-dashed border-slate-200 p-3">
+            <MentionBox
               value={note}
-              onChange={(e) => setNote(e.target.value)}
+              onChange={setNote}
+              onMention={(id) => setNoteMentions((s) => [...s, id])}
+              users={users}
+              placeholder="اكتب تحديثًا أو تحديًا… استخدم @ للإشارة لشخص"
+              multiline
             />
             <div className="flex flex-wrap items-center gap-2">
               <button onClick={() => addNote("update")} className="btn-ghost py-1.5 text-xs">
@@ -307,6 +393,19 @@ function FollowCard({ i, canManage }: { i: KpiInitiative; canManage: boolean }) 
             </div>
           </div>
         )}
+
+        <div className="space-y-2">
+          {updates.map((u) => (
+            <UpdateItem
+              key={u.id}
+              u={u}
+              canManage={canManage}
+              users={users}
+              onChange={() => router.refresh()}
+            />
+          ))}
+          {updates.length === 0 && <p className="text-xs text-slate-400">لا تحديثات بعد.</p>}
+        </div>
       </div>
 
       {/* الإغلاق */}
@@ -425,14 +524,17 @@ function MilestoneProgressRow({
 function UpdateItem({
   u,
   canManage,
+  users,
   onChange,
 }: {
   u: KpiInitiativeProgressUpdate;
   canManage: boolean;
+  users: MentionUser[];
   onChange: () => void;
 }) {
   const [, startTransition] = useTransition();
   const [reply, setReply] = useState("");
+  const [replyMentions, setReplyMentions] = useState<string[]>([]);
   const [showReply, setShowReply] = useState(false);
   const replies = u.replies ?? [];
   const isChallenge = u.kind === "challenge";
@@ -448,9 +550,14 @@ function UpdateItem({
   function sendReply() {
     if (!reply.trim()) return;
     act(async () => {
-      const res = await addUpdateReply({ update_id: u.id, body: reply });
+      const res = await addUpdateReply({
+        update_id: u.id,
+        body: reply,
+        mention_user_ids: replyMentions,
+      });
       if (res.ok) {
         setReply("");
+        setReplyMentions([]);
         setShowReply(false);
       }
       return res;
@@ -550,17 +657,100 @@ function UpdateItem({
 
       {showReply && canManage && (
         <div className="mt-2 flex gap-2">
-          <input
-            className="input py-1.5 text-xs"
-            placeholder="اكتب رداً أو تحديثاً…"
+          <MentionBox
             value={reply}
-            onChange={(e) => setReply(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && sendReply()}
+            onChange={setReply}
+            onMention={(id) => setReplyMentions((s) => [...s, id])}
+            users={users}
+            placeholder="اكتب رداً… استخدم @ للإشارة"
+            onEnter={sendReply}
           />
           <button onClick={sendReply} className="btn-primary shrink-0 py-1.5 text-xs">
             إرسال
           </button>
         </div>
+      )}
+    </div>
+  );
+}
+
+function DeliverableRow({
+  d,
+  canManage,
+  completed,
+  onChange,
+}: {
+  d: NonNullable<KpiInitiative["deliverables"]>[number];
+  canManage: boolean;
+  completed: boolean;
+  onChange: () => void;
+}) {
+  const supabase = createClient();
+  const [, startTransition] = useTransition();
+  const [busy, setBusy] = useState(false);
+
+  function act(fn: () => Promise<{ ok: boolean; error?: string }>) {
+    startTransition(async () => {
+      const res = await fn();
+      if (res.ok) onChange();
+      else alert(res.error);
+    });
+  }
+
+  async function attach(file: File) {
+    setBusy(true);
+    const path = `deliverables/${Date.now()}-${file.name}`;
+    const { error } = await supabase.storage.from("kpi-docs").upload(path, file);
+    if (error) {
+      setBusy(false);
+      alert("تعذّر رفع الوثيقة: " + error.message);
+      return;
+    }
+    const res = await setDeliverableDoc({ id: d.id, doc_url: path, doc_name: file.name });
+    setBusy(false);
+    if (res.ok) onChange();
+    else alert(res.error);
+  }
+
+  async function openDoc() {
+    if (!d.doc_url) return;
+    const { data } = await supabase.storage.from("kpi-docs").createSignedUrl(d.doc_url, 120);
+    if (data?.signedUrl) window.open(data.signedUrl, "_blank");
+  }
+
+  return (
+    <div className="flex items-center gap-2 rounded-lg bg-slate-50 px-3 py-1.5 text-xs">
+      <input
+        type="checkbox"
+        checked={d.done}
+        disabled={!canManage || completed}
+        onChange={(e) => act(() => toggleDeliverable(d.id, e.target.checked))}
+        className="h-4 w-4 accent-emerald-600"
+      />
+      <span className={`flex-1 ${d.done ? "text-emerald-700 line-through" : "text-mushar-dark"}`}>
+        {d.title}
+      </span>
+      {d.doc_url ? (
+        <button onClick={openDoc} className="inline-flex items-center gap-1 font-semibold text-mushar-primary hover:underline">
+          <Paperclip size={12} /> {d.doc_name ? "الوثيقة" : "عرض"}
+        </button>
+      ) : canManage && !completed ? (
+        <label className="cursor-pointer font-semibold text-mushar-primary hover:underline">
+          {busy ? "جارٍ…" : "إرفاق وثيقة"}
+          <input
+            type="file"
+            className="hidden"
+            onChange={(e) => e.target.files?.[0] && attach(e.target.files[0])}
+          />
+        </label>
+      ) : null}
+      {d.doc_url && canManage && !completed && (
+        <button
+          onClick={() => act(() => setDeliverableDoc({ id: d.id, doc_url: null, doc_name: null }))}
+          className="text-mushar-accent hover:underline"
+        >
+          إزالة
+        </button>
       )}
     </div>
   );

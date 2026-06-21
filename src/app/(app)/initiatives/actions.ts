@@ -244,6 +244,22 @@ export async function toggleDeliverable(
   return { ok: true };
 }
 
+export async function setDeliverableDoc(input: {
+  id: string;
+  doc_url: string | null;
+  doc_name: string | null;
+}): Promise<Result> {
+  const { supabase, user } = await uid();
+  if (!user) return { ok: false, error: "غير مصرّح" };
+  const { error } = await supabase
+    .from("kpi_initiative_deliverables")
+    .update({ doc_url: input.doc_url, doc_name: input.doc_name })
+    .eq("id", input.id);
+  if (error) return { ok: false, error: "تعذّر حفظ الوثيقة" };
+  revalidatePath("/initiatives/follow-up");
+  return { ok: true };
+}
+
 export async function deleteDeliverable(id: string): Promise<Result> {
   const { supabase, user } = await uid();
   if (!user) return { ok: false, error: "غير مصرّح" };
@@ -256,12 +272,30 @@ export async function deleteDeliverable(id: string): Promise<Result> {
   return { ok: true };
 }
 
+async function notifyMentions(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  ids: string[] | undefined,
+  body: string
+) {
+  const uniq = Array.from(new Set((ids ?? []).filter(Boolean)));
+  if (!uniq.length) return;
+  await supabase.from("notifications").insert(
+    uniq.map((id) => ({
+      user_id: id,
+      title: "تمت الإشارة إليك",
+      body,
+      link: "/initiatives/follow-up",
+    }))
+  );
+}
+
 // ===== تحديثات/تحديات المتابعة =====
 export async function addInitiativeUpdate(input: {
   initiative_id: string;
   kind: "update" | "challenge";
   body: string;
   severity?: "low" | "medium" | "high" | "critical" | null;
+  mention_user_ids?: string[];
 }): Promise<Result> {
   const { supabase, user } = await uid();
   if (!user) return { ok: false, error: "غير مصرّح" };
@@ -275,6 +309,8 @@ export async function addInitiativeUpdate(input: {
     created_by: user.id,
   });
   if (error) return { ok: false, error: "تعذّر الحفظ" };
+
+  await notifyMentions(supabase, input.mention_user_ids, input.body.trim());
 
   // تنبيه القيادة عند تحدٍّ حرِج
   if (severity === "critical") {
@@ -335,6 +371,7 @@ export async function setUpdateResolved(
 export async function addUpdateReply(input: {
   update_id: string;
   body: string;
+  mention_user_ids?: string[];
 }): Promise<Result> {
   const { supabase, user } = await uid();
   if (!user) return { ok: false, error: "غير مصرّح" };
@@ -345,6 +382,7 @@ export async function addUpdateReply(input: {
     created_by: user.id,
   });
   if (error) return { ok: false, error: "تعذّر الحفظ" };
+  await notifyMentions(supabase, input.mention_user_ids, input.body.trim());
   revalidatePath("/initiatives/follow-up");
   return { ok: true };
 }

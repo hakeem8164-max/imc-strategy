@@ -515,6 +515,8 @@ export interface KpiDeliverable {
   initiative_id: string;
   title: string;
   done: boolean;
+  doc_url: string | null;
+  doc_name: string | null;
   sort_order: number;
   created_at: string;
 }
