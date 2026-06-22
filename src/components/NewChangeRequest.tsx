@@ -8,6 +8,7 @@ import { submitChange } from "@/app/(app)/change-requests/actions";
 import { createClient } from "@/lib/supabase/client";
 import FilterSelect from "@/components/ui/FilterSelect";
 import SearchableSelect from "@/components/ui/SearchableSelect";
+import NumberInput from "@/components/ui/NumberInput";
 import { notify } from "@/components/ui/toast";
 import {
   UNITS,
@@ -508,7 +509,10 @@ export default function NewChangeRequest({
             {[["baseline","خط الأساس"],["target_q1","الربع الأول"],["target_q2","الربع الثاني"],["target_q3","الربع الثالث"],["target_q4","الربع الرابع"],["target_total","المستهدف الكلي"]].map(([k,lbl]) => (
               <div key={k}>
                 <label className="label text-[11px]">{lbl}</label>
-                <input type="number" step="any" className="input" value={v[k] ?? ""} onChange={(e) => set(k, e.target.value)} />
+                <NumberInput
+                  value={v[k] === "" || v[k] == null ? null : Number(v[k])}
+                  onValueChange={(n) => set(k, n == null ? "" : String(n))}
+                />
               </div>
             ))}
           </div>

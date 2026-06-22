@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Check, X, Clock, Paperclip } from "lucide-react";
 import { reviewChange } from "@/app/(app)/change-requests/actions";
 import { notify } from "@/components/ui/toast";
+import { promptDialog } from "@/components/ui/confirm";
 import { createClient } from "@/lib/supabase/client";
 import type { Profile } from "@/lib/types";
 import type { ChangeRequest } from "@/lib/data";
@@ -89,13 +90,24 @@ export default function ChangeRequestsList({
     else notify("تعذّر فتح المرفق", "error");
   }
 
-  function review(cr: ChangeRequest, decision: "approve" | "reject") {
+  async function review(cr: ChangeRequest, decision: "approve" | "reject") {
     let note: string | null = null;
     if (decision === "reject") {
-      note = prompt("سبب الرفض/الإعادة:") ?? "";
-      if (note === "") return;
+      note = await promptDialog("سبب الرفض/الإعادة:", {
+        title: "رفض/إعادة الطلب",
+        confirmText: "إرسال",
+        danger: true,
+        multiline: true,
+      });
+      if (!note || !note.trim()) return;
     } else {
-      note = prompt("ملاحظة الاعتماد (اختياري):") || null;
+      note = await promptDialog("ملاحظة الاعتماد (اختياري):", {
+        title: "اعتماد الطلب",
+        confirmText: "اعتماد",
+        multiline: true,
+      });
+      if (note === null) return; // أُلغي
+      note = note.trim() || null;
     }
     startTransition(async () => {
       const res = await reviewChange(cr.id, decision, note);

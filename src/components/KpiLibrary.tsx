@@ -3,8 +3,10 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import FilterSelect from "@/components/ui/FilterSelect";
+import ToggleSwitch from "@/components/ui/ToggleSwitch";
+import NumberInput from "@/components/ui/NumberInput";
 import { notify } from "@/components/ui/toast";
-import { confirmDialog } from "@/components/ui/confirm";
+import { confirmDialog, promptDialog } from "@/components/ui/confirm";
 import {
   addDimension,
   deleteDimension,
@@ -98,8 +100,12 @@ export default function KpiLibrary({
     });
   }
 
-  function editObjective(o: Objective) {
-    const name = prompt("اسم الهدف:", o.name);
+  async function editObjective(o: Objective) {
+    const name = await promptDialog("اسم الهدف:", {
+      title: "تعديل اسم الهدف",
+      defaultValue: o.name,
+      confirmText: "حفظ",
+    });
     if (name == null) return;
     startTransition(async () => {
       const res = await renameObjective(o.id, name);
@@ -347,21 +353,11 @@ export default function KpiLibrary({
                                     {k.unit}
                                   </p>
                                 </div>
-                                <button
-                                  onClick={() => toggleActive(k)}
-                                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
-                                    k.is_active ? "bg-emerald-500" : "bg-slate-300"
-                                  }`}
+                                <ToggleSwitch
+                                  checked={k.is_active}
+                                  onCheckedChange={() => toggleActive(k)}
                                   title={k.is_active ? "مفعّل" : "موقوف"}
-                                >
-                                  <span
-                                    className={`inline-block h-5 w-5 transform rounded-full bg-white transition ${
-                                      k.is_active
-                                        ? "-translate-x-0.5"
-                                        : "-translate-x-5"
-                                    }`}
-                                  />
-                                </button>
+                                />
                                 <button
                                   onClick={() => setEditing(k)}
                                   className="btn-ghost px-3 py-1.5 text-xs"
@@ -444,7 +440,6 @@ function EditKpiModal({
   const [err, setErr] = useState<string | null>(null);
 
   const set = (patch: Partial<KpiInput>) => setF((s) => ({ ...s, ...patch }));
-  const numOrNull = (v: string) => (v === "" ? null : Number(v));
 
   const dimName = (id: string) =>
     dimensions.find((d) => d.id === id)?.name ?? "";
@@ -472,15 +467,10 @@ function EditKpiModal({
   ) => (
     <div>
       <label className="label">{label}</label>
-      <input
-        type="number"
-        step="any"
-        className="input"
-        placeholder="اختياري"
-        value={f[key] ?? ""}
-        onChange={(e) =>
-          set({ [key]: numOrNull(e.target.value) } as Partial<KpiInput>)
-        }
+      <NumberInput
+        step={1}
+        value={f[key] ?? null}
+        onValueChange={(n) => set({ [key]: n } as Partial<KpiInput>)}
       />
     </div>
   );

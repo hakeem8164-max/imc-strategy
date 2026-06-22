@@ -13,7 +13,7 @@ import {
 } from "@/app/(app)/admin/settings/actions";
 import type { OrgUnit, OrgUnitTypeDef } from "@/lib/types";
 import { notify } from "@/components/ui/toast";
-import { confirmDialog } from "@/components/ui/confirm";
+import { confirmDialog, promptDialog } from "@/components/ui/confirm";
 
 export default function OrgStructureManager({
   orgName,
@@ -97,8 +97,12 @@ export default function OrgStructureManager({
     }
   }
 
-  function rename(u: OrgUnit) {
-    const v = prompt("الاسم الجديد:", u.name);
+  async function rename(u: OrgUnit) {
+    const v = await promptDialog("الاسم الجديد:", {
+      title: "تعديل الاسم",
+      defaultValue: u.name,
+      confirmText: "حفظ",
+    });
     if (v && v.trim() && v !== u.name) {
       startTransition(async () => {
         const res = await renameOrgUnit(u.id, v);

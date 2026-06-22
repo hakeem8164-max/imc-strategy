@@ -5,6 +5,7 @@ import "./globals.css";
 import InstallPrompt from "@/components/InstallPrompt";
 import ToastProvider from "@/components/ui/toast";
 import ConfirmProvider from "@/components/ui/confirm";
+import { TipProvider } from "@/components/ui/Tip";
 
 const cairo = Cairo({
   subsets: ["arabic", "latin"],
@@ -52,12 +53,14 @@ export default function RootLayout({
       </head>
       <body className="font-sans antialiased">
         <DirectionProvider direction="rtl">
-          <ToastProvider>
-            <ConfirmProvider>
-              {children}
-              <InstallPrompt />
-            </ConfirmProvider>
-          </ToastProvider>
+          <TipProvider>
+            <ToastProvider>
+              <ConfirmProvider>
+                {children}
+                <InstallPrompt />
+              </ConfirmProvider>
+            </ToastProvider>
+          </TipProvider>
         </DirectionProvider>
       </body>
     </html>
