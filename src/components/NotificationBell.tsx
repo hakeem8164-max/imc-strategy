@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Popover } from "@base-ui/react/popover";
 import { createClient } from "@/lib/supabase/client";
 import { Bell } from "lucide-react";
 import { markAllRead } from "@/app/(app)/notifications-actions";
@@ -12,7 +13,6 @@ export default function NotificationBell() {
   const router = useRouter();
   const [items, setItems] = useState<Notification[]>([]);
   const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
 
   async function load() {
     const { data } = await supabase
@@ -30,19 +30,9 @@ export default function NotificationBell() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    function onClick(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node))
-        setOpen(false);
-    }
-    document.addEventListener("mousedown", onClick);
-    return () => document.removeEventListener("mousedown", onClick);
-  }, []);
-
   const unread = items.filter((n) => !n.is_read).length;
 
-  async function toggle() {
-    const next = !open;
+  async function onOpenChange(next: boolean) {
     setOpen(next);
     if (next && unread > 0) {
       await markAllRead();
@@ -59,9 +49,8 @@ export default function NotificationBell() {
   }
 
   return (
-    <div className="relative" ref={ref}>
-      <button
-        onClick={toggle}
+    <Popover.Root open={open} onOpenChange={onOpenChange}>
+      <Popover.Trigger
         className="relative flex h-9 w-9 items-center justify-center rounded-full text-white/90 transition hover:bg-white/10"
         title="الإشعارات"
       >
@@ -71,42 +60,44 @@ export default function NotificationBell() {
             {unread > 9 ? "9+" : unread}
           </span>
         )}
-      </button>
+      </Popover.Trigger>
 
-      {open && (
-        <div className="absolute left-0 top-12 z-20 w-80 overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-cardHover">
-          <div className="border-b border-slate-100 px-4 py-3 text-sm font-bold text-mushar-dark">
-            الإشعارات
-          </div>
-          <div className="max-h-96 overflow-y-auto">
-            {items.length === 0 ? (
-              <p className="px-4 py-8 text-center text-sm text-slate-400">
-                لا توجد إشعارات
-              </p>
-            ) : (
-              items.map((n) => (
-                <button
-                  key={n.id}
-                  onClick={() => go(n.link)}
-                  className="block w-full border-b border-slate-50 px-4 py-3 text-right transition last:border-0 hover:bg-slate-50"
-                >
-                  <p className="text-sm font-semibold text-mushar-dark">
-                    {n.title}
-                  </p>
-                  {n.body && (
-                    <p className="mt-0.5 text-xs leading-relaxed text-slate-500">
-                      {n.body}
+      <Popover.Portal>
+        <Popover.Positioner sideOffset={8} align="end" className="z-20">
+          <Popover.Popup className="w-80 origin-[var(--transform-origin)] overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-cardHover outline-none transition-[transform,opacity] data-[ending-style]:scale-95 data-[ending-style]:opacity-0 data-[starting-style]:scale-95 data-[starting-style]:opacity-0">
+            <div className="border-b border-slate-100 px-4 py-3 text-sm font-bold text-mushar-dark">
+              الإشعارات
+            </div>
+            <div className="max-h-96 overflow-y-auto">
+              {items.length === 0 ? (
+                <p className="px-4 py-8 text-center text-sm text-slate-400">
+                  لا توجد إشعارات
+                </p>
+              ) : (
+                items.map((n) => (
+                  <button
+                    key={n.id}
+                    onClick={() => go(n.link)}
+                    className="block w-full border-b border-slate-50 px-4 py-3 text-right transition last:border-0 hover:bg-slate-50"
+                  >
+                    <p className="text-sm font-semibold text-mushar-dark">
+                      {n.title}
                     </p>
-                  )}
-                  <p className="mt-1 text-[10px] text-slate-300">
-                    {new Date(n.created_at).toLocaleString("ar-SA-u-nu-latn")}
-                  </p>
-                </button>
-              ))
-            )}
-          </div>
-        </div>
-      )}
-    </div>
+                    {n.body && (
+                      <p className="mt-0.5 text-xs leading-relaxed text-slate-500">
+                        {n.body}
+                      </p>
+                    )}
+                    <p className="mt-1 text-[10px] text-slate-300">
+                      {new Date(n.created_at).toLocaleString("ar-SA-u-nu-latn")}
+                    </p>
+                  </button>
+                ))
+              )}
+            </div>
+          </Popover.Popup>
+        </Popover.Positioner>
+      </Popover.Portal>
+    </Popover.Root>
   );
 }
