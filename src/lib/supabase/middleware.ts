@@ -40,6 +40,7 @@ export async function updateSession(request: NextRequest) {
   const isPublicAsset =
     path.startsWith("/_next") ||
     path.startsWith("/favicon") ||
+    path.startsWith("/base-ui-demo") ||
     path === "/mushar-logo.png" ||
     path === "/mushar-logo-light.png";
 
