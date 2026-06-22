@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import KpiCard from "@/components/KpiCard";
+import FilterSelect from "@/components/ui/FilterSelect";
 import {
   RotateCcw,
   LayoutGrid,
@@ -194,8 +195,6 @@ export default function KpiBrowser({
     [dimensions, objectives, filtered]
   );
 
-  const selCls = "input py-2 text-sm";
-
   return (
     <div className="space-y-5">
       <div className="card space-y-3 p-4">
@@ -206,62 +205,84 @@ export default function KpiBrowser({
           onChange={(e) => setQ(e.target.value)}
         />
         <div className="grid grid-cols-2 gap-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-8">
-          <select
-            className={selCls}
-            value={dim}
-            onChange={(e) => {
-              setDim(e.target.value);
+          <FilterSelect
+            className="w-full"
+            value={dim ?? ""}
+            onValueChange={(v) => {
+              setDim(v);
               setObj("all");
             }}
-          >
-            <option value="all">كل المناظير</option>
-            {dimensions.map((d) => (
-              <option key={d.id} value={d.id}>{d.name}</option>
-            ))}
-          </select>
-          <select className={selCls} value={obj} onChange={(e) => setObj(e.target.value)}>
-            <option value="all">كل الأهداف</option>
-            {objOptions.map((o) => (
-              <option key={o.id} value={o.id}>{o.name}</option>
-            ))}
-          </select>
-          <select className={selCls} value={unit} onChange={(e) => setUnit(e.target.value)}>
-            <option value="all">كل الإدارات (المالك)</option>
-            {usedUnits.map((u) => (
-              <option key={u.id} value={u.id}>{u.name}</option>
-            ))}
-          </select>
-          <select className={selCls} value={freq} onChange={(e) => setFreq(e.target.value)}>
-            <option value="all">كل الدوريات</option>
-            {freqs.map((f) => (
-              <option key={f} value={f!}>{f}</option>
-            ))}
-          </select>
-          <select className={selCls} value={period} onChange={(e) => setPeriod(e.target.value)}>
-            <option value="">آخر فترة قياس</option>
-            {periods.map((p) => (
-              <option key={p} value={p}>{p}</option>
-            ))}
-          </select>
-          <select className={selCls} value={status} onChange={(e) => setStatus(e.target.value)}>
-            <option value="all">كل حالات الأداء</option>
-            {statusOptions.map((s) => (
-              <option key={s} value={s}>{s}</option>
-            ))}
-          </select>
-          <select className={selCls} value={trend} onChange={(e) => setTrend(e.target.value)}>
-            <option value="all">كل الاتجاهات</option>
-            <option value="up">صاعد ↗</option>
-            <option value="down">هابط ↘</option>
-            <option value="flat">ثابت</option>
-            <option value="none">بلا قياس سابق</option>
-          </select>
-          <select className={selCls} value={type} onChange={(e) => setType(e.target.value)}>
-            <option value="all">كل الأنواع</option>
-            {types.map((u) => (
-              <option key={u} value={u}>{UNIT_LABEL[u] ?? u}</option>
-            ))}
-          </select>
+            options={[
+              { value: "all", label: "كل المناظير" },
+              ...dimensions.map((d) => ({ value: d.id, label: d.name })),
+            ]}
+          />
+          <FilterSelect
+            className="w-full"
+            value={obj ?? ""}
+            onValueChange={(v) => setObj(v)}
+            options={[
+              { value: "all", label: "كل الأهداف" },
+              ...objOptions.map((o) => ({ value: o.id, label: o.name })),
+            ]}
+          />
+          <FilterSelect
+            className="w-full"
+            value={unit ?? ""}
+            onValueChange={(v) => setUnit(v)}
+            options={[
+              { value: "all", label: "كل الإدارات (المالك)" },
+              ...usedUnits.map((u) => ({ value: u.id, label: u.name })),
+            ]}
+          />
+          <FilterSelect
+            className="w-full"
+            value={freq ?? ""}
+            onValueChange={(v) => setFreq(v)}
+            options={[
+              { value: "all", label: "كل الدوريات" },
+              ...freqs.map((f) => ({ value: String(f), label: String(f) })),
+            ]}
+          />
+          <FilterSelect
+            className="w-full"
+            value={period ?? ""}
+            onValueChange={(v) => setPeriod(v)}
+            options={[
+              { value: "", label: "آخر فترة قياس" },
+              ...periods.map((p) => ({ value: p, label: p })),
+            ]}
+          />
+          <FilterSelect
+            className="w-full"
+            value={status ?? ""}
+            onValueChange={(v) => setStatus(v)}
+            options={[
+              { value: "all", label: "كل حالات الأداء" },
+              ...statusOptions.map((s) => ({ value: s, label: s })),
+            ]}
+          />
+          <FilterSelect
+            className="w-full"
+            value={trend ?? ""}
+            onValueChange={(v) => setTrend(v)}
+            options={[
+              { value: "all", label: "كل الاتجاهات" },
+              { value: "up", label: "صاعد ↗" },
+              { value: "down", label: "هابط ↘" },
+              { value: "flat", label: "ثابت" },
+              { value: "none", label: "بلا قياس سابق" },
+            ]}
+          />
+          <FilterSelect
+            className="w-full"
+            value={type ?? ""}
+            onValueChange={(v) => setType(v)}
+            options={[
+              { value: "all", label: "كل الأنواع" },
+              ...types.map((u) => ({ value: u, label: UNIT_LABEL[u] ?? u })),
+            ]}
+          />
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-3 pt-1">

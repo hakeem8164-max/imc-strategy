@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import FilterSelect from "@/components/ui/FilterSelect";
 import { useRouter } from "next/navigation";
 import {
   addOrgUnit,
@@ -242,32 +243,27 @@ export default function OrgStructureManager({
         <div className="grid gap-3 md:grid-cols-4">
           <div>
             <label className="label">النوع</label>
-            <select
-              className="input"
-              value={newType}
-              onChange={(e) => setNewType(e.target.value)}
-            >
-              {unitTypes.map((t) => (
-                <option key={t.id} value={t.name}>
-                  {t.name}
-                </option>
-              ))}
-            </select>
+            <FilterSelect
+              className="w-full"
+              value={newType ?? ""}
+              onValueChange={(v) => setNewType(v)}
+              options={unitTypes.map((t) => ({ value: t.name, label: t.name }))}
+            />
           </div>
           <div>
             <label className="label">يتبع لـ (اختياري)</label>
-            <select
-              className="input"
-              value={newParent}
-              onChange={(e) => setNewParent(e.target.value)}
-            >
-              <option value="">— المستوى الأعلى —</option>
-              {units.map((u) => (
-                <option key={u.id} value={u.id}>
-                  {u.unit_type}: {u.name}
-                </option>
-              ))}
-            </select>
+            <FilterSelect
+              className="w-full"
+              value={newParent ?? ""}
+              onValueChange={(v) => setNewParent(v)}
+              options={[
+                { value: "", label: "— المستوى الأعلى —" },
+                ...units.map((u) => ({
+                  value: u.id,
+                  label: `${u.unit_type}: ${u.name}`,
+                })),
+              ]}
+            />
           </div>
           <div className="md:col-span-2">
             <label className="label">الاسم</label>

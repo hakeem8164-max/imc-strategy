@@ -20,6 +20,7 @@ import {
   deleteDecision,
 } from "@/app/(app)/kpis/[id]/decisions-actions";
 import type { SimpleUser } from "@/components/KpiDecisions";
+import FilterSelect from "@/components/ui/FilterSelect";
 
 function fmtDate(d: string | null) {
   if (!d) return null;
@@ -129,19 +130,18 @@ export default function DecisionsTracker({
           ))}
         </div>
         <div className="mr-auto flex flex-wrap items-center gap-2">
-          <select
-            className="input w-auto py-2 text-sm"
-            value={assignee}
-            onChange={(e) => setAssignee(e.target.value)}
-          >
-            <option value="all">كل المسؤولين</option>
-            <option value="me">المُسنَد إليّ</option>
-            {users.map((u) => (
-              <option key={u.id} value={u.id}>
-                {u.full_name || "مستخدم"}
-              </option>
-            ))}
-          </select>
+          <FilterSelect
+            value={assignee ?? ""}
+            onValueChange={(v) => setAssignee(v)}
+            options={[
+              { value: "all", label: "كل المسؤولين" },
+              { value: "me", label: "المُسنَد إليّ" },
+              ...users.map((u) => ({
+                value: u.id,
+                label: u.full_name || "مستخدم",
+              })),
+            ]}
+          />
           <div className="relative">
             <Search
               size={15}

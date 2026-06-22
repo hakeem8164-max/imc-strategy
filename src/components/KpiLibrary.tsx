@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import FilterSelect from "@/components/ui/FilterSelect";
 import {
   addDimension,
   deleteDimension,
@@ -504,18 +505,18 @@ function EditKpiModal({
 
           <div>
             <label className="label">الهدف الاستراتيجي (المنظور)</label>
-            <select
-              className="input"
+            <FilterSelect
+              className="w-full"
               value={f.objective_id ?? ""}
-              onChange={(e) => set({ objective_id: e.target.value || null })}
-            >
-              <option value="">— بدون هدف —</option>
-              {objectives.map((o) => (
-                <option key={o.id} value={o.id}>
-                  {dimName(o.dimension_id)} ← {o.name}
-                </option>
-              ))}
-            </select>
+              onValueChange={(v) => set({ objective_id: v || null })}
+              options={[
+                { value: "", label: "— بدون هدف —" },
+                ...objectives.map((o) => ({
+                  value: o.id,
+                  label: `${dimName(o.dimension_id)} ← ${o.name}`,
+                })),
+              ]}
+            />
           </div>
 
           <div>
@@ -530,33 +531,30 @@ function EditKpiModal({
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <label className="label">المالك (من الهيكل التنظيمي)</label>
-              <select
-                className="input"
+              <FilterSelect
+                className="w-full"
                 value={f.owner_unit_id ?? ""}
-                onChange={(e) => set({ owner_unit_id: e.target.value || null })}
-              >
-                <option value="">— بدون —</option>
-                {orgUnits.map((u) => (
-                  <option key={u.id} value={u.id}>
-                    {u.unit_type}: {u.name}
-                  </option>
-                ))}
-              </select>
+                onValueChange={(v) => set({ owner_unit_id: v || null })}
+                options={[
+                  { value: "", label: "— بدون —" },
+                  ...orgUnits.map((u) => ({
+                    value: u.id,
+                    label: `${u.unit_type}: ${u.name}`,
+                  })),
+                ]}
+              />
             </div>
             <div>
               <label className="label">دورية القياس</label>
-              <select
-                className="input"
+              <FilterSelect
+                className="w-full"
                 value={f.frequency ?? ""}
-                onChange={(e) => set({ frequency: e.target.value || null })}
-              >
-                <option value="">— اختر —</option>
-                {FREQUENCIES.map((fr) => (
-                  <option key={fr} value={fr}>
-                    {fr}
-                  </option>
-                ))}
-              </select>
+                onValueChange={(v) => set({ frequency: v || null })}
+                options={[
+                  { value: "", label: "— اختر —" },
+                  ...FREQUENCIES.map((fr) => ({ value: fr, label: fr })),
+                ]}
+              />
             </div>
           </div>
 
@@ -574,47 +572,36 @@ function EditKpiModal({
           <div className="grid gap-4 sm:grid-cols-3">
             <div>
               <label className="label">الوحدة</label>
-              <select
-                className="input"
-                value={f.unit}
-                onChange={(e) => set({ unit: e.target.value as Unit })}
-              >
-                {UNITS.map((u) => (
-                  <option key={u.value} value={u.value}>
-                    {u.label}
-                  </option>
-                ))}
-              </select>
+              <FilterSelect
+                className="w-full"
+                value={f.unit ?? ""}
+                onValueChange={(v) => set({ unit: v as Unit })}
+                options={UNITS.map((u) => ({ value: u.value, label: u.label }))}
+              />
             </div>
             <div>
               <label className="label">القطبية</label>
-              <select
-                className="input"
-                value={f.polarity}
-                onChange={(e) => set({ polarity: e.target.value as Polarity })}
-              >
-                {POLARITIES.map((p) => (
-                  <option key={p.value} value={p.value}>
-                    {p.label}
-                  </option>
-                ))}
-              </select>
+              <FilterSelect
+                className="w-full"
+                value={f.polarity ?? ""}
+                onValueChange={(v) => set({ polarity: v as Polarity })}
+                options={POLARITIES.map((p) => ({
+                  value: p.value,
+                  label: p.label,
+                }))}
+              />
             </div>
             <div>
               <label className="label">آلية الاحتساب</label>
-              <select
-                className="input"
-                value={f.aggregation}
-                onChange={(e) =>
-                  set({ aggregation: e.target.value as Aggregation })
-                }
-              >
-                {AGGREGATIONS.map((a) => (
-                  <option key={a.value} value={a.value}>
-                    {a.label}
-                  </option>
-                ))}
-              </select>
+              <FilterSelect
+                className="w-full"
+                value={f.aggregation ?? ""}
+                onValueChange={(v) => set({ aggregation: v as Aggregation })}
+                options={AGGREGATIONS.map((a) => ({
+                  value: a.value,
+                  label: a.label,
+                }))}
+              />
             </div>
           </div>
 

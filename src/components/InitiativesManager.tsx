@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import FilterSelect from "@/components/ui/FilterSelect";
 import { useRouter } from "next/navigation";
 import {
   Plus,
@@ -159,20 +160,18 @@ export default function InitiativesManager({
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="sm:col-span-2">
               <label className="label">الهدف الاستراتيجي المرتبط *</label>
-              <select
-                className="input"
-                value={objectiveId}
-                onChange={(e) => setObjectiveId(e.target.value)}
-              >
-                <option value="">— اختر الهدف —</option>
-                {objectives.map((o) => (
-                  <option key={o.id} value={o.id}>
-                    {o.dimension?.name ? `${o.dimension.name} ← ` : ""}
-                    {o.code ? `${o.code} ` : ""}
-                    {o.name}
-                  </option>
-                ))}
-              </select>
+              <FilterSelect
+                className="w-full"
+                value={objectiveId ?? ""}
+                onValueChange={(v) => setObjectiveId(v)}
+                options={[
+                  { value: "", label: "— اختر الهدف —" },
+                  ...objectives.map((o) => ({
+                    value: o.id,
+                    label: `${o.dimension?.name ? `${o.dimension.name} ← ` : ""}${o.code ? `${o.code} ` : ""}${o.name}`,
+                  })),
+                ]}
+              />
             </div>
             <div className="sm:col-span-2">
               <label className="label">عنوان المبادرة *</label>
@@ -193,48 +192,45 @@ export default function InitiativesManager({
             </div>
             <div>
               <label className="label">الإدارة المالكة</label>
-              <select
-                className="input"
-                value={unitId}
-                onChange={(e) => setUnitId(e.target.value)}
-              >
-                <option value="">— بدون —</option>
-                {orgUnits.map((u) => (
-                  <option key={u.id} value={u.id}>
-                    {u.unit_type}: {u.name}
-                  </option>
-                ))}
-              </select>
+              <FilterSelect
+                className="w-full"
+                value={unitId ?? ""}
+                onValueChange={(v) => setUnitId(v)}
+                options={[
+                  { value: "", label: "— بدون —" },
+                  ...orgUnits.map((u) => ({
+                    value: u.id,
+                    label: `${u.unit_type}: ${u.name}`,
+                  })),
+                ]}
+              />
             </div>
             <div>
               <label className="label">مدير المبادرة (المسؤول)</label>
-              <select
-                className="input"
-                value={managerId}
-                onChange={(e) => setManagerId(e.target.value)}
-              >
-                <option value="">— بدون —</option>
-                {users.map((u) => (
-                  <option key={u.id} value={u.id}>
-                    {u.full_name ?? u.email}
-                  </option>
-                ))}
-              </select>
+              <FilterSelect
+                className="w-full"
+                value={managerId ?? ""}
+                onValueChange={(v) => setManagerId(v)}
+                options={[
+                  { value: "", label: "— بدون —" },
+                  ...users.map((u) => ({
+                    value: u.id,
+                    label: u.full_name ?? u.email ?? "",
+                  })),
+                ]}
+              />
             </div>
             <div>
               <label className="label">سنة بداية المبادرة</label>
-              <select
-                className="input"
-                value={startYear}
-                onChange={(e) => setStartYear(e.target.value)}
-              >
-                <option value="">— اختر السنة —</option>
-                {YEARS.map((y) => (
-                  <option key={y} value={y}>
-                    {y}
-                  </option>
-                ))}
-              </select>
+              <FilterSelect
+                className="w-full"
+                value={startYear ?? ""}
+                onValueChange={(v) => setStartYear(v)}
+                options={[
+                  { value: "", label: "— اختر السنة —" },
+                  ...YEARS.map((y) => ({ value: String(y), label: String(y) })),
+                ]}
+              />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>

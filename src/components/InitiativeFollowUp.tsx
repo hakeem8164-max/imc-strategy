@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
+import FilterSelect from "@/components/ui/FilterSelect";
 import { useRouter } from "next/navigation";
 import {
   Target,
@@ -373,17 +374,17 @@ function FollowCard({
               </button>
               <span className="mx-1 h-5 w-px bg-slate-200" />
               <label className="text-[11px] text-slate-500">خطورة التحدّي:</label>
-              <select
-                className="input w-28 py-1.5 text-xs"
-                value={severity}
-                onChange={(e) => setSeverity(e.target.value as Severity)}
-              >
-                {(Object.keys(SEVERITY) as Severity[]).map((s) => (
-                  <option key={s} value={s}>
-                    {SEVERITY[s].label}
-                  </option>
-                ))}
-              </select>
+              <div className="w-28">
+                <FilterSelect
+                  className="w-full"
+                  value={severity ?? ""}
+                  onValueChange={(v) => setSeverity(v as Severity)}
+                  options={(Object.keys(SEVERITY) as Severity[]).map((s) => ({
+                    value: s,
+                    label: SEVERITY[s].label,
+                  }))}
+                />
+              </div>
               <button
                 onClick={() => addNote("challenge")}
                 className="rounded-lg bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-700 hover:bg-amber-100"

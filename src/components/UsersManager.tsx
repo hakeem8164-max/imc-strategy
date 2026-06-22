@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import FilterSelect from "@/components/ui/FilterSelect";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { updateUser } from "@/app/(app)/admin/users/actions";
@@ -157,46 +158,38 @@ function UserRow({
         <p className="mt-1 text-xs text-slate-400">{user.email}</p>
       </td>
       <td className="px-4 py-3">
-        <select
-          className="input py-1.5"
-          value={role}
-          onChange={(e) => setRole(e.target.value as Role)}
-        >
-          {(Object.keys(ROLE_LABELS) as Role[]).map((r) => (
-            <option key={r} value={r}>
-              {ROLE_LABELS[r]}
-            </option>
-          ))}
-        </select>
+        <FilterSelect
+          className="w-full"
+          value={role ?? ""}
+          onValueChange={(v) => setRole(v as Role)}
+          options={(Object.keys(ROLE_LABELS) as Role[]).map((r) => ({
+            value: r,
+            label: ROLE_LABELS[r],
+          }))}
+        />
       </td>
       <td className="px-4 py-3">
-        <select
-          className="input py-1.5"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
+        <FilterSelect
+          className="w-full"
+          value={title ?? ""}
+          onValueChange={(v) => setTitle(v)}
           disabled={role !== "owner"}
-        >
-          <option value="">— بدون —</option>
-          {OWNER_TITLES.map((t) => (
-            <option key={t} value={t}>
-              {t}
-            </option>
-          ))}
-        </select>
+          options={[
+            { value: "", label: "— بدون —" },
+            ...OWNER_TITLES.map((t) => ({ value: t, label: t })),
+          ]}
+        />
       </td>
       <td className="px-4 py-3">
-        <select
-          className="input py-1.5"
-          value={unit}
-          onChange={(e) => setUnit(e.target.value)}
-        >
-          <option value="">— بدون —</option>
-          {orgUnits.map((o: OrgUnit) => (
-            <option key={o.id} value={o.id}>
-              {o.name}
-            </option>
-          ))}
-        </select>
+        <FilterSelect
+          className="w-full"
+          value={unit ?? ""}
+          onValueChange={(v) => setUnit(v)}
+          options={[
+            { value: "", label: "— بدون —" },
+            ...orgUnits.map((o: OrgUnit) => ({ value: o.id, label: o.name })),
+          ]}
+        />
       </td>
       <td className="px-4 py-3 text-left">
         <div className="flex justify-end gap-1">
@@ -330,49 +323,41 @@ function AddUserModal({ orgUnits, onClose, onDone, supabase }: any) {
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
               <label className="label">الدور</label>
-              <select
-                className="input"
-                value={role}
-                onChange={(e) => setRole(e.target.value as Role)}
-              >
-                {(Object.keys(ROLE_LABELS) as Role[]).map((r) => (
-                  <option key={r} value={r}>
-                    {ROLE_LABELS[r]}
-                  </option>
-                ))}
-              </select>
+              <FilterSelect
+                className="w-full"
+                value={role ?? ""}
+                onValueChange={(v) => setRole(v as Role)}
+                options={(Object.keys(ROLE_LABELS) as Role[]).map((r) => ({
+                  value: r,
+                  label: ROLE_LABELS[r],
+                }))}
+              />
             </div>
             <div>
               <label className="label">الإدارة</label>
-              <select
-                className="input"
-                value={unit}
-                onChange={(e) => setUnit(e.target.value)}
-              >
-                <option value="">— بدون —</option>
-                {orgUnits.map((o: OrgUnit) => (
-                  <option key={o.id} value={o.id}>
-                    {o.name}
-                  </option>
-                ))}
-              </select>
+              <FilterSelect
+                className="w-full"
+                value={unit ?? ""}
+                onValueChange={(v) => setUnit(v)}
+                options={[
+                  { value: "", label: "— بدون —" },
+                  ...orgUnits.map((o: OrgUnit) => ({ value: o.id, label: o.name })),
+                ]}
+              />
             </div>
           </div>
           {role === "owner" && (
             <div>
               <label className="label">المنصب (لربط المؤشرات)</label>
-              <select
-                className="input"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-              >
-                <option value="">— اختر منصبًا —</option>
-                {OWNER_TITLES.map((t) => (
-                  <option key={t} value={t}>
-                    {t}
-                  </option>
-                ))}
-              </select>
+              <FilterSelect
+                className="w-full"
+                value={title ?? ""}
+                onValueChange={(v) => setTitle(v)}
+                options={[
+                  { value: "", label: "— اختر منصبًا —" },
+                  ...OWNER_TITLES.map((t) => ({ value: t, label: t })),
+                ]}
+              />
             </div>
           )}
           {mode === "create" && (

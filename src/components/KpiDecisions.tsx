@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import FilterSelect from "@/components/ui/FilterSelect";
 import { useRouter } from "next/navigation";
 import {
   Gavel,
@@ -149,18 +150,18 @@ export default function KpiDecisions({
               <label className="mb-1 block text-xs font-semibold text-slate-500">
                 المسؤول عن المتابعة <span className="text-mushar-accent">*</span>
               </label>
-              <select
-                className="input"
-                value={assignee}
-                onChange={(e) => setAssignee(e.target.value)}
-              >
-                <option value="">— اختر الشخص —</option>
-                {users.map((u) => (
-                  <option key={u.id} value={u.id}>
-                    {u.full_name || "مستخدم"}
-                  </option>
-                ))}
-              </select>
+              <FilterSelect
+                className="w-full"
+                value={assignee ?? ""}
+                onValueChange={(v) => setAssignee(v)}
+                options={[
+                  { value: "", label: "— اختر الشخص —" },
+                  ...users.map((u) => ({
+                    value: u.id,
+                    label: u.full_name || "مستخدم",
+                  })),
+                ]}
+              />
             </div>
             <div>
               <label className="mb-1 block text-xs font-semibold text-slate-500">
@@ -361,18 +362,17 @@ function DecisionItem({
           <div className="flex flex-wrap items-center gap-2">
             <div className="flex items-center gap-1 text-xs text-slate-500">
               <AtSign size={13} />
-              <select
-                className="input w-auto py-1.5 text-xs"
-                value={mention}
-                onChange={(e) => setMention(e.target.value)}
-              >
-                <option value="">إشعار شخص (اختياري)</option>
-                {users.map((u) => (
-                  <option key={u.id} value={u.id}>
-                    {u.full_name || "مستخدم"}
-                  </option>
-                ))}
-              </select>
+              <FilterSelect
+                value={mention ?? ""}
+                onValueChange={(v) => setMention(v)}
+                options={[
+                  { value: "", label: "إشعار شخص (اختياري)" },
+                  ...users.map((u) => ({
+                    value: u.id,
+                    label: u.full_name || "مستخدم",
+                  })),
+                ]}
+              />
             </div>
             <button
               onClick={postUpdate}

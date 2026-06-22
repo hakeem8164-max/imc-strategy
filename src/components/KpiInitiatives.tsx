@@ -18,6 +18,7 @@ import type {
   InitiativeStatus,
 } from "@/lib/data";
 import type { SimpleUser } from "@/components/KpiDecisions";
+import FilterSelect from "@/components/ui/FilterSelect";
 import {
   addInitiative,
   updateInitiative,
@@ -140,18 +141,18 @@ export default function KpiInitiatives({
               <label className="mb-1 block text-xs font-semibold text-slate-500">
                 المسؤول
               </label>
-              <select
-                className="input"
-                value={owner}
-                onChange={(e) => setOwner(e.target.value)}
-              >
-                <option value="">— اختر —</option>
-                {users.map((u) => (
-                  <option key={u.id} value={u.id}>
-                    {u.full_name || "مستخدم"}
-                  </option>
-                ))}
-              </select>
+              <FilterSelect
+                className="w-full"
+                value={owner ?? ""}
+                onValueChange={(v) => setOwner(v)}
+                options={[
+                  { value: "", label: "— اختر —" },
+                  ...users.map((u) => ({
+                    value: u.id,
+                    label: u.full_name || "مستخدم",
+                  })),
+                ]}
+              />
             </div>
             <div>
               <label className="mb-1 block text-xs font-semibold text-slate-500">
@@ -398,18 +399,16 @@ function InitiativeItem({
         <div className="mt-3 flex flex-wrap items-center gap-3 border-t border-slate-100 pt-3">
           <label className="flex items-center gap-1.5 text-xs text-slate-500">
             الحالة:
-            <select
-              className="input w-auto py-1 text-xs"
-              value={i.status}
-              onChange={(e) => setStatus(e.target.value as InitiativeStatus)}
+            <FilterSelect
+              className="w-full"
+              value={i.status ?? ""}
+              onValueChange={(v) => setStatus(v as InitiativeStatus)}
               disabled={pending}
-            >
-              {(Object.keys(STATUS) as InitiativeStatus[]).map((s) => (
-                <option key={s} value={s}>
-                  {STATUS[s].label}
-                </option>
-              ))}
-            </select>
+              options={(Object.keys(STATUS) as InitiativeStatus[]).map((s) => ({
+                value: s,
+                label: STATUS[s].label,
+              }))}
+            />
           </label>
           <label className="flex items-center gap-1.5 text-xs text-slate-500">
             الإنجاز %:

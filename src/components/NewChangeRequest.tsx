@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Plus } from "lucide-react";
 import { submitChange } from "@/app/(app)/change-requests/actions";
 import { createClient } from "@/lib/supabase/client";
+import FilterSelect from "@/components/ui/FilterSelect";
 import {
   UNITS,
   POLARITIES,
@@ -236,68 +237,87 @@ export default function NewChangeRequest({
         return <textarea className="input min-h-[70px]" value={v[key] ?? ""} onChange={(e) => set(key, e.target.value)} />;
       case "dimension":
         return (
-          <select className="input" value={v[key] ?? ""} onChange={(e) => set(key, e.target.value)}>
-            <option value="">— اختر المنظور —</option>
-            {dimensions.map((d) => (<option key={d.id} value={d.id}>{d.name}</option>))}
-          </select>
+          <FilterSelect className="w-full" value={v[key] ?? ""} onValueChange={(val) => set(key, val)}
+            options={[
+              { value: "", label: "— اختر المنظور —" },
+              ...dimensions.map((d) => ({ value: d.id, label: d.name })),
+            ]}
+          />
         );
       case "objective":
         return (
-          <select className="input" value={v[key] ?? ""} onChange={(e) => set(key, e.target.value)}>
-            <option value="">— اختر الهدف —</option>
-            {objectives.map((o) => (
-              <option key={o.id} value={o.id}>{o.dimension?.name ? `${o.dimension.name} ← ` : ""}{o.name}</option>
-            ))}
-          </select>
+          <FilterSelect className="w-full" value={v[key] ?? ""} onValueChange={(val) => set(key, val)}
+            options={[
+              { value: "", label: "— اختر الهدف —" },
+              ...objectives.map((o) => ({
+                value: o.id,
+                label: `${o.dimension?.name ? `${o.dimension.name} ← ` : ""}${o.name}`,
+              })),
+            ]}
+          />
         );
       case "unit":
         return (
-          <select className="input" value={v[key] ?? ""} onChange={(e) => set(key, e.target.value)}>
-            <option value="">— اختر —</option>
-            {UNITS.map((u) => (<option key={u.value} value={u.value}>{u.label}</option>))}
-          </select>
+          <FilterSelect className="w-full" value={v[key] ?? ""} onValueChange={(val) => set(key, val)}
+            options={[
+              { value: "", label: "— اختر —" },
+              ...UNITS.map((u) => ({ value: u.value, label: u.label })),
+            ]}
+          />
         );
       case "polarity":
         return (
-          <select className="input" value={v[key] ?? ""} onChange={(e) => set(key, e.target.value)}>
-            <option value="">— اختر —</option>
-            {POLARITIES.map((p) => (<option key={p.value} value={p.value}>{p.label}</option>))}
-          </select>
+          <FilterSelect className="w-full" value={v[key] ?? ""} onValueChange={(val) => set(key, val)}
+            options={[
+              { value: "", label: "— اختر —" },
+              ...POLARITIES.map((p) => ({ value: p.value, label: p.label })),
+            ]}
+          />
         );
       case "aggregation":
         return (
-          <select className="input" value={v[key] ?? ""} onChange={(e) => set(key, e.target.value)}>
-            <option value="">— اختر —</option>
-            {AGGREGATIONS.map((a) => (<option key={a.value} value={a.value}>{a.label}</option>))}
-          </select>
+          <FilterSelect className="w-full" value={v[key] ?? ""} onValueChange={(val) => set(key, val)}
+            options={[
+              { value: "", label: "— اختر —" },
+              ...AGGREGATIONS.map((a) => ({ value: a.value, label: a.label })),
+            ]}
+          />
         );
       case "frequency":
         return (
-          <select className="input" value={v[key] ?? ""} onChange={(e) => set(key, e.target.value)}>
-            <option value="">— اختر —</option>
-            {FREQUENCIES.map((f) => (<option key={f} value={f}>{f}</option>))}
-          </select>
+          <FilterSelect className="w-full" value={v[key] ?? ""} onValueChange={(val) => set(key, val)}
+            options={[
+              { value: "", label: "— اختر —" },
+              ...FREQUENCIES.map((f) => ({ value: f, label: f })),
+            ]}
+          />
         );
       case "owner_unit":
         return (
-          <select className="input" value={v[key] ?? ""} onChange={(e) => set(key, e.target.value)}>
-            <option value="">— بدون —</option>
-            {orgUnits.map((u) => (<option key={u.id} value={u.id}>{u.unit_type}: {u.name}</option>))}
-          </select>
+          <FilterSelect className="w-full" value={v[key] ?? ""} onValueChange={(val) => set(key, val)}
+            options={[
+              { value: "", label: "— بدون —" },
+              ...orgUnits.map((u) => ({ value: u.id, label: `${u.unit_type}: ${u.name}` })),
+            ]}
+          />
         );
       case "owner_user":
         return (
-          <select className="input" value={v[key] ?? ""} onChange={(e) => set(key, e.target.value)}>
-            <option value="">— بدون —</option>
-            {users.map((u) => (<option key={u.id} value={u.id}>{u.full_name ?? u.email}</option>))}
-          </select>
+          <FilterSelect className="w-full" value={v[key] ?? ""} onValueChange={(val) => set(key, val)}
+            options={[
+              { value: "", label: "— بدون —" },
+              ...users.map((u) => ({ value: u.id, label: u.full_name ?? u.email ?? "" })),
+            ]}
+          />
         );
       case "year":
         return (
-          <select className="input" value={v[key] ?? ""} onChange={(e) => set(key, e.target.value)}>
-            <option value="">— اختر السنة —</option>
-            {YEARS.map((y) => (<option key={y} value={y}>{y}</option>))}
-          </select>
+          <FilterSelect className="w-full" value={v[key] ?? ""} onValueChange={(val) => set(key, val)}
+            options={[
+              { value: "", label: "— اختر السنة —" },
+              ...YEARS.map((y) => ({ value: String(y), label: String(y) })),
+            ]}
+          />
         );
       case "date":
         return <input type="date" className="input" value={v[key] ?? ""} onChange={(e) => set(key, e.target.value)} />;
@@ -413,30 +433,32 @@ export default function NewChangeRequest({
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <label className="label">مجال طلب التغيير *</label>
-          <select
-            className="input"
-            value={domain}
-            onChange={(e) => { setDomain(e.target.value as typeof domain); setTargetId(""); setAspectKey(""); setV({}); }}
-          >
-            <option value="">— اختر المجال —</option>
-            <option value="objective">الأهداف</option>
-            <option value="kpi">المؤشرات</option>
-            <option value="initiative">المبادرات</option>
-          </select>
+          <FilterSelect
+            className="w-full"
+            value={domain ?? ""}
+            onValueChange={(v) => { setDomain(v as typeof domain); setTargetId(""); setAspectKey(""); setV({}); }}
+            options={[
+              { value: "", label: "— اختر المجال —" },
+              { value: "objective", label: "الأهداف" },
+              { value: "kpi", label: "المؤشرات" },
+              { value: "initiative", label: "المبادرات" },
+            ]}
+          />
         </div>
         <div>
           <label className="label">نوع طلب التغيير *</label>
-          <select
-            className="input"
-            value={action}
+          <FilterSelect
+            className="w-full"
+            value={action ?? ""}
             disabled={!domain}
-            onChange={(e) => { setAction(e.target.value as typeof action); setTargetId(""); setAspectKey(""); setV({}); }}
-          >
-            <option value="">— اختر النوع —</option>
-            <option value="create">إضافة</option>
-            <option value="update">تعديل</option>
-            <option value="delete">حذف</option>
-          </select>
+            onValueChange={(v) => { setAction(v as typeof action); setTargetId(""); setAspectKey(""); setV({}); }}
+            options={[
+              { value: "", label: "— اختر النوع —" },
+              { value: "create", label: "إضافة" },
+              { value: "update", label: "تعديل" },
+              { value: "delete", label: "حذف" },
+            ]}
+          />
         </div>
       </div>
 
@@ -451,20 +473,24 @@ export default function NewChangeRequest({
       {(action === "update" || action === "delete") && domain && (
         <div>
           <label className="label">العنصر *</label>
-          <select className="input" value={targetId} onChange={(e) => setTargetId(e.target.value)}>
-            <option value="">— اختر —</option>
-            {targetList.map((t) => (<option key={t.id} value={t.id}>{t.name}</option>))}
-          </select>
+          <FilterSelect className="w-full" value={targetId ?? ""} onValueChange={(v) => setTargetId(v)}
+            options={[
+              { value: "", label: "— اختر —" },
+              ...targetList.map((t) => ({ value: t.id, label: t.name })),
+            ]}
+          />
         </div>
       )}
 
       {action === "update" && domain && (
         <div>
           <label className="label">الحقل المراد تعديله *</label>
-          <select className="input" value={aspectKey} onChange={(e) => { setAspectKey(e.target.value); setV({}); }}>
-            <option value="">— اختر الحقل —</option>
-            {aspects.map((a) => (<option key={a.key} value={a.key}>{a.label}</option>))}
-          </select>
+          <FilterSelect className="w-full" value={aspectKey ?? ""} onValueChange={(v) => { setAspectKey(v); setV({}); }}
+            options={[
+              { value: "", label: "— اختر الحقل —" },
+              ...aspects.map((a) => ({ value: a.key, label: a.label })),
+            ]}
+          />
         </div>
       )}
 
