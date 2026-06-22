@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import FilterSelect from "@/components/ui/FilterSelect";
+import Modal from "@/components/ui/Modal";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { updateUser } from "@/app/(app)/admin/users/actions";
@@ -270,15 +271,8 @@ function AddUserModal({ orgUnits, onClose, onDone, supabase }: any) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="card max-h-[90vh] w-full max-w-lg overflow-y-auto p-4 sm:p-6">
-        <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-lg font-bold text-mushar-dark">إضافة مستخدم</h3>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600">
-            ✕
-          </button>
-        </div>
-
+    <Modal open onClose={onClose} title="إضافة مستخدم" maxWidth="max-w-lg">
+      <div>
         <div className="mb-4 flex gap-2 rounded-lg bg-slate-100 p-1">
           <button
             onClick={() => setMode("create")}
@@ -415,6 +409,6 @@ function AddUserModal({ orgUnits, onClose, onDone, supabase }: any) {
           )}
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }

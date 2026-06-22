@@ -2,9 +2,12 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { Collapsible } from "@base-ui/react/collapsible";
+import { ChevronDown } from "lucide-react";
 import FilterSelect from "@/components/ui/FilterSelect";
 import ToggleSwitch from "@/components/ui/ToggleSwitch";
 import NumberInput from "@/components/ui/NumberInput";
+import Modal from "@/components/ui/Modal";
 import { notify } from "@/components/ui/toast";
 import { confirmDialog, promptDialog } from "@/components/ui/confirm";
 import {
@@ -61,10 +64,6 @@ export default function KpiLibrary({
 
   const ownerName = (id: string | null) =>
     id ? orgUnits.find((u) => u.id === id)?.name ?? "—" : "—";
-
-  function toggleDim(id: string) {
-    setOpenDim((s) => ({ ...s, [id]: !s[id] }));
-  }
 
   function createDim() {
     startTransition(async () => {
@@ -197,29 +196,33 @@ export default function KpiLibrary({
           const dimKpiCount = kpis.filter((k) => k.dimension_id === d.id).length;
           const isOpen = openDim[d.id];
           return (
-            <div key={d.id} className="card overflow-hidden">
+            <Collapsible.Root
+              key={d.id}
+              open={isOpen}
+              onOpenChange={(o) => setOpenDim((s) => ({ ...s, [d.id]: o }))}
+              className="card overflow-hidden"
+            >
               <div
-                className="flex cursor-pointer items-center gap-3 px-5 py-4"
+                className="flex items-center gap-3 px-5 py-4"
                 style={{ backgroundColor: `${d.color}14` }}
-                onClick={() => toggleDim(d.id)}
               >
-                <span
-                  className={`text-sm transition-transform ${isOpen ? "rotate-180" : ""}`}
-                >
-                  ▾
-                </span>
-                <span
-                  className="h-3 w-3 rounded-full"
-                  style={{ backgroundColor: d.color }}
-                />
-                <h3 className="font-bold text-mushar-dark">{d.name}</h3>
-                <span className="text-xs text-slate-400">
-                  ({dimObjectives.length} أهداف · {dimKpiCount} مؤشر)
-                </span>
-                <div className="mr-auto flex items-center gap-2">
+                <Collapsible.Trigger className="flex flex-1 items-center gap-3 text-right outline-none">
+                  <ChevronDown
+                    size={16}
+                    className={`text-slate-500 transition-transform ${isOpen ? "rotate-180" : ""}`}
+                  />
+                  <span
+                    className="h-3 w-3 rounded-full"
+                    style={{ backgroundColor: d.color }}
+                  />
+                  <h3 className="font-bold text-mushar-dark">{d.name}</h3>
+                  <span className="text-xs text-slate-400">
+                    ({dimObjectives.length} أهداف · {dimKpiCount} مؤشر)
+                  </span>
+                </Collapsible.Trigger>
+                <div className="flex items-center gap-2">
                   <button
-                    onClick={(e) => {
-                      e.stopPropagation();
+                    onClick={() => {
                       setAddingObjFor(d.id);
                       setObjName("");
                       setOpenDim((s) => ({ ...s, [d.id]: true }));
@@ -229,10 +232,7 @@ export default function KpiLibrary({
                     + هدف
                   </button>
                   <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      removeDim(d);
-                    }}
+                    onClick={() => removeDim(d)}
                     className="rounded-lg px-2 py-1.5 text-xs font-semibold text-mushar-accent hover:bg-mushar-accent/10"
                   >
                     حذف المنظور
@@ -240,7 +240,7 @@ export default function KpiLibrary({
                 </div>
               </div>
 
-              {isOpen && (
+              <Collapsible.Panel className="h-[var(--collapsible-panel-height)] overflow-hidden transition-[height] duration-200 motion-reduce:transition-none">
                 <div className="space-y-3 p-4">
                   {addingObjFor === d.id && (
                     <div className="flex flex-wrap items-end gap-2 rounded-xl bg-slate-50 p-3">
@@ -378,8 +378,8 @@ export default function KpiLibrary({
                     );
                   })}
                 </div>
-              )}
-            </div>
+              </Collapsible.Panel>
+            </Collapsible.Root>
           );
         })}
         {dimensions.length === 0 && (
@@ -476,15 +476,8 @@ function EditKpiModal({
   );
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="card max-h-[90vh] w-full max-w-2xl overflow-y-auto p-4 sm:p-6">
-        <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-lg font-bold text-mushar-dark">تحرير المؤشر</h3>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600">
-            ✕
-          </button>
-        </div>
-
+    <Modal open onClose={onClose} title="تحرير المؤشر">
+      <div>
         <div className="space-y-4">
           <div>
             <label className="label">اسم المؤشر</label>
@@ -639,6 +632,6 @@ function EditKpiModal({
           </button>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }

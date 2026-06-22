@@ -19,6 +19,22 @@ notify.success = (m: string) => notify(m, "success");
 notify.error = (m: string) => notify(m, "error");
 notify.info = (m: string) => notify(m, "info");
 
+/** توست وعدي: جارٍ… ← تم/فشل */
+notify.promise = async <T,>(
+  p: Promise<T>,
+  msgs: { loading: string; success: string; error: string }
+): Promise<T> => {
+  const id = toastManager.add({ title: msgs.loading, type: "info", timeout: 0 });
+  try {
+    const r = await p;
+    toastManager.update(id, { title: msgs.success, type: "success", timeout: 4000 });
+    return r;
+  } catch (e) {
+    toastManager.update(id, { title: msgs.error, type: "error", timeout: 6000 });
+    throw e;
+  }
+};
+
 const STYLE: Record<string, { border: string; icon: React.ReactNode }> = {
   success: { border: "border-r-emerald-500", icon: <CheckCircle2 size={18} className="text-emerald-600" /> },
   error: { border: "border-r-mushar-accent", icon: <AlertTriangle size={18} className="text-mushar-accent" /> },

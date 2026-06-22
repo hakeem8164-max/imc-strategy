@@ -235,38 +235,49 @@ function FollowCard({
     if (!lessons.trim()) return notify("اكتب الدروس المستفادة.", "error");
     if (!file) return notify("رفع وثيقة الإغلاق إلزامي.", "error");
     setBusy(true);
-    const path = `change-requests/${Date.now()}-${file.name}`;
-    const { error: upErr } = await supabase.storage.from("kpi-docs").upload(path, file);
-    if (upErr) {
-      setBusy(false);
-      return notify("تعذّر رفع الوثيقة: " + upErr.message, "error");
-    }
-    const res = await submitChange({
-      entity_type: "initiative",
-      action: "update",
-      entity_id: i.id,
-      title: `طلب اكتمال المبادرة: ${i.title}`,
-      payload: {
-        mark_complete: "1",
-        lessons_learned: lessons.trim(),
-        completion_doc_url: path,
-        completion_doc_name: file.name,
-        __meta: {
-          reason: "طلب اعتماد اكتمال المبادرة",
-          attachment_url: path,
-          attachment_name: file.name,
-          new_value: "اكتمال المبادرة",
-        },
-      },
-    });
-    setBusy(false);
-    if (res.ok) {
+    try {
+      await notify.promise(
+        (async () => {
+          const path = `change-requests/${Date.now()}-${file.name}`;
+          const { error: upErr } = await supabase.storage
+            .from("kpi-docs")
+            .upload(path, file);
+          if (upErr) throw new Error("تعذّر رفع الوثيقة");
+          const res = await submitChange({
+            entity_type: "initiative",
+            action: "update",
+            entity_id: i.id,
+            title: `طلب اكتمال المبادرة: ${i.title}`,
+            payload: {
+              mark_complete: "1",
+              lessons_learned: lessons.trim(),
+              completion_doc_url: path,
+              completion_doc_name: file.name,
+              __meta: {
+                reason: "طلب اعتماد اكتمال المبادرة",
+                attachment_url: path,
+                attachment_name: file.name,
+                new_value: "اكتمال المبادرة",
+              },
+            },
+          });
+          if (!res.ok) throw new Error(res.error || "تعذّر رفع الطلب");
+        })(),
+        {
+          loading: "جارٍ رفع طلب الاكتمال…",
+          success: "تم رفع طلب اكتمال المبادرة للاعتماد.",
+          error: "تعذّر رفع طلب الاكتمال.",
+        }
+      );
       setShowComplete(false);
       setLessons("");
       setFile(null);
-      notify("تم رفع طلب اكتمال المبادرة للاعتماد.", "success");
       router.refresh();
-    } else notify(res.error || "خطأ", "error");
+    } catch {
+      /* عُرض الخطأ عبر التوست */
+    } finally {
+      setBusy(false);
+    }
   }
 
   async function openDoc(path: string) {
