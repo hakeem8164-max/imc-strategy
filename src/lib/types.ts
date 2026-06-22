@@ -1,4 +1,4 @@
-export type Role = "admin" | "executive" | "owner" | "employee" | "viewer";
+export type Role = "admin" | "executive" | "owner" | "employee" | "viewer" | "secretary";
 
 export type Unit = "%" | "$" | "#" | "";
 
@@ -221,6 +221,7 @@ export const ROLE_LABELS: Record<Role, string> = {
   owner: "مدير قطاع/إدارة/محفظة",
   employee: "موظف إدخال البيانات",
   viewer: "مشاهد",
+  secretary: "أمين اللجان",
 };
 
 /** وصف موجز لكل دور */
@@ -230,4 +231,5 @@ export const ROLE_DESCRIPTIONS: Record<Role, string> = {
   owner: "يُدخل النتائج، ويعتمد ما يرسله موظفو إدارته قبل رفعها للمسؤول.",
   employee: "يُدخل نتائج مؤشرات إدارته وترسل لمدير الإدارة.",
   viewer: "اطّلاع محدود.",
+  secretary: "يوثّق محاضر الاجتماعات ويسجّل التوصيات ويتابعها.",
 };

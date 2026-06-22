@@ -1,0 +1,6 @@
+-- وحدة الاجتماعات والتوصيات: جداول + صلاحيات + دوال إغلاق + مجالات قابلة للضبط.
+-- (انظر التطبيق على القاعدة: recommendation_domains, meetings, meeting_recommendations,
+--  recommendation_participants, recommendation_updates, recommendation_update_replies,
+--  can_manage_meetings(), request_recommendation_closure(), review_recommendation_closure())
+-- المجالات المبدئية: البناء والتأهيل، الصيانة والتشغيل، الشراكات، الموارد المالية،
+--  الموارد البشرية، التنظيمات والتشريعات، خطط تشغيلية.

@@ -20,6 +20,7 @@ import {
   KeyRound,
   ScrollText,
   Landmark,
+  CalendarCheck,
   Rocket,
   GanttChartSquare,
   GitPullRequestArrow,
@@ -35,6 +36,12 @@ const NAV: Item[] = [
   { href: "/", label: "لوحة الأداء التنفيذية", icon: LayoutDashboard },
   { href: "/kpis", label: "لوحة الأداء التفصيلية", icon: ClipboardList },
   { href: "/awqaf", label: "أهداف الوقفين", icon: Landmark },
+  {
+    href: "/meetings",
+    label: "الاجتماعات",
+    icon: CalendarCheck,
+    roles: ["admin", "executive", "owner", "employee", "secretary"],
+  },
   {
     href: "/my-tasks",
     label: "مهامّي",

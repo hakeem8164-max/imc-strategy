@@ -699,3 +699,115 @@ export async function getChangeRequests(): Promise<ChangeRequest[]> {
     .order("created_at", { ascending: false });
   return (data as ChangeRequest[]) ?? [];
 }
+
+// ===== الاجتماعات والتوصيات =====
+export interface RecommendationDomain {
+  id: string;
+  name: string;
+  sort_order: number;
+  is_active: boolean;
+}
+
+export interface RecUpdateReply {
+  id: string;
+  update_id: string;
+  body: string;
+  created_by: string | null;
+  created_at: string;
+  author?: { full_name: string | null } | null;
+}
+
+export interface RecommendationUpdate {
+  id: string;
+  recommendation_id: string;
+  kind: "update" | "challenge";
+  body: string;
+  severity: "low" | "medium" | "high" | "critical" | null;
+  resolved: boolean;
+  resolved_at: string | null;
+  created_by: string | null;
+  created_at: string;
+  author?: { full_name: string | null } | null;
+  replies?: RecUpdateReply[];
+}
+
+export interface MeetingRecommendation {
+  id: string;
+  meeting_id: string;
+  name: string;
+  description: string | null;
+  domain_id: string | null;
+  owner_unit_id: string | null;
+  owner_user_id: string | null;
+  due_date: string | null;
+  priority: "low" | "medium" | "high" | "critical";
+  closure_status: "open" | "pending" | "closed";
+  closure_doc_url: string | null;
+  closure_doc_name: string | null;
+  resolved_at: string | null;
+  created_at: string;
+  domain?: { id: string; name: string } | null;
+  owner_unit?: { id: string; name: string } | null;
+  owner?: { full_name: string | null } | null;
+  participants?: { org_unit: { id: string; name: string } | null }[];
+  updates?: RecommendationUpdate[];
+  meeting?: { id: string; title: string; meeting_date: string | null } | null;
+}
+
+export interface Meeting {
+  id: string;
+  type: string;
+  meeting_date: string | null;
+  committee: string | null;
+  title: string;
+  attendees: string | null;
+  minutes: string | null;
+  cycle: string | null;
+  created_at: string;
+  recommendations?: MeetingRecommendation[];
+}
+
+export async function getRecommendationDomains(): Promise<RecommendationDomain[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("recommendation_domains")
+    .select("*")
+    .order("sort_order");
+  return (data as RecommendationDomain[]) ?? [];
+}
+
+export async function getMeetings(): Promise<Meeting[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("meetings")
+    .select(
+      "*, recommendations:meeting_recommendations(*, domain:recommendation_domains(id,name), owner_unit:org_units(id,name), owner:profiles!meeting_recommendations_owner_user_id_fkey(full_name), participants:recommendation_participants(org_unit:org_units(id,name)), updates:recommendation_updates(*, author:profiles!recommendation_updates_created_by_fkey(full_name), replies:recommendation_update_replies(*, author:profiles!recommendation_update_replies_created_by_fkey(full_name))))"
+    )
+    .order("meeting_date", { ascending: false, nullsFirst: false })
+    .order("created_at", { ascending: false });
+  const list = (data as Meeting[]) ?? [];
+  for (const m of list) {
+    if (m.recommendations) {
+      m.recommendations.sort((a, b) => a.created_at.localeCompare(b.created_at));
+      for (const r of m.recommendations)
+        if (r.updates) {
+          r.updates.sort((a, b) => b.created_at.localeCompare(a.created_at));
+          for (const u of r.updates)
+            if (u.replies) u.replies.sort((a, b) => a.created_at.localeCompare(b.created_at));
+        }
+    }
+  }
+  return list;
+}
+
+/** توصيات مُسنَدة للمستخدم وغير مغلقة (لصفحة مهامّي) */
+export async function getMyRecommendations(userId: string): Promise<MeetingRecommendation[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("meeting_recommendations")
+    .select("*, meeting:meetings(id,title,meeting_date), domain:recommendation_domains(id,name)")
+    .eq("owner_user_id", userId)
+    .neq("closure_status", "closed")
+    .order("due_date", { ascending: true, nullsFirst: false });
+  return (data as MeetingRecommendation[]) ?? [];
+}

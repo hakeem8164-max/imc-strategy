@@ -6,7 +6,7 @@ import { setPermission } from "@/app/(app)/admin/permissions/actions";
 import { notify } from "@/components/ui/toast";
 import { PERMISSIONS, ROLE_LABELS, type Role } from "@/lib/types";
 
-const ROLES: Role[] = ["admin", "executive", "owner", "viewer"];
+const ROLES: Role[] = ["admin", "executive", "owner", "secretary", "viewer"];
 
 export default function PermissionsMatrix({
   initial,

@@ -10,13 +10,19 @@ import {
   CheckCircle2,
   ClipboardList,
   Gavel,
+  CalendarCheck,
 } from "lucide-react";
 import {
   getProfile,
   getDueKpis,
   getMyDecisions,
   getMyInitiatives,
+  getMyRecommendations,
 } from "@/lib/data";
+import {
+  computeRecStatus,
+  REC_STATUS,
+} from "@/lib/recommendation-status";
 
 function fmtDate(d: string | null) {
   if (!d) return null;
@@ -32,13 +38,18 @@ export default async function MyTasksPage() {
   const profile = await getProfile();
   if (!profile) redirect("/login");
 
-  const [dueItems, decisions, initiatives] = await Promise.all([
+  const [dueItems, decisions, initiatives, recommendations] = await Promise.all([
     getDueKpis(profile),
     getMyDecisions(profile.id),
     getMyInitiatives(profile.id),
+    getMyRecommendations(profile.id),
   ]);
 
-  const total = dueItems.length + decisions.length + initiatives.length;
+  const total =
+    dueItems.length +
+    decisions.length +
+    initiatives.length +
+    recommendations.length;
 
   return (
     <>
@@ -84,6 +95,64 @@ export default async function MyTasksPage() {
             </div>
           ) : (
             <OpenDecisions decisions={decisions} />
+          )}
+        </section>
+
+        {/* توصيات اجتماعات مُسنَدة إليّ */}
+        <section>
+          <h2 className="mb-3 flex items-center gap-2 text-base font-bold text-mushar-dark">
+            <CalendarCheck size={18} className="text-mushar-primary" />
+            توصيات اجتماعات مُسنَدة إليّ
+          </h2>
+          {recommendations.length === 0 ? (
+            <div className="card flex items-center gap-2 p-5 text-sm text-slate-400">
+              <CheckCircle2 size={16} className="text-green-500" />
+              لا توجد توصيات مفتوحة مُسنَدة إليك.
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {recommendations.map((r) => {
+                const st =
+                  REC_STATUS[
+                    computeRecStatus({
+                      closed: r.closure_status === "closed",
+                      due_date: r.due_date,
+                    })
+                  ];
+                return (
+                  <Link
+                    key={r.id}
+                    href="/meetings"
+                    className="card group block p-4 transition hover:border-mushar-pale"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0 flex-1">
+                        <p className="flex items-center gap-1 text-sm font-bold text-mushar-dark group-hover:text-mushar-primary">
+                          {r.name}
+                          <ArrowLeft size={13} className="text-slate-300" />
+                        </p>
+                        <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-400">
+                          {r.meeting?.title && <span>{r.meeting.title}</span>}
+                          {r.domain?.name && <span>· {r.domain.name}</span>}
+                          {r.due_date && (
+                            <span className="flex items-center gap-1">
+                              <CalendarClock size={12} />
+                              استحقاق: {fmtDate(r.due_date)}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <span
+                        className="shrink-0 rounded-md px-2 py-1 text-[11px] font-bold"
+                        style={{ backgroundColor: `${st.color}1a`, color: st.color }}
+                      >
+                        {st.label}
+                      </span>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
           )}
         </section>
 
