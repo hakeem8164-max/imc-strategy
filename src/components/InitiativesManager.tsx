@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import FilterSelect from "@/components/ui/FilterSelect";
+import SearchableSelect from "@/components/ui/SearchableSelect";
 import { useRouter } from "next/navigation";
 import {
   Plus,
@@ -26,6 +27,8 @@ import {
 import type { Objective, Profile, OrgUnit } from "@/lib/types";
 import type { KpiInitiative } from "@/lib/data";
 import { computeAutoStatus, AUTO_STATUS, achievedWeight } from "@/lib/initiative-status";
+import { notify } from "@/components/ui/toast";
+import { confirmDialog } from "@/components/ui/confirm";
 
 const YEARS = Array.from({ length: 11 }, (_, i) => 2025 + i);
 
@@ -134,7 +137,7 @@ export default function InitiativesManager({
       if (res.ok) {
         resetForm();
         setShowForm(false);
-        alert("تم رفع طلب إنشاء المبادرة. سيظهر بعد اعتماده النهائي.");
+        notify("تم رفع طلب إنشاء المبادرة. سيظهر بعد اعتماده النهائي.", "success");
         router.refresh();
       } else setErr(res.error || "خطأ");
     });
@@ -160,17 +163,15 @@ export default function InitiativesManager({
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="sm:col-span-2">
               <label className="label">الهدف الاستراتيجي المرتبط *</label>
-              <FilterSelect
+              <SearchableSelect
                 className="w-full"
+                placeholder="— اختر الهدف —"
                 value={objectiveId ?? ""}
                 onValueChange={(v) => setObjectiveId(v)}
-                options={[
-                  { value: "", label: "— اختر الهدف —" },
-                  ...objectives.map((o) => ({
-                    value: o.id,
-                    label: `${o.dimension?.name ? `${o.dimension.name} ← ` : ""}${o.code ? `${o.code} ` : ""}${o.name}`,
-                  })),
-                ]}
+                options={objectives.map((o) => ({
+                  value: o.id,
+                  label: `${o.dimension?.name ? `${o.dimension.name} ← ` : ""}${o.code ? `${o.code} ` : ""}${o.name}`,
+                }))}
               />
             </div>
             <div className="sm:col-span-2">
@@ -192,32 +193,28 @@ export default function InitiativesManager({
             </div>
             <div>
               <label className="label">الإدارة المالكة</label>
-              <FilterSelect
+              <SearchableSelect
                 className="w-full"
+                placeholder="— بدون —"
                 value={unitId ?? ""}
                 onValueChange={(v) => setUnitId(v)}
-                options={[
-                  { value: "", label: "— بدون —" },
-                  ...orgUnits.map((u) => ({
-                    value: u.id,
-                    label: `${u.unit_type}: ${u.name}`,
-                  })),
-                ]}
+                options={orgUnits.map((u) => ({
+                  value: u.id,
+                  label: `${u.unit_type}: ${u.name}`,
+                }))}
               />
             </div>
             <div>
               <label className="label">مدير المبادرة (المسؤول)</label>
-              <FilterSelect
+              <SearchableSelect
                 className="w-full"
+                placeholder="— بدون —"
                 value={managerId ?? ""}
                 onValueChange={(v) => setManagerId(v)}
-                options={[
-                  { value: "", label: "— بدون —" },
-                  ...users.map((u) => ({
-                    value: u.id,
-                    label: u.full_name ?? u.email ?? "",
-                  })),
-                ]}
+                options={users.map((u) => ({
+                  value: u.id,
+                  label: u.full_name ?? u.email ?? "",
+                }))}
               />
             </div>
             <div>
@@ -460,12 +457,12 @@ function InitiativeCard({
     startTransition(async () => {
       const res = await fn();
       if (res.ok) router.refresh();
-      else alert(res.error);
+      else notify(res.error || "خطأ", "error");
     });
   }
 
-  function remove() {
-    if (confirm(`رفع طلب حذف المبادرة «${i.title}»؟`))
+  async function remove() {
+    if (await confirmDialog(`رفع طلب حذف المبادرة «${i.title}»؟`, { danger: true, confirmText: "حذف" }))
       run(() => removeInitiative(i.id, i.title));
   }
 
@@ -591,7 +588,7 @@ function MilestonesSection({
   function add() {
     if (!title.trim()) return;
     if (!(Number(weight) > 0)) {
-      alert("لكل معلَم وزن أكبر من صفر.");
+      notify("لكل معلَم وزن أكبر من صفر.", "info");
       return;
     }
     startTransition(async () => {
@@ -609,7 +606,7 @@ function MilestonesSection({
         setStart("");
         setDue("");
         onChange();
-      } else alert(res.error);
+      } else notify(res.error || "خطأ", "error");
     });
   }
 
@@ -617,7 +614,7 @@ function MilestonesSection({
     startTransition(async () => {
       const res = await fn();
       if (res.ok) onChange();
-      else alert(res.error);
+      else notify(res.error || "خطأ", "error");
     });
   }
 
@@ -662,7 +659,7 @@ function MilestonesSection({
               <button
                 onClick={() => {
                   if (milestones.length <= 5) {
-                    alert("لا يمكن النزول تحت 5 معالم.");
+                    notify("لا يمكن النزول تحت 5 معالم.", "error");
                     return;
                   }
                   act(() => deleteMilestone(m.id));
@@ -739,7 +736,7 @@ function DeliverablesSection({
     startTransition(async () => {
       const res = await fn();
       if (res.ok) onChange();
-      else alert(res.error);
+      else notify(res.error || "خطأ", "error");
     });
   }
 

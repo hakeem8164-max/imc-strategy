@@ -17,6 +17,7 @@ import {
   Send,
 } from "lucide-react";
 import type { KpiDecision, KpiDecisionUpdate } from "@/lib/data";
+import { confirmDialog } from "@/components/ui/confirm";
 import {
   addDecision,
   addDecisionUpdate,
@@ -244,8 +245,8 @@ function DecisionItem({
       router.refresh();
     });
   }
-  function remove() {
-    if (!confirm("حذف هذا القرار وكل تحديثاته؟")) return;
+  async function remove() {
+    if (!(await confirmDialog("حذف هذا القرار وكل تحديثاته؟", { danger: true, confirmText: "حذف" }))) return;
     start(async () => {
       await deleteDecision(d.id, kpiId);
       router.refresh();

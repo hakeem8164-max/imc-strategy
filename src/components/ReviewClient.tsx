@@ -17,6 +17,7 @@ import {
   type KpiEntry,
   type Role,
 } from "@/lib/types";
+import { notify } from "@/components/ui/toast";
 import { formatValue } from "@/lib/format";
 import { FileText, CheckCircle2, XCircle } from "lucide-react";
 import {
@@ -52,7 +53,7 @@ async function openDoc(path: string) {
     .from("kpi-docs")
     .createSignedUrl(path, 3600);
   if (data?.signedUrl) window.open(data.signedUrl, "_blank");
-  else alert("تعذّر فتح الوثيقة");
+  else notify("تعذّر فتح الوثيقة", "error");
 }
 
 export default function ReviewClient({
@@ -266,11 +267,11 @@ function SubmitRow({
 
   async function submit() {
     if (value === "" || Number.isNaN(Number(value))) {
-      alert("أدخل قيمة صحيحة");
+      notify("أدخل قيمة صحيحة", "error");
       return;
     }
     if (!start || !end) {
-      alert("حدّد تاريخ البداية والنهاية");
+      notify("حدّد تاريخ البداية والنهاية", "info");
       return;
     }
     setBusy(true);
@@ -283,7 +284,7 @@ function SubmitRow({
         .upload(path, file);
       if (upErr) {
         setBusy(false);
-        alert("تعذّر رفع الوثيقة: " + upErr.message);
+        notify("تعذّر رفع الوثيقة: " + upErr.message, "error");
         return;
       }
       document_url = path;
@@ -306,7 +307,7 @@ function SubmitRow({
       setFile(null);
       setTimeout(() => setDone(false), 2500);
       onDone();
-    } else alert(res.error);
+    } else notify(res.error || "خطأ", "error");
   }
 
   return (
@@ -415,7 +416,7 @@ function PendingRow({
         : await approveEntry(entry.id);
     setBusy(false);
     if (res.ok) onDone();
-    else alert(res.error);
+    else notify(res.error || "خطأ", "error");
   }
   async function reject() {
     if (!reason.trim()) return;
@@ -426,7 +427,7 @@ function PendingRow({
         : await rejectEntry(entry.id, reason);
     setBusy(false);
     if (res.ok) onDone();
-    else alert(res.error);
+    else notify(res.error || "خطأ", "error");
   }
 
   return (

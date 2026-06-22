@@ -3,6 +3,8 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import FilterSelect from "@/components/ui/FilterSelect";
+import { notify } from "@/components/ui/toast";
+import { confirmDialog } from "@/components/ui/confirm";
 import {
   addDimension,
   deleteDimension,
@@ -69,16 +71,16 @@ export default function KpiLibrary({
         setDimName("");
         setShowAddDim(false);
         router.refresh();
-      } else alert(res.error);
+      } else notify(res.error || "خطأ", "error");
     });
   }
 
-  function removeDim(d: Dimension) {
-    if (confirm(`حذف المنظور «${d.name}»؟`)) {
+  async function removeDim(d: Dimension) {
+    if (await confirmDialog(`حذف المنظور «${d.name}»؟`, { danger: true, confirmText: "حذف" })) {
       startTransition(async () => {
         const res = await deleteDimension(d.id);
         if (res.ok) router.refresh();
-        else alert(res.error);
+        else notify(res.error || "خطأ", "error");
       });
     }
   }
@@ -92,7 +94,7 @@ export default function KpiLibrary({
         setAddingObjFor(null);
         setOpenDim((s) => ({ ...s, [dimId]: true }));
         router.refresh();
-      } else alert(res.error);
+      } else notify(res.error || "خطأ", "error");
     });
   }
 
@@ -102,16 +104,16 @@ export default function KpiLibrary({
     startTransition(async () => {
       const res = await renameObjective(o.id, name);
       if (res.ok) router.refresh();
-      else alert(res.error);
+      else notify(res.error || "خطأ", "error");
     });
   }
 
-  function removeObjective(o: Objective) {
-    if (confirm(`حذف الهدف «${o.name}»؟`)) {
+  async function removeObjective(o: Objective) {
+    if (await confirmDialog(`حذف الهدف «${o.name}»؟`, { danger: true, confirmText: "حذف" })) {
       startTransition(async () => {
         const res = await deleteObjective(o.id);
         if (res.ok) router.refresh();
-        else alert(res.error);
+        else notify(res.error || "خطأ", "error");
       });
     }
   }
@@ -120,7 +122,7 @@ export default function KpiLibrary({
     startTransition(async () => {
       const res = await addKpi(objId);
       if (res.ok) router.refresh();
-      else alert(res.error);
+      else notify(res.error || "خطأ", "error");
     });
   }
 
@@ -128,16 +130,16 @@ export default function KpiLibrary({
     startTransition(async () => {
       const res = await toggleKpiActive(k.id, !k.is_active);
       if (res.ok) router.refresh();
-      else alert(res.error);
+      else notify(res.error || "خطأ", "error");
     });
   }
 
-  function removeKpi(k: Kpi) {
-    if (confirm(`حذف المؤشر «${k.name}»؟ سيُحذف مع كل قياساته.`)) {
+  async function removeKpi(k: Kpi) {
+    if (await confirmDialog(`حذف المؤشر «${k.name}»؟ سيُحذف مع كل قياساته.`, { danger: true, confirmText: "حذف" })) {
       startTransition(async () => {
         const res = await deleteKpi(k.id);
         if (res.ok) router.refresh();
-        else alert(res.error);
+        else notify(res.error || "خطأ", "error");
       });
     }
   }

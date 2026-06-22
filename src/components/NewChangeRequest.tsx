@@ -7,6 +7,8 @@ import { Plus } from "lucide-react";
 import { submitChange } from "@/app/(app)/change-requests/actions";
 import { createClient } from "@/lib/supabase/client";
 import FilterSelect from "@/components/ui/FilterSelect";
+import SearchableSelect from "@/components/ui/SearchableSelect";
+import { notify } from "@/components/ui/toast";
 import {
   UNITS,
   POLARITIES,
@@ -237,23 +239,17 @@ export default function NewChangeRequest({
         return <textarea className="input min-h-[70px]" value={v[key] ?? ""} onChange={(e) => set(key, e.target.value)} />;
       case "dimension":
         return (
-          <FilterSelect className="w-full" value={v[key] ?? ""} onValueChange={(val) => set(key, val)}
-            options={[
-              { value: "", label: "— اختر المنظور —" },
-              ...dimensions.map((d) => ({ value: d.id, label: d.name })),
-            ]}
+          <SearchableSelect className="w-full" placeholder="— اختر المنظور —" value={v[key] ?? ""} onValueChange={(val) => set(key, val)}
+            options={dimensions.map((d) => ({ value: d.id, label: d.name }))}
           />
         );
       case "objective":
         return (
-          <FilterSelect className="w-full" value={v[key] ?? ""} onValueChange={(val) => set(key, val)}
-            options={[
-              { value: "", label: "— اختر الهدف —" },
-              ...objectives.map((o) => ({
-                value: o.id,
-                label: `${o.dimension?.name ? `${o.dimension.name} ← ` : ""}${o.name}`,
-              })),
-            ]}
+          <SearchableSelect className="w-full" placeholder="— اختر الهدف —" value={v[key] ?? ""} onValueChange={(val) => set(key, val)}
+            options={objectives.map((o) => ({
+              value: o.id,
+              label: `${o.dimension?.name ? `${o.dimension.name} ← ` : ""}${o.name}`,
+            }))}
           />
         );
       case "unit":
@@ -294,20 +290,14 @@ export default function NewChangeRequest({
         );
       case "owner_unit":
         return (
-          <FilterSelect className="w-full" value={v[key] ?? ""} onValueChange={(val) => set(key, val)}
-            options={[
-              { value: "", label: "— بدون —" },
-              ...orgUnits.map((u) => ({ value: u.id, label: `${u.unit_type}: ${u.name}` })),
-            ]}
+          <SearchableSelect className="w-full" placeholder="— بدون —" value={v[key] ?? ""} onValueChange={(val) => set(key, val)}
+            options={orgUnits.map((u) => ({ value: u.id, label: `${u.unit_type}: ${u.name}` }))}
           />
         );
       case "owner_user":
         return (
-          <FilterSelect className="w-full" value={v[key] ?? ""} onValueChange={(val) => set(key, val)}
-            options={[
-              { value: "", label: "— بدون —" },
-              ...users.map((u) => ({ value: u.id, label: u.full_name ?? u.email ?? "" })),
-            ]}
+          <SearchableSelect className="w-full" placeholder="— بدون —" value={v[key] ?? ""} onValueChange={(val) => set(key, val)}
+            options={users.map((u) => ({ value: u.id, label: u.full_name ?? u.email ?? "" }))}
           />
         );
       case "year":
@@ -410,7 +400,7 @@ export default function NewChangeRequest({
     if (res.ok) {
       reset();
       setOpen(false);
-      alert("تم رفع طلب التغيير. يخضع لسلسلة الاعتماد قبل تطبيقه.");
+      notify("تم رفع طلب التغيير. يخضع لسلسلة الاعتماد قبل تطبيقه.", "success");
       router.refresh();
     } else setErr(res.error || "خطأ");
   }
@@ -473,11 +463,8 @@ export default function NewChangeRequest({
       {(action === "update" || action === "delete") && domain && (
         <div>
           <label className="label">العنصر *</label>
-          <FilterSelect className="w-full" value={targetId ?? ""} onValueChange={(v) => setTargetId(v)}
-            options={[
-              { value: "", label: "— اختر —" },
-              ...targetList.map((t) => ({ value: t.id, label: t.name })),
-            ]}
+          <SearchableSelect className="w-full" placeholder="ابحث واختر العنصر…" value={targetId ?? ""} onValueChange={(v) => setTargetId(v)}
+            options={targetList.map((t) => ({ value: t.id, label: t.name }))}
           />
         </div>
       )}

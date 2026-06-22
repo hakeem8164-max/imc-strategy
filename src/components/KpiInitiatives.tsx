@@ -19,6 +19,7 @@ import type {
 } from "@/lib/data";
 import type { SimpleUser } from "@/components/KpiDecisions";
 import FilterSelect from "@/components/ui/FilterSelect";
+import { confirmDialog } from "@/components/ui/confirm";
 import {
   addInitiative,
   updateInitiative,
@@ -244,8 +245,8 @@ function InitiativeItem({
       router.refresh();
     });
   }
-  function remove() {
-    if (!confirm("حذف هذه الخطة وكل معالمها؟")) return;
+  async function remove() {
+    if (!(await confirmDialog("حذف هذه الخطة وكل معالمها؟", { danger: true, confirmText: "حذف" }))) return;
     start(async () => {
       await deleteInitiative(i.id, kpiId);
       router.refresh();

@@ -13,6 +13,7 @@ import {
   Paperclip,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { notify } from "@/components/ui/toast";
 import {
   setMilestoneProgress,
   toggleDeliverable,
@@ -208,7 +209,7 @@ function FollowCard({
     startTransition(async () => {
       const res = await fn();
       if (res.ok) router.refresh();
-      else alert(res.error);
+      else notify(res.error || "خطأ", "error");
     });
   }
 
@@ -231,14 +232,14 @@ function FollowCard({
   }
 
   async function requestCompletion() {
-    if (!lessons.trim()) return alert("اكتب الدروس المستفادة.");
-    if (!file) return alert("رفع وثيقة الإغلاق إلزامي.");
+    if (!lessons.trim()) return notify("اكتب الدروس المستفادة.", "error");
+    if (!file) return notify("رفع وثيقة الإغلاق إلزامي.", "error");
     setBusy(true);
     const path = `change-requests/${Date.now()}-${file.name}`;
     const { error: upErr } = await supabase.storage.from("kpi-docs").upload(path, file);
     if (upErr) {
       setBusy(false);
-      return alert("تعذّر رفع الوثيقة: " + upErr.message);
+      return notify("تعذّر رفع الوثيقة: " + upErr.message, "error");
     }
     const res = await submitChange({
       entity_type: "initiative",
@@ -263,9 +264,9 @@ function FollowCard({
       setShowComplete(false);
       setLessons("");
       setFile(null);
-      alert("تم رفع طلب اكتمال المبادرة للاعتماد.");
+      notify("تم رفع طلب اكتمال المبادرة للاعتماد.", "success");
       router.refresh();
-    } else alert(res.error);
+    } else notify(res.error || "خطأ", "error");
   }
 
   async function openDoc(path: string) {
@@ -498,7 +499,7 @@ function MilestoneProgressRow({
     startTransition(async () => {
       const res = await setMilestoneProgress(id, n);
       if (res.ok) onSaved();
-      else alert(res.error);
+      else notify(res.error || "خطأ", "error");
     });
   }
 
@@ -544,7 +545,7 @@ function UpdateItem({
     startTransition(async () => {
       const res = await fn();
       if (res.ok) onChange();
-      else alert(res.error);
+      else notify(res.error || "خطأ", "error");
     });
   }
 
@@ -694,7 +695,7 @@ function DeliverableRow({
     startTransition(async () => {
       const res = await fn();
       if (res.ok) onChange();
-      else alert(res.error);
+      else notify(res.error || "خطأ", "error");
     });
   }
 
@@ -704,13 +705,13 @@ function DeliverableRow({
     const { error } = await supabase.storage.from("kpi-docs").upload(path, file);
     if (error) {
       setBusy(false);
-      alert("تعذّر رفع الوثيقة: " + error.message);
+      notify("تعذّر رفع الوثيقة: " + error.message, "error");
       return;
     }
     const res = await setDeliverableDoc({ id: d.id, doc_url: path, doc_name: file.name });
     setBusy(false);
     if (res.ok) onChange();
-    else alert(res.error);
+    else notify(res.error || "خطأ", "error");
   }
 
   async function openDoc() {

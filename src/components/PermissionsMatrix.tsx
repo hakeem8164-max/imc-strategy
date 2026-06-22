@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { setPermission } from "@/app/(app)/admin/permissions/actions";
+import { notify } from "@/components/ui/toast";
 import { PERMISSIONS, ROLE_LABELS, type Role } from "@/lib/types";
 
 const ROLES: Role[] = ["admin", "executive", "owner", "viewer"];
@@ -32,7 +33,7 @@ export default function PermissionsMatrix({
       setSavingKey(null);
       if (!res.ok) {
         setState((s) => ({ ...s, [key]: !next })); // تراجع
-        alert(res.error);
+        notify(res.error || "خطأ", "error");
       } else {
         router.refresh();
       }

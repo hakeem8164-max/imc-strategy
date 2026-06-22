@@ -21,6 +21,7 @@ import {
 } from "@/app/(app)/kpis/[id]/decisions-actions";
 import type { SimpleUser } from "@/components/KpiDecisions";
 import FilterSelect from "@/components/ui/FilterSelect";
+import { confirmDialog } from "@/components/ui/confirm";
 
 function fmtDate(d: string | null) {
   if (!d) return null;
@@ -89,8 +90,8 @@ export default function DecisionsTracker({
       router.refresh();
     });
   }
-  function remove(d: KpiDecision) {
-    if (!confirm("حذف هذا القرار وكل تحديثاته؟")) return;
+  async function remove(d: KpiDecision) {
+    if (!(await confirmDialog("حذف هذا القرار وكل تحديثاته؟", { danger: true, confirmText: "حذف" }))) return;
     start(async () => {
       await deleteDecision(d.id, d.kpi_id);
       router.refresh();

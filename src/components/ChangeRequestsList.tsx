@@ -4,6 +4,7 @@ import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Check, X, Clock, Paperclip } from "lucide-react";
 import { reviewChange } from "@/app/(app)/change-requests/actions";
+import { notify } from "@/components/ui/toast";
 import { createClient } from "@/lib/supabase/client";
 import type { Profile } from "@/lib/types";
 import type { ChangeRequest } from "@/lib/data";
@@ -85,7 +86,7 @@ export default function ChangeRequestsList({
       .from("kpi-docs")
       .createSignedUrl(path, 120);
     if (data?.signedUrl) window.open(data.signedUrl, "_blank");
-    else alert("تعذّر فتح المرفق");
+    else notify("تعذّر فتح المرفق", "error");
   }
 
   function review(cr: ChangeRequest, decision: "approve" | "reject") {
@@ -99,7 +100,7 @@ export default function ChangeRequestsList({
     startTransition(async () => {
       const res = await reviewChange(cr.id, decision, note);
       if (res.ok) router.refresh();
-      else alert(res.error);
+      else notify(res.error || "خطأ", "error");
     });
   }
 

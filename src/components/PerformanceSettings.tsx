@@ -3,6 +3,8 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Trash2, Plus } from "lucide-react";
+import { notify } from "@/components/ui/toast";
+import { confirmDialog } from "@/components/ui/confirm";
 import {
   addBand,
   updateBand,
@@ -40,22 +42,22 @@ export default function PerformanceSettings({
         setLabel("");
         setMinPct(0);
         router.refresh();
-      } else alert(r.error);
+      } else notify(r.error || "خطأ", "error");
     });
   }
   function save(id: string, patch: Partial<Band>) {
     start(async () => {
       const r = await updateBand(id, patch);
       if (r.ok) router.refresh();
-      else alert(r.error);
+      else notify(r.error || "خطأ", "error");
     });
   }
-  function remove(b: Band) {
-    if (confirm(`حذف المستوى «${b.label}»؟`))
+  async function remove(b: Band) {
+    if (await confirmDialog(`حذف المستوى «${b.label}»؟`, { danger: true, confirmText: "حذف" }))
       start(async () => {
         const r = await deleteBand(b.id);
         if (r.ok) router.refresh();
-        else alert(r.error);
+        else notify(r.error || "خطأ", "error");
       });
   }
   function saveDays() {
@@ -65,7 +67,7 @@ export default function PerformanceSettings({
         setDaysSaved(true);
         setTimeout(() => setDaysSaved(false), 1500);
         router.refresh();
-      } else alert(r.error);
+      } else notify(r.error || "خطأ", "error");
     });
   }
 

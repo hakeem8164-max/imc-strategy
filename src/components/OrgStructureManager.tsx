@@ -12,6 +12,8 @@ import {
   deleteUnitType,
 } from "@/app/(app)/admin/settings/actions";
 import type { OrgUnit, OrgUnitTypeDef } from "@/lib/types";
+import { notify } from "@/components/ui/toast";
+import { confirmDialog } from "@/components/ui/confirm";
 
 export default function OrgStructureManager({
   orgName,
@@ -51,7 +53,7 @@ export default function OrgStructureManager({
         setNameSaved(true);
         setTimeout(() => setNameSaved(false), 2000);
         router.refresh();
-      } else alert(res.error);
+      } else notify(res.error || "خطأ", "error");
     });
   }
 
@@ -85,12 +87,12 @@ export default function OrgStructureManager({
     });
   }
 
-  function removeType(t: OrgUnitTypeDef) {
-    if (confirm(`حذف النوع «${t.name}»؟`)) {
+  async function removeType(t: OrgUnitTypeDef) {
+    if (await confirmDialog(`حذف النوع «${t.name}»؟`, { danger: true, confirmText: "حذف" })) {
       startTransition(async () => {
         const res = await deleteUnitType(t.id);
         if (res.ok) router.refresh();
-        else alert(res.error);
+        else notify(res.error || "خطأ", "error");
       });
     }
   }
@@ -101,17 +103,17 @@ export default function OrgStructureManager({
       startTransition(async () => {
         const res = await renameOrgUnit(u.id, v);
         if (res.ok) router.refresh();
-        else alert(res.error);
+        else notify(res.error || "خطأ", "error");
       });
     }
   }
 
-  function remove(u: OrgUnit) {
-    if (confirm(`حذف «${u.name}»؟ سيُحذف كل ما تحته. لا يمكن التراجع.`)) {
+  async function remove(u: OrgUnit) {
+    if (await confirmDialog(`حذف «${u.name}»؟ سيُحذف كل ما تحته. لا يمكن التراجع.`, { danger: true, confirmText: "حذف" })) {
       startTransition(async () => {
         const res = await deleteOrgUnit(u.id);
         if (res.ok) router.refresh();
-        else alert(res.error);
+        else notify(res.error || "خطأ", "error");
       });
     }
   }

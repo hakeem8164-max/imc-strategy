@@ -3,6 +3,8 @@ import { Cairo } from "next/font/google";
 import { DirectionProvider } from "@base-ui/react/direction-provider";
 import "./globals.css";
 import InstallPrompt from "@/components/InstallPrompt";
+import ToastProvider from "@/components/ui/toast";
+import ConfirmProvider from "@/components/ui/confirm";
 
 const cairo = Cairo({
   subsets: ["arabic", "latin"],
@@ -50,8 +52,12 @@ export default function RootLayout({
       </head>
       <body className="font-sans antialiased">
         <DirectionProvider direction="rtl">
-          {children}
-          <InstallPrompt />
+          <ToastProvider>
+            <ConfirmProvider>
+              {children}
+              <InstallPrompt />
+            </ConfirmProvider>
+          </ToastProvider>
         </DirectionProvider>
       </body>
     </html>

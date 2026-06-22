@@ -12,6 +12,8 @@ import {
   type Profile,
   type Role,
 } from "@/lib/types";
+import { notify } from "@/components/ui/toast";
+import { confirmDialog } from "@/components/ui/confirm";
 
 function genPassword() {
   // كلمة مرور مؤقتة قوية
@@ -131,18 +133,18 @@ function UserRow({
         setSaved(true);
         router.refresh();
         setTimeout(() => setSaved(false), 1500);
-      } else alert(res.error);
+      } else notify(res.error || "خطأ", "error");
     });
   }
 
   async function del() {
-    if (!confirm(`حذف المستخدم «${name || user.email}» نهائياً؟`)) return;
+    if (!(await confirmDialog(`حذف المستخدم «${name || user.email}» نهائياً؟`, { danger: true, confirmText: "حذف" }))) return;
     setBusy(true);
     const { data, error } = await supabase.functions.invoke("delete-user", {
       body: { user_id: user.id },
     });
     setBusy(false);
-    if (error || data?.error) alert(data?.error || "تعذّر الحذف");
+    if (error || data?.error) notify(data?.error || "تعذّر الحذف", "error");
     else router.refresh();
   }
 
