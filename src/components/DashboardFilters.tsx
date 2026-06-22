@@ -2,6 +2,7 @@
 
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { RotateCcw } from "lucide-react";
+import FilterSelect from "@/components/ui/FilterSelect";
 import type { Dimension, OrgUnit } from "@/lib/types";
 
 export default function DashboardFilters({
@@ -29,47 +30,37 @@ export default function DashboardFilters({
   }
 
   const active = period || dim || unit;
-  const selCls = "input py-2 text-sm";
 
   return (
     <div className="card flex flex-wrap items-center gap-2 p-3 print:hidden">
       <span className="px-1 text-xs font-semibold text-slate-400">تصفية:</span>
-      <select
-        className={`${selCls} w-auto`}
+      <FilterSelect
+        ariaLabel="الفترة"
         value={period}
-        onChange={(e) => setParam("period", e.target.value)}
-      >
-        <option value="">آخر فترة (مقارنة بالسابقة)</option>
-        {periods.map((p) => (
-          <option key={p} value={p}>
-            {p}
-          </option>
-        ))}
-      </select>
-      <select
-        className={`${selCls} w-auto`}
+        onValueChange={(v) => setParam("period", v)}
+        options={[
+          { value: "", label: "آخر فترة (مقارنة بالسابقة)" },
+          ...periods.map((p) => ({ value: p, label: p })),
+        ]}
+      />
+      <FilterSelect
+        ariaLabel="المنظور"
         value={dim}
-        onChange={(e) => setParam("dim", e.target.value)}
-      >
-        <option value="">كل المناظير</option>
-        {dimensions.map((d) => (
-          <option key={d.id} value={d.id}>
-            {d.name}
-          </option>
-        ))}
-      </select>
-      <select
-        className={`${selCls} w-auto`}
+        onValueChange={(v) => setParam("dim", v)}
+        options={[
+          { value: "", label: "كل المناظير" },
+          ...dimensions.map((d) => ({ value: d.id, label: d.name })),
+        ]}
+      />
+      <FilterSelect
+        ariaLabel="الإدارة"
         value={unit}
-        onChange={(e) => setParam("unit", e.target.value)}
-      >
-        <option value="">كل الإدارات</option>
-        {orgUnits.map((u) => (
-          <option key={u.id} value={u.id}>
-            {u.name}
-          </option>
-        ))}
-      </select>
+        onValueChange={(v) => setParam("unit", v)}
+        options={[
+          { value: "", label: "كل الإدارات" },
+          ...orgUnits.map((u) => ({ value: u.id, label: u.name })),
+        ]}
+      />
       {active && (
         <button
           onClick={() => router.push(pathname)}
