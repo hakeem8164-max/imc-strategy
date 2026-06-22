@@ -2,6 +2,12 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 export async function updateSession(request: NextRequest) {
+  // صفحة معاينة مكوّنات Base UI عامة ولا تحتاج Supabase — نتجاوزها مبكراً
+  // كي تعمل دون أي متغيّرات بيئة (مفيد للمعاينة على أي استضافة).
+  if (request.nextUrl.pathname.startsWith("/base-ui-demo")) {
+    return NextResponse.next({ request });
+  }
+
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(
