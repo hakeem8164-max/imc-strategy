@@ -1,6 +1,7 @@
 "use client";
 
 import { Tooltip } from "@base-ui/react/tooltip";
+import { popupMotion } from "@/components/ui/styles";
 
 export function TipProvider({ children }: { children: React.ReactNode }) {
   return <Tooltip.Provider delay={300}>{children}</Tooltip.Provider>;
@@ -21,7 +22,9 @@ export default function Tip({
       </Tooltip.Trigger>
       <Tooltip.Portal>
         <Tooltip.Positioner sideOffset={6} className="z-[80]">
-          <Tooltip.Popup className="rounded-md bg-mushar-dark px-2 py-1 text-[11px] font-medium text-white shadow-lg">
+          <Tooltip.Popup
+            className={`rounded-md bg-mushar-dark px-2 py-1 text-[11px] font-medium text-white shadow-lg ${popupMotion}`}
+          >
             {content}
           </Tooltip.Popup>
         </Tooltip.Positioner>

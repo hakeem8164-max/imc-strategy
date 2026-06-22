@@ -20,6 +20,12 @@ const config: Config = {
           cream: "#FBF7F1",
           accent: "#BD9258",
           accentDark: "#8A6A3E",
+          // أسطح الوضع الليلي (توكنز موحّدة لمكوّنات Base UI)
+          ink: "#E6EEF0",
+          line: "#2B3D44",
+          surface: "#13232A",
+          field: "#0F1D22",
+          hover: "#1B2D34",
         },
       },
       fontFamily: {

@@ -8,6 +8,7 @@ import { LogOut, Menu, KeyRound, ChevronDown } from "lucide-react";
 import NotificationBell from "@/components/NotificationBell";
 import ThemeToggle from "@/components/ThemeToggle";
 import Tip from "@/components/ui/Tip";
+import { popupMotion } from "@/components/ui/styles";
 import { ROLE_LABELS, type Profile } from "@/lib/types";
 
 export default function TopBar({
@@ -83,8 +84,8 @@ export default function TopBar({
             </MenuPrimitive.Trigger>
             <MenuPrimitive.Portal>
               <MenuPrimitive.Positioner sideOffset={8} align="end" className="z-[70]">
-                <MenuPrimitive.Popup className="min-w-[200px] rounded-xl border border-slate-100 bg-white p-1 text-mushar-dark shadow-cardHover outline-none dark:border-[#24343b] dark:bg-[#13232a] dark:text-[#e6eef0]">
-                  <div className="border-b border-slate-100 px-3 py-2 dark:border-[#24343b]">
+                <MenuPrimitive.Popup className={`min-w-[200px] rounded-xl border border-slate-100 bg-white p-1 text-mushar-dark shadow-cardHover outline-none dark:border-mushar-line dark:bg-mushar-surface dark:text-mushar-ink ${popupMotion}`}>
+                  <div className="border-b border-slate-100 px-3 py-2 dark:border-mushar-line">
                     <p className="text-sm font-bold">{name}</p>
                     <p className="text-[11px] text-slate-400">
                       {ROLE_LABELS[profile.role]}
@@ -92,7 +93,7 @@ export default function TopBar({
                   </div>
                   <MenuPrimitive.Item
                     onClick={() => router.push("/account/password")}
-                    className="flex cursor-default items-center gap-2 rounded-lg px-3 py-2 text-sm outline-none data-[highlighted]:bg-mushar-pale dark:data-[highlighted]:bg-[#1b2d34]"
+                    className="flex cursor-default items-center gap-2 rounded-lg px-3 py-2 text-sm outline-none data-[highlighted]:bg-mushar-pale dark:data-[highlighted]:bg-mushar-hover"
                   >
                     <KeyRound size={15} className="text-slate-400" />
                     تغيير كلمة المرور

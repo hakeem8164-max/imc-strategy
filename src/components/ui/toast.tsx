@@ -35,8 +35,7 @@ function ToastList() {
           <Toast.Root
             key={t.id}
             toast={t}
-            className="card flex items-start gap-3 border-r-4 p-3.5 pe-9 transition-all data-[ending-style]:opacity-0 data-[starting-style]:opacity-0"
-            style={{}}
+            className="card flex items-start gap-3 border-r-4 p-3.5 pe-9 transition-all duration-200 data-[ending-style]:-translate-y-2 data-[ending-style]:opacity-0 data-[starting-style]:-translate-y-2 data-[starting-style]:opacity-0 motion-reduce:transition-none dark:bg-mushar-surface"
           >
             <span className={`shrink-0 ${s.border}`}>{s.icon}</span>
             <div className="flex-1">

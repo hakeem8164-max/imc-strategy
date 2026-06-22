@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AlertDialog } from "@base-ui/react/alert-dialog";
+import { popupMotion } from "@/components/ui/styles";
 
 type ConfirmOpts = {
   title?: string;
@@ -84,7 +85,7 @@ export default function ConfirmProvider({ children }: { children: React.ReactNod
       >
         <AlertDialog.Portal>
           <AlertDialog.Backdrop className="fixed inset-0 z-[90] bg-black/40 transition-opacity data-[ending-style]:opacity-0 data-[starting-style]:opacity-0" />
-          <AlertDialog.Popup className="card fixed left-1/2 top-1/2 z-[91] w-[90vw] max-w-sm -translate-x-1/2 -translate-y-1/2 p-5 outline-none transition-all data-[ending-style]:opacity-0 data-[starting-style]:opacity-0">
+          <AlertDialog.Popup className={`card fixed left-1/2 top-1/2 z-[91] w-[90vw] max-w-sm -translate-x-1/2 -translate-y-1/2 p-5 outline-none ${popupMotion}`}>
             <AlertDialog.Title className="text-base font-bold text-mushar-dark">
               {state.title ?? (isPrompt ? "إدخال" : "تأكيد")}
             </AlertDialog.Title>
