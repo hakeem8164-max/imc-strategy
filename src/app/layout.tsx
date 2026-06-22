@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Cairo } from "next/font/google";
+import { DirectionProvider } from "@base-ui/react/direction-provider";
 import "./globals.css";
 import InstallPrompt from "@/components/InstallPrompt";
 
@@ -48,8 +49,10 @@ export default function RootLayout({
         />
       </head>
       <body className="font-sans antialiased">
-        {children}
-        <InstallPrompt />
+        <DirectionProvider direction="rtl">
+          {children}
+          <InstallPrompt />
+        </DirectionProvider>
       </body>
     </html>
   );
