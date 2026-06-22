@@ -240,7 +240,7 @@ export default function KpiLibrary({
                 </div>
               </div>
 
-              <Collapsible.Panel className="h-[var(--collapsible-panel-height)] overflow-hidden transition-[height] duration-200 motion-reduce:transition-none">
+              <Collapsible.Panel>
                 <div className="space-y-3 p-4">
                   {addingObjFor === d.id && (
                     <div className="flex flex-wrap items-end gap-2 rounded-xl bg-slate-50 p-3">
