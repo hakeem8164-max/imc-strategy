@@ -98,10 +98,13 @@ export async function getUsers(): Promise<Profile[]> {
  */
 export const getAuthUser = cache(async () => {
   const supabase = await createClient();
+  // قراءة الجلسة محليًّا من الكوكيز بلا رحلة شبكة. صحّتها مضمونة لأن
+  // الـmiddleware يتحقق من الرمز ويُحدّث الجلسة في كل طلب فعلي، فلا
+  // داعي لتكرار التحقق الشبكي (auth/v1/user) في كل تصيير صفحة.
   const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  return user;
+    data: { session },
+  } = await supabase.auth.getSession();
+  return session?.user ?? null;
 });
 
 /** الملف الشخصي — مُخزّن مؤقتًا لكل طلب (يُستدعى في عدّة أماكن) */
