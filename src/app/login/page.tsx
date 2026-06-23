@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
@@ -34,9 +35,14 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         <div className="card overflow-hidden">
           <div className="flex flex-col items-center gap-4 border-b border-slate-100 bg-white px-8 pt-10 pb-6">
-            <div className="text-2xl font-extrabold text-brand-primary">
-              نظام إدارة الأداء
-            </div>
+            <Image
+              src="/logo.png"
+              alt="الشعار"
+              width={300}
+              height={170}
+              priority
+              className="h-auto w-[180px]"
+            />
             <div className="text-center">
               <h1 className="text-xl font-bold text-brand-dark">
                 منصة إدارة مؤشرات الأداء

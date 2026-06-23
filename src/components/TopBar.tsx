@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Menu as MenuPrimitive } from "@base-ui/react/menu";
@@ -42,7 +43,15 @@ export default function TopBar({
           >
             <Menu size={20} />
           </button>
-          <div>
+          <Image
+            src="/logo-light.png"
+            alt="الشعار"
+            width={300}
+            height={170}
+            priority
+            className="h-auto w-[120px] sm:w-[150px]"
+          />
+          <div className="border-r border-white/15 pr-3">
             <h1 className="text-sm font-extrabold leading-tight sm:text-base">
               نظام إدارة الأداء
             </h1>

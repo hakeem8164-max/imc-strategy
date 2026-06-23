@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
@@ -46,9 +47,14 @@ export default function ChangePasswordPage() {
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-bl from-brand-dark via-brand-primary to-brand-teal p-4">
       <div className="card w-full max-w-md p-8">
         <div className="mb-6 flex flex-col items-center gap-3 text-center">
-          <div className="text-xl font-extrabold text-brand-primary">
-            نظام إدارة الأداء
-          </div>
+          <Image
+            src="/logo.png"
+            alt="الشعار"
+            width={130}
+            height={78}
+            priority
+            className="h-auto w-[130px]"
+          />
           <h1 className="text-xl font-bold text-brand-dark">
             تعيين كلمة مرور جديدة
           </h1>

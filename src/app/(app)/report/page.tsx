@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import Image from "next/image";
 import ReportActions, { type ReportRow } from "@/components/ReportActions";
 import {
   getProfile,
@@ -182,9 +183,20 @@ export default async function ReportPage() {
               فترة التقرير: {latestPeriod || "—"} · تاريخ الإصدار: {today}
             </p>
           </div>
-          <div className="text-lg font-extrabold text-brand-primary dark:text-brand-ink">
-            نظام إدارة الأداء
-          </div>
+          <Image
+            src="/logo.png"
+            alt="الشعار"
+            width={110}
+            height={66}
+            className="h-auto w-[100px] dark:hidden"
+          />
+          <Image
+            src="/logo-light.png"
+            alt="الشعار"
+            width={110}
+            height={66}
+            className="hidden h-auto w-[100px] dark:block"
+          />
         </div>
 
         {/* الملخص التنفيذي */}

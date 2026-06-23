@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
@@ -197,9 +198,13 @@ export default function Sidebar({
           />
           <aside className="absolute right-0 top-0 flex h-full w-72 max-w-[82%] flex-col overflow-y-auto bg-white shadow-2xl">
             <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
-              <span className="text-base font-extrabold text-brand-primary">
-                نظام إدارة الأداء
-              </span>
+              <Image
+                src="/logo.png"
+                alt="الشعار"
+                width={84}
+                height={50}
+                className="h-auto w-[70px]"
+              />
               <button
                 onClick={onClose}
                 aria-label="إغلاق"
