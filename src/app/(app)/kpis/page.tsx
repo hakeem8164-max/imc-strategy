@@ -1,6 +1,7 @@
 import Header from "@/components/Header";
 import KpiBrowser from "@/components/KpiBrowser";
 import StatCard from "@/components/StatCard";
+import QuickEntry from "@/components/QuickEntry";
 import {
   getProfile,
   getDimensions,
@@ -59,11 +60,19 @@ export default async function KpisPage() {
 
   // نضع علامة على المؤشرات التي يملكها المستخدم لاستخدامها في فلتر "مؤشراتي"
   const marked = kpis.map((k) => ({ ...k, _mine: canEditKpi(profile, k) }));
+  const editableKpis = marked
+    .filter((k) => k._mine)
+    .map((k) => ({ id: k.id, name: k.name, unit: k.unit, code: k.code }));
 
   return (
     <>
       <Header profile={profile} title="لوحة الأداء التفصيلية" />
       <div className="space-y-6">
+        {editableKpis.length > 0 && (
+          <div className="flex justify-end">
+            <QuickEntry kpis={editableKpis} />
+          </div>
+        )}
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           <StatCard label="إجمالي المؤشرات" value={kpis.length} accent="#8C341F" />
           <StatCard
