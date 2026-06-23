@@ -80,7 +80,7 @@ export default function EntryForm({
           className={`rounded-lg px-3 py-2.5 text-sm ${
             msg.ok
               ? "bg-emerald-50 text-emerald-700"
-              : "bg-mushar-accent/10 text-mushar-accent"
+              : "bg-brand-accent/10 text-brand-accent"
           }`}
         >
           {msg.text}

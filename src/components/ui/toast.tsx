@@ -37,8 +37,8 @@ notify.promise = async <T,>(
 
 const STYLE: Record<string, { border: string; icon: React.ReactNode }> = {
   success: { border: "border-r-emerald-500", icon: <CheckCircle2 size={18} className="text-emerald-600" /> },
-  error: { border: "border-r-mushar-accent", icon: <AlertTriangle size={18} className="text-mushar-accent" /> },
-  info: { border: "border-r-mushar-primary", icon: <Info size={18} className="text-mushar-primary" /> },
+  error: { border: "border-r-brand-accent", icon: <AlertTriangle size={18} className="text-brand-accent" /> },
+  info: { border: "border-r-brand-primary", icon: <Info size={18} className="text-brand-primary" /> },
 };
 
 function ToastList() {
@@ -51,11 +51,11 @@ function ToastList() {
           <Toast.Root
             key={t.id}
             toast={t}
-            className="card flex items-start gap-3 border-r-4 p-3.5 pe-9 transition-all duration-200 data-[ending-style]:-translate-y-2 data-[ending-style]:opacity-0 data-[starting-style]:-translate-y-2 data-[starting-style]:opacity-0 motion-reduce:transition-none dark:bg-mushar-surface"
+            className="card flex items-start gap-3 border-r-4 p-3.5 pe-9 transition-all duration-200 data-[ending-style]:-translate-y-2 data-[ending-style]:opacity-0 data-[starting-style]:-translate-y-2 data-[starting-style]:opacity-0 motion-reduce:transition-none dark:bg-brand-surface"
           >
             <span className={`shrink-0 ${s.border}`}>{s.icon}</span>
             <div className="flex-1">
-              <Toast.Title className="text-sm font-semibold text-mushar-dark" />
+              <Toast.Title className="text-sm font-semibold text-brand-dark" />
               <Toast.Description className="mt-0.5 text-xs text-slate-500" />
             </div>
             <Toast.Close

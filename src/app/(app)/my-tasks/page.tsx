@@ -55,8 +55,8 @@ export default async function MyTasksPage() {
     <>
       <Header profile={profile} title="مهامّي" />
       <div className="space-y-6">
-        <div className="card bg-gradient-to-l from-mushar-dark to-mushar-primary p-5 text-white">
-          <p className="text-sm text-mushar-pale/80">
+        <div className="card bg-gradient-to-l from-brand-dark to-brand-primary p-5 text-white">
+          <p className="text-sm text-brand-pale/80">
             مرحبًا {profile.full_name || ""} 👋
           </p>
           <p className="mt-1 text-lg font-bold">
@@ -68,8 +68,8 @@ export default async function MyTasksPage() {
 
         {/* مؤشرات مستحقّة للإدخال */}
         <section>
-          <h2 className="mb-3 flex items-center gap-2 text-base font-bold text-mushar-dark">
-            <ClipboardList size={18} className="text-mushar-primary" />
+          <h2 className="mb-3 flex items-center gap-2 text-base font-bold text-brand-dark">
+            <ClipboardList size={18} className="text-brand-primary" />
             مؤشرات بحاجة لإدخال نتائجها
           </h2>
           {dueItems.length === 0 ? (
@@ -84,8 +84,8 @@ export default async function MyTasksPage() {
 
         {/* قرارات مُسنَدة إليّ */}
         <section>
-          <h2 className="mb-3 flex items-center gap-2 text-base font-bold text-mushar-dark">
-            <Gavel size={18} className="text-mushar-primary" />
+          <h2 className="mb-3 flex items-center gap-2 text-base font-bold text-brand-dark">
+            <Gavel size={18} className="text-brand-primary" />
             قرارات تنفيذية مُسنَدة إليّ
           </h2>
           {decisions.length === 0 ? (
@@ -100,8 +100,8 @@ export default async function MyTasksPage() {
 
         {/* توصيات اجتماعات مُسنَدة إليّ */}
         <section>
-          <h2 className="mb-3 flex items-center gap-2 text-base font-bold text-mushar-dark">
-            <CalendarCheck size={18} className="text-mushar-primary" />
+          <h2 className="mb-3 flex items-center gap-2 text-base font-bold text-brand-dark">
+            <CalendarCheck size={18} className="text-brand-primary" />
             توصيات اجتماعات مُسنَدة إليّ
           </h2>
           {recommendations.length === 0 ? (
@@ -123,11 +123,11 @@ export default async function MyTasksPage() {
                   <Link
                     key={r.id}
                     href="/meetings"
-                    className="card group block p-4 transition hover:border-mushar-pale"
+                    className="card group block p-4 transition hover:border-brand-pale"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0 flex-1">
-                        <p className="flex items-center gap-1 text-sm font-bold text-mushar-dark group-hover:text-mushar-primary">
+                        <p className="flex items-center gap-1 text-sm font-bold text-brand-dark group-hover:text-brand-primary">
                           {r.name}
                           <ArrowLeft size={13} className="text-slate-300" />
                         </p>
@@ -158,8 +158,8 @@ export default async function MyTasksPage() {
 
         {/* مبادرات/خطط أملكها */}
         <section>
-          <h2 className="mb-3 flex items-center gap-2 text-base font-bold text-mushar-dark">
-            <Rocket size={18} className="text-mushar-primary" />
+          <h2 className="mb-3 flex items-center gap-2 text-base font-bold text-brand-dark">
+            <Rocket size={18} className="text-brand-primary" />
             خطط ومبادرات أتولّاها
           </h2>
           {initiatives.length === 0 ? (
@@ -173,11 +173,11 @@ export default async function MyTasksPage() {
                 <Link
                   key={i.id}
                   href={`/kpis/${i.kpi_id}`}
-                  className="card group block p-4 transition hover:border-mushar-pale"
+                  className="card group block p-4 transition hover:border-brand-pale"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
-                      <p className="flex items-center gap-1 text-sm font-bold text-mushar-dark group-hover:text-mushar-primary">
+                      <p className="flex items-center gap-1 text-sm font-bold text-brand-dark group-hover:text-brand-primary">
                         {i.title}
                         <ArrowLeft size={13} className="text-slate-300" />
                       </p>
@@ -199,12 +199,12 @@ export default async function MyTasksPage() {
                       </div>
                     </div>
                     <div className="w-24 shrink-0">
-                      <div className="mb-1 text-left text-xs font-bold text-mushar-dark">
+                      <div className="mb-1 text-left text-xs font-bold text-brand-dark">
                         {i.progress}%
                       </div>
                       <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
                         <div
-                          className="h-full rounded-full bg-mushar-primary"
+                          className="h-full rounded-full bg-brand-primary"
                           style={{ width: `${i.progress}%` }}
                         />
                       </div>

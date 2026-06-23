@@ -8,7 +8,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        mushar: {
+        brand: {
           // هوية شركة المساجد المتكاملة: أساسي طوبي #8C341F + ثانوي ذهبي #BD9258
           DEFAULT: "#8C341F",
           primary: "#8C341F",

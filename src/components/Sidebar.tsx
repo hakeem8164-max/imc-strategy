@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
@@ -120,7 +119,7 @@ function NavLinks({
   const itemCls = (active: boolean) =>
     `flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-semibold transition ${
       active
-        ? "bg-mushar-primary text-white shadow-sm"
+        ? "bg-brand-primary text-white shadow-sm"
         : "text-slate-600 hover:bg-slate-50"
     }`;
 
@@ -198,13 +197,9 @@ export default function Sidebar({
           />
           <aside className="absolute right-0 top-0 flex h-full w-72 max-w-[82%] flex-col overflow-y-auto bg-white shadow-2xl">
             <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
-              <Image
-                src="/mushar-logo.png"
-                alt="المساجد المتكاملة"
-                width={84}
-                height={50}
-                className="h-auto w-[70px]"
-              />
+              <span className="text-base font-extrabold text-brand-primary">
+                نظام إدارة الأداء
+              </span>
               <button
                 onClick={onClose}
                 aria-label="إغلاق"
@@ -244,7 +239,7 @@ function CollapsibleGroup({
       <button
         onClick={() => setOpen((v) => !v)}
         className={`flex w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-semibold transition ${
-          groupActive ? "text-mushar-primary" : "text-slate-600 hover:bg-slate-50"
+          groupActive ? "text-brand-primary" : "text-slate-600 hover:bg-slate-50"
         }`}
       >
         <GroupIcon size={18} strokeWidth={2} />
@@ -255,7 +250,7 @@ function CollapsibleGroup({
         />
       </button>
       {open && (
-        <div className="mt-0.5 space-y-0.5 border-r-2 border-mushar-pale pr-2">
+        <div className="mt-0.5 space-y-0.5 border-r-2 border-brand-pale pr-2">
           {items.map((item) => {
             const active = pathname.startsWith(item.href);
             const Icon = item.icon;
@@ -267,7 +262,7 @@ function CollapsibleGroup({
                 prefetch={false}
                 className={`flex items-center gap-3 rounded-lg px-3.5 py-2 text-[13px] transition ${
                   active
-                    ? "bg-mushar-primary text-white shadow-sm"
+                    ? "bg-brand-primary text-white shadow-sm"
                     : "text-slate-500 hover:bg-slate-50"
                 }`}
               >

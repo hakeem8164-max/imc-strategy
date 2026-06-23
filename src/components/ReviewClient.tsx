@@ -33,7 +33,7 @@ const STATUS_STYLE: Record<EntryStatus, string> = {
   pending_manager: "bg-amber-100 text-amber-700",
   pending_officer: "bg-sky-100 text-sky-700",
   approved: "bg-emerald-100 text-emerald-700",
-  rejected: "bg-mushar-accent/10 text-mushar-accent",
+  rejected: "bg-brand-accent/10 text-brand-accent",
   submitted: "bg-amber-100 text-amber-700",
 };
 
@@ -81,7 +81,7 @@ export default function ReviewClient({
       {/* جدول إدخال النتائج (للمالك/المدير) */}
       {editableKpis.length > 0 && (
         <div className="card p-5">
-          <h3 className="mb-1 text-base font-bold text-mushar-dark">
+          <h3 className="mb-1 text-base font-bold text-brand-dark">
             إدخال النتائج وإرسالها للاعتماد
           </h3>
           <p className="mb-4 text-xs text-slate-400">
@@ -122,7 +122,7 @@ export default function ReviewClient({
       {/* طابور المدير: اعتماد ما يرسله الموظفون */}
       {isManager && (
         <div className="card p-5">
-          <h3 className="mb-4 text-base font-bold text-mushar-dark">
+          <h3 className="mb-4 text-base font-bold text-brand-dark">
             بانتظار اعتماد المدير ({managerPending.length})
           </h3>
           {managerPending.length === 0 ? (
@@ -147,7 +147,7 @@ export default function ReviewClient({
       {/* طابور مسؤول الأداء: الاعتماد النهائي */}
       {isAdmin && (
         <div className="card p-5">
-          <h3 className="mb-4 text-base font-bold text-mushar-dark">
+          <h3 className="mb-4 text-base font-bold text-brand-dark">
             بانتظار الاعتماد النهائي ({officerPending.length})
           </h3>
           {officerPending.length === 0 ? (
@@ -171,7 +171,7 @@ export default function ReviewClient({
 
       {/* سجلّ نتائجي */}
       <div className="card p-5">
-        <h3 className="mb-4 text-base font-bold text-mushar-dark">
+        <h3 className="mb-4 text-base font-bold text-brand-dark">
           سجلّ نتائجي ({mySubmissions.length})
         </h3>
         {mySubmissions.length === 0 ? (
@@ -193,7 +193,7 @@ export default function ReviewClient({
               <tbody>
                 {mySubmissions.map((e) => (
                   <tr key={e.id} className="border-b border-slate-100 last:border-0">
-                    <td className="px-3 py-2 font-medium text-mushar-dark">
+                    <td className="px-3 py-2 font-medium text-brand-dark">
                       {e.kpi?.name ?? "—"}
                     </td>
                     <td className="px-3 py-2">
@@ -210,7 +210,7 @@ export default function ReviewClient({
                     <td className="px-3 py-2">
                       <StatusBadge status={e.status} />
                       {e.status === "rejected" && e.review_note && (
-                        <p className="mt-1 text-[11px] text-mushar-accent">
+                        <p className="mt-1 text-[11px] text-brand-accent">
                           السبب: {e.review_note}
                         </p>
                       )}
@@ -219,7 +219,7 @@ export default function ReviewClient({
                       {e.document_url ? (
                         <button
                           onClick={() => openDoc(e.document_url!)}
-                          className="text-xs font-semibold text-mushar-primary hover:underline"
+                          className="text-xs font-semibold text-brand-primary hover:underline"
                         >
                           عرض
                         </button>
@@ -313,7 +313,7 @@ function SubmitRow({
   return (
     <tr className="border-b border-slate-100 align-middle last:border-0">
       <td className="px-3 py-2">
-        <p className="font-medium text-mushar-dark">{kpi.name}</p>
+        <p className="font-medium text-brand-dark">{kpi.name}</p>
         <p className="text-[11px] text-slate-400">{kpi.dimension?.name}</p>
       </td>
       <td className="px-3 py-2 text-xs text-slate-500">
@@ -434,7 +434,7 @@ function PendingRow({
     <div className="rounded-xl border border-slate-100 p-4">
       <div className="flex flex-wrap items-center gap-3">
         <div className="flex-1">
-          <p className="text-sm font-bold text-mushar-dark">
+          <p className="text-sm font-bold text-brand-dark">
             {entry.kpi?.name ?? "—"}
           </p>
           <p className="text-xs text-slate-400">
@@ -466,7 +466,7 @@ function PendingRow({
             <button
               onClick={() => setRejecting(true)}
               disabled={busy}
-              className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold text-mushar-accent hover:bg-mushar-accent/10"
+              className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold text-brand-accent hover:bg-brand-accent/10"
             >
               <XCircle size={14} /> {rejectLabel}
             </button>

@@ -10,7 +10,7 @@ const ACTION_LABEL: Record<string, string> = {
 const ACTION_STYLE: Record<string, string> = {
   INSERT: "bg-emerald-100 text-emerald-700",
   UPDATE: "bg-amber-100 text-amber-700",
-  DELETE: "bg-mushar-accent/10 text-mushar-accent",
+  DELETE: "bg-brand-accent/10 text-brand-accent",
 };
 const ENTITY_LABEL: Record<string, string> = {
   kpis: "مؤشر",
@@ -78,7 +78,7 @@ export default async function AuditPage() {
                     <td className="whitespace-nowrap px-4 py-3 text-xs text-slate-500">
                       {new Date(e.created_at).toLocaleString("ar-SA-u-nu-latn")}
                     </td>
-                    <td className="px-4 py-3 text-mushar-dark">
+                    <td className="px-4 py-3 text-brand-dark">
                       {e.user?.full_name || e.user?.email || "—"}
                     </td>
                     <td className="px-4 py-3">

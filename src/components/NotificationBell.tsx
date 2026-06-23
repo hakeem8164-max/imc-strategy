@@ -56,7 +56,7 @@ export default function NotificationBell() {
       >
         <Bell size={19} strokeWidth={2} />
         {unread > 0 && (
-          <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-mushar-accent px-1 text-[10px] font-bold text-white">
+          <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-brand-accent px-1 text-[10px] font-bold text-white">
             {unread > 9 ? "9+" : unread}
           </span>
         )}
@@ -65,7 +65,7 @@ export default function NotificationBell() {
       <Popover.Portal>
         <Popover.Positioner sideOffset={8} align="end" className="z-20">
           <Popover.Popup className="w-80 origin-[var(--transform-origin)] overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-cardHover outline-none transition-[transform,opacity] data-[ending-style]:scale-95 data-[ending-style]:opacity-0 data-[starting-style]:scale-95 data-[starting-style]:opacity-0">
-            <div className="border-b border-slate-100 px-4 py-3 text-sm font-bold text-mushar-dark">
+            <div className="border-b border-slate-100 px-4 py-3 text-sm font-bold text-brand-dark">
               الإشعارات
             </div>
             <div className="max-h-96 overflow-y-auto">
@@ -80,7 +80,7 @@ export default function NotificationBell() {
                     onClick={() => go(n.link)}
                     className="block w-full border-b border-slate-50 px-4 py-3 text-right transition last:border-0 hover:bg-slate-50"
                   >
-                    <p className="text-sm font-semibold text-mushar-dark">
+                    <p className="text-sm font-semibold text-brand-dark">
                       {n.title}
                     </p>
                     {n.body && (

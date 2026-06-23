@@ -78,7 +78,7 @@ export default async function KpiDetailPage({
       <div className="space-y-6">
         <Link
           href="/kpis"
-          className="inline-flex items-center gap-1 text-sm font-medium text-mushar-primary hover:underline"
+          className="inline-flex items-center gap-1 text-sm font-medium text-brand-primary hover:underline"
         >
           → العودة إلى المؤشرات
         </Link>
@@ -98,7 +98,7 @@ export default async function KpiDetailPage({
                 </span>
                 <span className="text-xs text-slate-400">رقم {kpi.code}</span>
               </div>
-              <h2 className="text-xl font-bold text-mushar-dark">{kpi.name}</h2>
+              <h2 className="text-xl font-bold text-brand-dark">{kpi.name}</h2>
               {kpi.description && (
                 <p className="mt-2 text-sm leading-relaxed text-slate-500">
                   {kpi.description}
@@ -107,7 +107,7 @@ export default async function KpiDetailPage({
             </div>
             <div className="text-center">
               <p className="text-xs text-slate-400">آخر قيمة</p>
-              <p className="text-3xl font-extrabold text-mushar-dark">
+              <p className="text-3xl font-extrabold text-brand-dark">
                 {formatValue(latest?.value ?? null, kpi.unit)}
               </p>
               {pct !== null && (
@@ -119,7 +119,7 @@ export default async function KpiDetailPage({
           </div>
 
           {kpi.measurement_method && (
-            <div className="mt-4 rounded-xl bg-mushar-pale/30 px-4 py-3 text-sm text-mushar-dark">
+            <div className="mt-4 rounded-xl bg-brand-pale/30 px-4 py-3 text-sm text-brand-dark">
               <span className="font-semibold">آلية القياس: </span>
               {kpi.measurement_method}
             </div>
@@ -129,7 +129,7 @@ export default async function KpiDetailPage({
             {meta.map((m) => (
               <div key={m.label} className="rounded-xl bg-slate-50 px-3 py-2.5">
                 <p className="text-[11px] text-slate-400">{m.label}</p>
-                <p className="mt-0.5 text-sm font-semibold text-mushar-dark">
+                <p className="mt-0.5 text-sm font-semibold text-brand-dark">
                   {m.value ?? "—"}
                 </p>
               </div>
@@ -138,7 +138,7 @@ export default async function KpiDetailPage({
         </div>
 
         <div className="card p-6">
-          <h3 className="mb-4 text-base font-bold text-mushar-dark">
+          <h3 className="mb-4 text-base font-bold text-brand-dark">
             تطور المؤشر عبر الزمن
           </h3>
           <HistoryChart
@@ -150,7 +150,7 @@ export default async function KpiDetailPage({
 
         <div className="grid gap-6 lg:grid-cols-2">
           <div className="card p-6">
-            <h3 className="mb-4 text-base font-bold text-mushar-dark">
+            <h3 className="mb-4 text-base font-bold text-brand-dark">
               إدخال نتيجة
             </h3>
             {canEdit ? (
@@ -177,7 +177,7 @@ export default async function KpiDetailPage({
           </div>
 
           <div className="card p-6">
-            <h3 className="mb-4 text-base font-bold text-mushar-dark">
+            <h3 className="mb-4 text-base font-bold text-brand-dark">
               سجل القياسات ({entries.length})
             </h3>
             {entries.length === 0 ? (
@@ -192,14 +192,14 @@ export default async function KpiDetailPage({
                     className="flex items-center justify-between rounded-xl border border-slate-100 px-4 py-3"
                   >
                     <div>
-                      <p className="text-sm font-semibold text-mushar-dark">
+                      <p className="text-sm font-semibold text-brand-dark">
                         {e.period_label}
                       </p>
                       {e.note && (
                         <p className="text-xs text-slate-400">{e.note}</p>
                       )}
                     </div>
-                    <p className="text-lg font-bold text-mushar-primary">
+                    <p className="text-lg font-bold text-brand-primary">
                       {formatValue(e.value, kpi.unit)}
                     </p>
                   </div>

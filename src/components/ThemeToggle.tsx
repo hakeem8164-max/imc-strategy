@@ -19,7 +19,7 @@ export default function ThemeToggle() {
     if (next) root.classList.add("dark");
     else root.classList.remove("dark");
     try {
-      localStorage.setItem("mushar_theme", next ? "dark" : "light");
+      localStorage.setItem("brand_theme", next ? "dark" : "light");
     } catch {}
   }
 

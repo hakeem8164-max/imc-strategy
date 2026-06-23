@@ -28,15 +28,15 @@ export default function Modal({
       <Dialog.Portal>
         <Dialog.Backdrop className="fixed inset-0 z-50 bg-black/40 transition-opacity duration-150 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0 motion-reduce:transition-none" />
         <Dialog.Popup
-          className={`card fixed left-1/2 top-1/2 z-[51] max-h-[90vh] w-[92vw] ${maxWidth} -translate-x-1/2 -translate-y-1/2 overflow-y-auto p-4 outline-none sm:p-6 ${popupMotion} dark:bg-mushar-surface`}
+          className={`card fixed left-1/2 top-1/2 z-[51] max-h-[90vh] w-[92vw] ${maxWidth} -translate-x-1/2 -translate-y-1/2 overflow-y-auto p-4 outline-none sm:p-6 ${popupMotion} dark:bg-brand-surface`}
         >
           <div className="mb-4 flex items-center justify-between gap-3">
-            <Dialog.Title className="text-lg font-bold text-mushar-dark dark:text-mushar-ink">
+            <Dialog.Title className="text-lg font-bold text-brand-dark dark:text-brand-ink">
               {title}
             </Dialog.Title>
             <Dialog.Close
               aria-label="إغلاق"
-              className="rounded-lg p-1 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-mushar-hover"
+              className="rounded-lg p-1 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-brand-hover"
             >
               <X size={18} />
             </Dialog.Close>

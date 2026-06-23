@@ -24,7 +24,7 @@ export default async function SettingsPage() {
       <Header profile={profile} title="الهيكل التنظيمي" />
       <div>
         <OrgStructureManager
-          orgName={org?.name ?? "شركة المساجد المتكاملة"}
+          orgName={org?.name ?? "نظام إدارة الأداء"}
           units={units}
           unitTypes={unitTypes}
         />

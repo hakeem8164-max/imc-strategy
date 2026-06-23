@@ -1,8 +1,8 @@
 {
-  "name": "imc-performance-platform",
+  "name": "performance-management-system",
   "version": "1.0.0",
   "private": true,
-  "description": "منصة المساجد المتكاملة لإدارة الأداء",
+  "description": "نظام إدارة الأداء",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

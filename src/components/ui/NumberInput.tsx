@@ -33,15 +33,15 @@ export default function NumberInput({
       step={step}
       className={className}
     >
-      <NumberField.Group className="flex items-stretch overflow-hidden rounded-lg border border-slate-200 bg-white focus-within:border-mushar-primary focus-within:ring-2 focus-within:ring-mushar-pale dark:border-[#2b3d44] dark:bg-[#0f1d22]">
-        <NumberField.Decrement className="flex w-8 items-center justify-center text-slate-400 transition hover:bg-slate-50 hover:text-mushar-primary dark:hover:bg-[#15262d]">
+      <NumberField.Group className="flex items-stretch overflow-hidden rounded-lg border border-slate-200 bg-white focus-within:border-brand-primary focus-within:ring-2 focus-within:ring-brand-pale dark:border-[#2b3d44] dark:bg-[#0f1d22]">
+        <NumberField.Decrement className="flex w-8 items-center justify-center text-slate-400 transition hover:bg-slate-50 hover:text-brand-primary dark:hover:bg-[#15262d]">
           <Minus size={13} />
         </NumberField.Decrement>
         <NumberField.Input
           placeholder={placeholder}
-          className="w-full min-w-0 border-x border-slate-200 bg-transparent px-1 py-2 text-center text-sm text-mushar-dark outline-none dark:border-[#2b3d44] dark:text-[#e6eef0]"
+          className="w-full min-w-0 border-x border-slate-200 bg-transparent px-1 py-2 text-center text-sm text-brand-dark outline-none dark:border-[#2b3d44] dark:text-[#e6eef0]"
         />
-        <NumberField.Increment className="flex w-8 items-center justify-center text-slate-400 transition hover:bg-slate-50 hover:text-mushar-primary dark:hover:bg-[#15262d]">
+        <NumberField.Increment className="flex w-8 items-center justify-center text-slate-400 transition hover:bg-slate-50 hover:text-brand-primary dark:hover:bg-[#15262d]">
           <Plus size={13} />
         </NumberField.Increment>
       </NumberField.Group>

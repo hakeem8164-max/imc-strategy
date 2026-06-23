@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
@@ -44,18 +43,13 @@ export default function ChangePasswordPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-bl from-mushar-dark via-mushar-primary to-mushar-teal p-4">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-bl from-brand-dark via-brand-primary to-brand-teal p-4">
       <div className="card w-full max-w-md p-8">
         <div className="mb-6 flex flex-col items-center gap-3 text-center">
-          <Image
-            src="/mushar-logo.png"
-            alt="المساجد المتكاملة"
-            width={130}
-            height={78}
-            priority
-            className="h-auto w-[130px]"
-          />
-          <h1 className="text-xl font-bold text-mushar-dark">
+          <div className="text-xl font-extrabold text-brand-primary">
+            نظام إدارة الأداء
+          </div>
+          <h1 className="text-xl font-bold text-brand-dark">
             تعيين كلمة مرور جديدة
           </h1>
           <p className="text-sm text-slate-500">
@@ -85,7 +79,7 @@ export default function ChangePasswordPage() {
             />
           </div>
           {error && (
-            <div className="rounded-lg bg-mushar-accent/10 px-3 py-2.5 text-sm text-mushar-accent">
+            <div className="rounded-lg bg-brand-accent/10 px-3 py-2.5 text-sm text-brand-accent">
               {error}
             </div>
           )}

@@ -22,7 +22,7 @@ function genPassword() {
   let p = "";
   for (let i = 0; i < 10; i++)
     p += chars[Math.floor(Math.random() * chars.length)];
-  return "Mushar@" + p;
+  return "Pms@" + p;
 }
 
 export default function UsersManager({
@@ -207,7 +207,7 @@ function UserRow({
             <button
               onClick={del}
               disabled={busy}
-              className="rounded-lg px-3 py-1.5 text-xs font-semibold text-mushar-accent hover:bg-mushar-accent/10"
+              className="rounded-lg px-3 py-1.5 text-xs font-semibold text-brand-accent hover:bg-brand-accent/10"
             >
               حذف
             </button>
@@ -278,7 +278,7 @@ function AddUserModal({ orgUnits, onClose, onDone, supabase }: any) {
             onClick={() => setMode("create")}
             className={`flex-1 rounded-md py-2 text-sm font-semibold transition ${
               mode === "create"
-                ? "bg-white text-mushar-primary shadow-sm"
+                ? "bg-white text-brand-primary shadow-sm"
                 : "text-slate-500"
             }`}
           >
@@ -288,7 +288,7 @@ function AddUserModal({ orgUnits, onClose, onDone, supabase }: any) {
             onClick={() => setMode("invite")}
             className={`flex-1 rounded-md py-2 text-sm font-semibold transition ${
               mode === "invite"
-                ? "bg-white text-mushar-primary shadow-sm"
+                ? "bg-white text-brand-primary shadow-sm"
                 : "text-slate-500"
             }`}
           >
@@ -304,7 +304,7 @@ function AddUserModal({ orgUnits, onClose, onDone, supabase }: any) {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="name@mushar.sa"
+              placeholder="name@brand.sa"
             />
           </div>
           <div>
@@ -382,7 +382,7 @@ function AddUserModal({ orgUnits, onClose, onDone, supabase }: any) {
             className={`mt-4 rounded-lg px-3 py-2.5 text-sm ${
               result.ok
                 ? "bg-emerald-50 text-emerald-700"
-                : "bg-mushar-accent/10 text-mushar-accent"
+                : "bg-brand-accent/10 text-brand-accent"
             }`}
           >
             {result.text}

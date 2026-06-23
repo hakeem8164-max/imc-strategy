@@ -140,7 +140,7 @@ function AttendeesView({ raw }: { raw: string }) {
               key={i}
               className="flex items-center gap-2 border-b border-slate-100 px-3 py-1.5 last:border-b-0"
             >
-              <span className="flex-1 font-semibold text-mushar-dark">{a.name}</span>
+              <span className="flex-1 font-semibold text-brand-dark">{a.name}</span>
               <span className="flex-1 text-slate-500">{a.title}</span>
             </div>
           ))}
@@ -364,7 +364,7 @@ export default function MeetingsManager({
                   setFFrom("");
                   setFTo("");
                 }}
-                className="flex items-center gap-1 font-semibold text-mushar-primary hover:underline"
+                className="flex items-center gap-1 font-semibold text-brand-primary hover:underline"
               >
                 <X size={12} /> مسح الفلاتر
               </button>
@@ -385,8 +385,8 @@ export default function MeetingsManager({
       ) : (
         groups.map(([cycle, list]) => (
           <section key={cycle} className="space-y-3">
-            <h2 className="flex items-center gap-2 text-base font-bold text-mushar-dark">
-              <CalendarDays size={18} className="text-mushar-primary" />
+            <h2 className="flex items-center gap-2 text-base font-bold text-brand-dark">
+              <CalendarDays size={18} className="text-brand-primary" />
               دورة التقييم {cycle}
               <span className="text-xs font-normal text-slate-400">
                 ({list.length} اجتماع)
@@ -434,7 +434,7 @@ function StatCard({
       </span>
       <div className="min-w-0">
         <p className="flex items-baseline gap-1.5">
-          <span className="text-xl font-bold text-mushar-dark">{value}</span>
+          <span className="text-xl font-bold text-brand-dark">{value}</span>
           {sub && (
             <span className="text-[11px] font-bold" style={{ color }}>
               {sub}
@@ -568,7 +568,7 @@ function CreateMeetingForm({
     <div className="card space-y-5 p-5">
       {/* بيانات الاجتماع */}
       <div className="space-y-3">
-        <h3 className="text-sm font-bold text-mushar-dark">بيانات الاجتماع</h3>
+        <h3 className="text-sm font-bold text-brand-dark">بيانات الاجتماع</h3>
         <div className="grid gap-3 sm:grid-cols-2">
           <div>
             <label className="label">نوع الاجتماع *</label>
@@ -654,7 +654,7 @@ function CreateMeetingForm({
 
       {/* التوصيات */}
       <div className="space-y-3 border-t border-slate-100 pt-4">
-        <h3 className="text-sm font-bold text-mushar-dark">
+        <h3 className="text-sm font-bold text-brand-dark">
           التوصيات <span className="text-slate-400">({recs.length})</span>
         </h3>
 
@@ -666,10 +666,10 @@ function CreateMeetingForm({
                 key={i}
                 className="flex items-center gap-2 rounded-lg bg-slate-50 px-3 py-2 text-xs"
               >
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-mushar-pale/60 text-[10px] font-bold text-mushar-primary">
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-pale/60 text-[10px] font-bold text-brand-primary">
                   {i + 1}
                 </span>
-                <span className="min-w-0 flex-1 truncate font-semibold text-mushar-dark">
+                <span className="min-w-0 flex-1 truncate font-semibold text-brand-dark">
                   {r.name}
                 </span>
                 <span
@@ -781,8 +781,8 @@ function CreateMeetingForm({
                     onClick={() => toggleParticipant(u.id)}
                     className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold transition ${
                       on
-                        ? "border-mushar-primary bg-mushar-primary text-white"
-                        : "border-slate-200 bg-white text-slate-500 hover:border-mushar-pale"
+                        ? "border-brand-primary bg-brand-primary text-white"
+                        : "border-slate-200 bg-white text-slate-500 hover:border-brand-pale"
                     }`}
                   >
                     {u.name}
@@ -795,7 +795,7 @@ function CreateMeetingForm({
           <div className="flex justify-end">
             <button
               onClick={addToList}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-mushar-accent px-4 py-2 text-xs font-bold text-white transition hover:bg-mushar-accentDark"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-brand-accent px-4 py-2 text-xs font-bold text-white transition hover:bg-brand-accentDark"
             >
               <Plus size={14} /> إضافة للقائمة
             </button>
@@ -835,7 +835,7 @@ function RecEditor({
       <div className="flex items-center justify-between">
         <span className="text-xs font-semibold text-slate-500">توصية {idx + 1}</span>
         {onRemove && (
-          <button onClick={onRemove} className="text-mushar-accent hover:text-red-600">
+          <button onClick={onRemove} className="text-brand-accent hover:text-red-600">
             <Trash2 size={14} />
           </button>
         )}
@@ -937,7 +937,7 @@ function MultiUnitPicker({
           {selected.map((u) => (
             <span
               key={u.id}
-              className="inline-flex items-center gap-1 rounded-md bg-mushar-pale/50 px-2 py-0.5 text-[11px] text-mushar-primary"
+              className="inline-flex items-center gap-1 rounded-md bg-brand-pale/50 px-2 py-0.5 text-[11px] text-brand-primary"
             >
               {u.name}
               <button onClick={() => onChange(value.filter((v) => v !== u.id))}>
@@ -1012,10 +1012,10 @@ function MeetingCard({
           />
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="rounded-md bg-mushar-pale/50 px-2 py-0.5 text-[11px] font-semibold text-mushar-primary">
+              <span className="rounded-md bg-brand-pale/50 px-2 py-0.5 text-[11px] font-semibold text-brand-primary">
                 {meeting.type}
               </span>
-              <h3 className="text-sm font-bold text-mushar-dark">{meeting.title}</h3>
+              <h3 className="text-sm font-bold text-brand-dark">{meeting.title}</h3>
             </div>
             <p className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[11px] text-slate-400">
               <span className="flex items-center gap-1">
@@ -1176,7 +1176,7 @@ function AddRecInline({
   }
 
   return (
-    <div className="rounded-xl border border-mushar-pale bg-white p-3">
+    <div className="rounded-xl border border-brand-pale bg-white p-3">
       <RecEditor
         r={r}
         idx={0}
@@ -1297,7 +1297,7 @@ function RecommendationCard({
       {/* رأس التوصية */}
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div className="min-w-0 flex-1 space-y-1">
-          <p className="text-sm font-semibold text-mushar-dark">{rec.name}</p>
+          <p className="text-sm font-semibold text-brand-dark">{rec.name}</p>
           {rec.description && (
             <p className="text-xs text-slate-500">{rec.description}</p>
           )}
@@ -1343,8 +1343,8 @@ function RecommendationCard({
 
       {/* المحادثة */}
       <div className="mt-3 border-t border-slate-100 pt-3">
-        <h5 className="mb-2 flex items-center gap-1.5 text-xs font-bold text-mushar-dark">
-          <MessageSquare size={13} className="text-mushar-primary" /> التحديثات والتحديات
+        <h5 className="mb-2 flex items-center gap-1.5 text-xs font-bold text-brand-dark">
+          <MessageSquare size={13} className="text-brand-primary" /> التحديثات والتحديات
         </h5>
 
         {canConverse && rec.closure_status !== "closed" && (
@@ -1473,14 +1473,14 @@ function RecommendationCard({
         ) : canConverse ? (
           showClose ? (
             <div className="space-y-3 rounded-lg border border-emerald-200 p-3">
-              <h5 className="text-xs font-bold text-mushar-dark">طلب إغلاق التوصية</h5>
+              <h5 className="text-xs font-bold text-brand-dark">طلب إغلاق التوصية</h5>
               <p className="text-[11px] text-slate-500">
                 لا تُغلق التوصية إلا بإرفاق وثيقة ورفعها لمسؤول القياس للاعتماد.
               </p>
               <input
                 type="file"
                 onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-                className="block w-full text-xs text-slate-500 file:ml-3 file:rounded-lg file:border-0 file:bg-mushar-pale/50 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-mushar-primary"
+                className="block w-full text-xs text-slate-500 file:ml-3 file:rounded-lg file:border-0 file:bg-brand-pale/50 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-brand-primary"
               />
               <div className="flex justify-end gap-2">
                 <button onClick={() => setShowClose(false)} className="btn-ghost py-1.5 text-xs">
@@ -1590,7 +1590,7 @@ function UpdateItem({
               </span>
             )}
           </div>
-          <p className={`mt-1 ${u.resolved ? "text-slate-500 line-through" : "text-mushar-dark"}`}>
+          <p className={`mt-1 ${u.resolved ? "text-slate-500 line-through" : "text-brand-dark"}`}>
             {u.body}
           </p>
           <p className="text-[10px] text-slate-400">
@@ -1611,7 +1611,7 @@ function UpdateItem({
                 {canConverse && (
                   <button
                     onClick={() => act(() => deleteRecReply(r.id))}
-                    className="text-mushar-accent hover:underline"
+                    className="text-brand-accent hover:underline"
                   >
                     حذف
                   </button>
@@ -1626,7 +1626,7 @@ function UpdateItem({
         <div className="mt-2 flex flex-wrap items-center gap-3 border-t border-slate-100 pt-2 text-[11px]">
           <button
             onClick={() => setShowReply((v) => !v)}
-            className="font-semibold text-mushar-primary hover:underline"
+            className="font-semibold text-brand-primary hover:underline"
           >
             رد
           </button>
@@ -1638,7 +1638,7 @@ function UpdateItem({
           </button>
           <button
             onClick={() => act(() => deleteRecUpdate(u.id))}
-            className="mr-auto text-mushar-accent hover:underline"
+            className="mr-auto text-brand-accent hover:underline"
           >
             حذف
           </button>
@@ -1680,7 +1680,7 @@ function DomainSettings({ domains }: { domains: RecommendationDomain[] }) {
 
   return (
     <div className="card space-y-3 p-5">
-      <h3 className="text-sm font-bold text-mushar-dark">مجالات التوصيات</h3>
+      <h3 className="text-sm font-bold text-brand-dark">مجالات التوصيات</h3>
       <div className="flex gap-2">
         <input
           className="input flex-1"
@@ -1815,7 +1815,7 @@ function MentionBox({
               key={u.id}
               type="button"
               onClick={() => pick(u)}
-              className="block w-full px-3 py-2 text-right text-xs hover:bg-mushar-pale/40"
+              className="block w-full px-3 py-2 text-right text-xs hover:bg-brand-pale/40"
             >
               @{u.full_name}
             </button>

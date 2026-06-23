@@ -111,7 +111,7 @@ function MentionBox({
               key={u.id}
               type="button"
               onClick={() => pick(u)}
-              className="block w-full px-3 py-2 text-right text-xs hover:bg-mushar-pale/40"
+              className="block w-full px-3 py-2 text-right text-xs hover:bg-brand-pale/40"
             >
               @{u.full_name}
             </button>
@@ -291,11 +291,11 @@ function FollowCard({
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div className="space-y-1">
           {i.objective && (
-            <span className="inline-flex items-center gap-1 rounded-md bg-mushar-pale/40 px-2 py-0.5 text-[11px] font-semibold text-mushar-primary">
+            <span className="inline-flex items-center gap-1 rounded-md bg-brand-pale/40 px-2 py-0.5 text-[11px] font-semibold text-brand-primary">
               <Target size={12} /> {i.objective.name}
             </span>
           )}
-          <h3 className="text-sm font-bold text-mushar-dark">{i.title}</h3>
+          <h3 className="text-sm font-bold text-brand-dark">{i.title}</h3>
           <p className="text-[11px] text-slate-400">
             {i.owner_unit?.name ?? "—"} · {i.owner?.full_name ?? "—"}
             {i.start_year ? ` · بداية ${i.start_year}` : ""}
@@ -322,8 +322,8 @@ function FollowCard({
 
       {/* جانت */}
       <div>
-        <h4 className="mb-2 flex items-center gap-1.5 text-sm font-bold text-mushar-dark">
-          <Flag size={14} className="text-mushar-primary" /> مخطط جانت للمعالم
+        <h4 className="mb-2 flex items-center gap-1.5 text-sm font-bold text-brand-dark">
+          <Flag size={14} className="text-brand-primary" /> مخطط جانت للمعالم
         </h4>
         <MilestoneGantt milestones={milestones} />
       </div>
@@ -331,7 +331,7 @@ function FollowCard({
       {/* تحديث الإنجاز عبر المعالم (نسبة 0–100% لكل معلم) */}
       {canManage && !completed && (
         <div>
-          <h4 className="mb-2 text-sm font-bold text-mushar-dark">
+          <h4 className="mb-2 text-sm font-bold text-brand-dark">
             تحديث نسبة إنجاز المعالم
           </h4>
           <div className="grid gap-1.5 sm:grid-cols-2">
@@ -345,8 +345,8 @@ function FollowCard({
       {/* المخرجات */}
       {deliverables.length > 0 && (
         <div>
-          <h4 className="mb-2 flex items-center gap-1.5 text-sm font-bold text-mushar-dark">
-            <PackageCheck size={14} className="text-mushar-primary" /> المخرجات (
+          <h4 className="mb-2 flex items-center gap-1.5 text-sm font-bold text-brand-dark">
+            <PackageCheck size={14} className="text-brand-primary" /> المخرجات (
             {deliverables.filter((d) => d.done).length}/{deliverables.length})
           </h4>
           <div className="grid gap-1.5 sm:grid-cols-2">
@@ -365,8 +365,8 @@ function FollowCard({
 
       {/* التحديات والتحديثات */}
       <div>
-        <h4 className="mb-2 flex items-center gap-1.5 text-sm font-bold text-mushar-dark">
-          <MessageSquare size={14} className="text-mushar-primary" /> التحديثات والتحديات
+        <h4 className="mb-2 flex items-center gap-1.5 text-sm font-bold text-brand-dark">
+          <MessageSquare size={14} className="text-brand-primary" /> التحديثات والتحديات
         </h4>
 
         {/* صندوق الإضافة في الأعلى */}
@@ -445,7 +445,7 @@ function FollowCard({
         ) : canManage ? (
           showComplete ? (
             <div className="space-y-3 rounded-lg border border-emerald-200 p-3">
-              <h4 className="text-sm font-bold text-mushar-dark">طلب اكتمال المبادرة</h4>
+              <h4 className="text-sm font-bold text-brand-dark">طلب اكتمال المبادرة</h4>
               <p className="text-[11px] text-slate-500">
                 يُرفع للاعتماد عبر السلسلة. الوثيقة والدروس المستفادة إلزامية.
               </p>
@@ -462,7 +462,7 @@ function FollowCard({
                 <input
                   type="file"
                   onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-                  className="block w-full text-sm text-slate-500 file:ml-3 file:rounded-lg file:border-0 file:bg-mushar-pale/50 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-mushar-primary"
+                  className="block w-full text-sm text-slate-500 file:ml-3 file:rounded-lg file:border-0 file:bg-brand-pale/50 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-brand-primary"
                 />
               </div>
               <div className="flex justify-end gap-2">
@@ -516,7 +516,7 @@ function MilestoneProgressRow({
 
   return (
     <div className="flex items-center gap-2 rounded-lg bg-slate-50 px-3 py-1.5 text-xs">
-      <span className={`flex-1 truncate ${done ? "text-emerald-700" : "text-mushar-dark"}`} title={title}>
+      <span className={`flex-1 truncate ${done ? "text-emerald-700" : "text-brand-dark"}`} title={title}>
         {title} <span className="text-slate-400">· وزن {weight}%</span>
       </span>
       <input
@@ -611,7 +611,7 @@ function UpdateItem({
               </span>
             )}
           </div>
-          <p className={`mt-1 ${u.resolved ? "text-slate-500 line-through" : "text-mushar-dark"}`}>
+          <p className={`mt-1 ${u.resolved ? "text-slate-500 line-through" : "text-brand-dark"}`}>
             {u.body}
           </p>
           <p className="text-[10px] text-slate-400">
@@ -633,7 +633,7 @@ function UpdateItem({
                 {canManage && (
                   <button
                     onClick={() => act(() => deleteUpdateReply(r.id))}
-                    className="text-mushar-accent hover:underline"
+                    className="text-brand-accent hover:underline"
                   >
                     حذف
                   </button>
@@ -649,7 +649,7 @@ function UpdateItem({
         <div className="mt-2 flex flex-wrap items-center gap-3 border-t border-slate-100 pt-2 text-[11px]">
           <button
             onClick={() => setShowReply((v) => !v)}
-            className="font-semibold text-mushar-primary hover:underline"
+            className="font-semibold text-brand-primary hover:underline"
           >
             رد/تحديث
           </button>
@@ -661,7 +661,7 @@ function UpdateItem({
           </button>
           <button
             onClick={() => act(() => deleteInitiativeUpdate(u.id))}
-            className="mr-auto text-mushar-accent hover:underline"
+            className="mr-auto text-brand-accent hover:underline"
           >
             حذف
           </button>
@@ -740,15 +740,15 @@ function DeliverableRow({
         onChange={(e) => act(() => toggleDeliverable(d.id, e.target.checked))}
         className="h-4 w-4 accent-emerald-600"
       />
-      <span className={`flex-1 ${d.done ? "text-emerald-700 line-through" : "text-mushar-dark"}`}>
+      <span className={`flex-1 ${d.done ? "text-emerald-700 line-through" : "text-brand-dark"}`}>
         {d.title}
       </span>
       {d.doc_url ? (
-        <button onClick={openDoc} className="inline-flex items-center gap-1 font-semibold text-mushar-primary hover:underline">
+        <button onClick={openDoc} className="inline-flex items-center gap-1 font-semibold text-brand-primary hover:underline">
           <Paperclip size={12} /> {d.doc_name ? "الوثيقة" : "عرض"}
         </button>
       ) : canManage && !completed ? (
-        <label className="cursor-pointer font-semibold text-mushar-primary hover:underline">
+        <label className="cursor-pointer font-semibold text-brand-primary hover:underline">
           {busy ? "جارٍ…" : "إرفاق وثيقة"}
           <input
             type="file"
@@ -760,7 +760,7 @@ function DeliverableRow({
       {d.doc_url && canManage && !completed && (
         <button
           onClick={() => act(() => setDeliverableDoc({ id: d.id, doc_url: null, doc_name: null }))}
-          className="text-mushar-accent hover:underline"
+          className="text-brand-accent hover:underline"
         >
           إزالة
         </button>

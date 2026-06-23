@@ -39,7 +39,7 @@ export default function SearchableSelect({
           {selected && (
             <Combobox.Clear
               aria-label="مسح"
-              className="rounded p-1 text-slate-400 transition hover:text-mushar-accent"
+              className="rounded p-1 text-slate-400 transition hover:text-brand-accent"
             >
               <X size={14} />
             </Combobox.Clear>
@@ -60,7 +60,7 @@ export default function SearchableSelect({
                 <Combobox.Item key={o.value} value={o} className={itemClass}>
                   <span>{o.label}</span>
                   <Combobox.ItemIndicator>
-                    <Check size={15} className="text-mushar-primary" />
+                    <Check size={15} className="text-brand-primary" />
                   </Combobox.ItemIndicator>
                 </Combobox.Item>
               )}

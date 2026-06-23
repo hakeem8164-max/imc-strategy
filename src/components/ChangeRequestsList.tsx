@@ -121,7 +121,7 @@ export default function ChangeRequestsList({
     return (
       <div className="card space-y-2 p-4">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="rounded-md bg-mushar-pale/40 px-2 py-0.5 text-[11px] font-bold text-mushar-primary">
+          <span className="rounded-md bg-brand-pale/40 px-2 py-0.5 text-[11px] font-bold text-brand-primary">
             {ACTION[cr.action]} {ENTITY[cr.entity_type]}
           </span>
           <span
@@ -131,7 +131,7 @@ export default function ChangeRequestsList({
             {s.label}
           </span>
         </div>
-        <h3 className="text-sm font-bold text-mushar-dark">{cr.title}</h3>
+        <h3 className="text-sm font-bold text-brand-dark">{cr.title}</h3>
 
         {(() => {
           const meta = (cr.payload?.__meta ?? {}) as Meta;
@@ -149,7 +149,7 @@ export default function ChangeRequestsList({
                     {meta.current_value || "—"}
                   </span>
                   <span className="mx-1 text-slate-400">←</span>
-                  <span className="font-semibold text-mushar-dark">
+                  <span className="font-semibold text-brand-dark">
                     {meta.new_value || "—"}
                   </span>
                 </div>
@@ -168,7 +168,7 @@ export default function ChangeRequestsList({
               {meta.attachment_url && (
                 <button
                   onClick={() => openDoc(meta.attachment_url!)}
-                  className="inline-flex items-center gap-1 font-semibold text-mushar-primary hover:underline"
+                  className="inline-flex items-center gap-1 font-semibold text-brand-primary hover:underline"
                 >
                   <Paperclip size={12} />
                   {meta.attachment_name || "المرفق"}
@@ -193,7 +193,7 @@ export default function ChangeRequestsList({
             </button>
             <button
               onClick={() => review(cr, "reject")}
-              className="inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-semibold text-mushar-accent hover:bg-mushar-accent/10"
+              className="inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-semibold text-brand-accent hover:bg-brand-accent/10"
             >
               <X size={14} /> رفض/إعادة
             </button>
@@ -206,8 +206,8 @@ export default function ChangeRequestsList({
   return (
     <div className="space-y-6">
       <section>
-        <h2 className="mb-3 flex items-center gap-2 text-sm font-bold text-mushar-dark">
-          <Clock size={16} className="text-mushar-primary" />
+        <h2 className="mb-3 flex items-center gap-2 text-sm font-bold text-brand-dark">
+          <Clock size={16} className="text-brand-primary" />
           بانتظار إجرائي ({actionable.length})
         </h2>
         {actionable.length === 0 ? (
@@ -225,7 +225,7 @@ export default function ChangeRequestsList({
 
       {mine.length > 0 && (
         <section>
-          <h2 className="mb-3 text-sm font-bold text-mushar-dark">
+          <h2 className="mb-3 text-sm font-bold text-brand-dark">
             طلباتي ({mine.length})
           </h2>
           <div className="grid gap-3 lg:grid-cols-2">
@@ -238,7 +238,7 @@ export default function ChangeRequestsList({
 
       {(profile.role === "admin" || profile.role === "executive") && (
         <section>
-          <h2 className="mb-3 text-sm font-bold text-mushar-dark">
+          <h2 className="mb-3 text-sm font-bold text-brand-dark">
             كل الطلبات ({history.length})
           </h2>
           <div className="grid gap-3 lg:grid-cols-2">
