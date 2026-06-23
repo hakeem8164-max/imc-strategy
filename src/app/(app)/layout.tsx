@@ -1,23 +1,18 @@
 import { redirect } from "next/navigation";
 import AppShell from "@/components/AppShell";
-import { getProfile, getOrgProfile } from "@/lib/data";
-import { createClient } from "@/lib/supabase/server";
+import { getProfile, getOrgProfile, getAuthUser } from "@/lib/data";
 
 export default async function AppLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
   if (!user) redirect("/login");
   if (user.user_metadata?.must_change_password) redirect("/account/password");
 
-  const profile = await getProfile();
+  const [profile, org] = await Promise.all([getProfile(), getOrgProfile()]);
   if (!profile) redirect("/login");
-  const org = await getOrgProfile();
 
   return (
     <AppShell

@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import type {
   Dimension,
@@ -21,7 +22,7 @@ export async function getNotifications(): Promise<Notification[]> {
   return (data as Notification[]) ?? [];
 }
 
-export async function getOrgProfile(): Promise<OrgProfile | null> {
+export const getOrgProfile = cache(async (): Promise<OrgProfile | null> => {
   const supabase = await createClient();
   const { data } = await supabase
     .from("org_profile")
@@ -29,7 +30,7 @@ export async function getOrgProfile(): Promise<OrgProfile | null> {
     .eq("id", 1)
     .single();
   return (data as OrgProfile) ?? null;
-}
+});
 
 export async function getOrgUnitTypes(): Promise<OrgUnitTypeDef[]> {
   const supabase = await createClient();
@@ -68,20 +69,31 @@ export async function getUsers(): Promise<Profile[]> {
   return (data as Profile[]) ?? [];
 }
 
-export async function getProfile(): Promise<Profile | null> {
+/**
+ * المستخدم المُصادَق — مُخزّن مؤقتًا لكل طلب عبر cache() حتى لا يتكرّر
+ * الاتصال بخادم المصادقة في التخطيط والصفحة والمكوّنات في نفس الطلب.
+ */
+export const getAuthUser = cache(async () => {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  return user;
+});
+
+/** الملف الشخصي — مُخزّن مؤقتًا لكل طلب (يُستدعى في عدّة أماكن) */
+export const getProfile = cache(async (): Promise<Profile | null> => {
+  const user = await getAuthUser();
   if (!user) return null;
 
+  const supabase = await createClient();
   const { data } = await supabase
     .from("profiles")
     .select("*")
     .eq("id", user.id)
     .single();
   return (data as Profile) ?? null;
-}
+});
 
 /** مناظير الخطة فقط (تُستثنى المناظير المستقلة مثل أهداف الوقفين) */
 export async function getDimensions(): Promise<Dimension[]> {
