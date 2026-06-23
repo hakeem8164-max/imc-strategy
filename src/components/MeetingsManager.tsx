@@ -979,7 +979,7 @@ function MeetingCard({
 }) {
   const router = useRouter();
   const [, startTransition] = useTransition();
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   const [showAddRec, setShowAddRec] = useState(false);
   const recs = meeting.recommendations ?? [];
   const st = statsOf(recs);
