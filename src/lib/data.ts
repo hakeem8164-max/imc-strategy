@@ -781,7 +781,7 @@ export async function getMeetings(): Promise<Meeting[]> {
   const { data } = await supabase
     .from("meetings")
     .select(
-      "*, recommendations:meeting_recommendations(*, domain:recommendation_domains(id,name), owner_unit:org_units(id,name), owner:profiles!meeting_recommendations_owner_user_id_fkey(full_name), participants:recommendation_participants(org_unit:org_units(id,name)), updates:recommendation_updates(*, author:profiles!recommendation_updates_created_by_fkey(full_name), replies:recommendation_update_replies(*, author:profiles!recommendation_update_replies_created_by_fkey(full_name))))"
+      "*, recommendations:meeting_recommendations(*, domain:recommendation_domains(id,name), owner_unit:org_units!meeting_recommendations_owner_unit_id_fkey(id,name), owner:profiles!meeting_recommendations_owner_user_id_fkey(full_name), participants:recommendation_participants(org_unit:org_units(id,name)), updates:recommendation_updates(*, author:profiles!recommendation_updates_created_by_fkey(full_name), replies:recommendation_update_replies(*, author:profiles!recommendation_update_replies_created_by_fkey(full_name))))"
     )
     .order("meeting_date", { ascending: false, nullsFirst: false })
     .order("created_at", { ascending: false });

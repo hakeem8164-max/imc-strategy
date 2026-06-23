@@ -99,6 +99,39 @@ function recStatusOf(r: MeetingRecommendation): RecStatus {
   });
 }
 
+/** عرض الحضور: يحاول قراءة JSON [{name,title}] ويتراجع للنص الخام للبيانات القديمة */
+function AttendeesView({ raw }: { raw: string }) {
+  let list: { name: string; title: string }[] | null = null;
+  try {
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) list = parsed;
+  } catch {
+    list = null;
+  }
+  return (
+    <div className="text-xs text-slate-500">
+      <p className="mb-1 flex items-center gap-1 font-semibold text-slate-500">
+        <Users size={12} className="text-slate-400" /> الحضور
+      </p>
+      {list && list.length > 0 ? (
+        <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
+          {list.map((a, i) => (
+            <div
+              key={i}
+              className="flex items-center gap-2 border-b border-slate-100 px-3 py-1.5 last:border-b-0"
+            >
+              <span className="flex-1 font-semibold text-mushar-dark">{a.name}</span>
+              <span className="flex-1 text-slate-500">{a.title}</span>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p>{raw}</p>
+      )}
+    </div>
+  );
+}
+
 export default function MeetingsManager({
   meetings,
   domains,
@@ -299,14 +332,18 @@ function CreateMeetingForm({
   const [type, setType] = useState("");
   const [title, setTitle] = useState("");
   const [date, setDate] = useState("");
-  const [committee, setCommittee] = useState("");
-  const [attendees, setAttendees] = useState("");
+  const [attendees, setAttendees] = useState<{ name: string; title: string }[]>([
+    { name: "", title: "" },
+  ]);
   const [minutes, setMinutes] = useState("");
   const [recs, setRecs] = useState<RecDraft[]>([]);
   const [draft, setDraft] = useState<RecDraft>(emptyRec());
 
   function patchDraft(p: Partial<RecDraft>) {
     setDraft((s) => ({ ...s, ...p }));
+  }
+  function patchAttendee(i: number, p: Partial<{ name: string; title: string }>) {
+    setAttendees((s) => s.map((a, idx) => (idx === i ? { ...a, ...p } : a)));
   }
   function toggleParticipant(id: string) {
     setDraft((s) => ({
@@ -318,25 +355,37 @@ function CreateMeetingForm({
   }
   function addToList() {
     if (!draft.name.trim()) return notify("اكتب اسم التوصية", "error");
+    if (!draft.description.trim()) return notify("اكتب وصف التوصية", "error");
+    if (!draft.domain_id) return notify("اختر مجال التوصية", "error");
+    if (!draft.owner_unit_id) return notify("اختر الإدارة المسؤولة", "error");
+    if (!draft.owner_user_id) return notify("اختر المسؤول", "error");
+    if (!draft.due_date) return notify("حدّد تاريخ الاستحقاق", "error");
+    if (draft.participant_unit_ids.length === 0)
+      return notify("اختر إدارة مشاركة واحدة على الأقل", "error");
     setRecs((s) => [...s, draft]);
     setDraft(emptyRec());
   }
 
   function submit() {
     if (!type) return notify("اختر نوع الاجتماع", "error");
+    if (!date) return notify("حدّد تاريخ المحضر", "error");
     if (!title.trim()) return notify("اكتب عنوان الاجتماع", "error");
-    // ضمّ المسودّة الحالية إن كان لها اسم ولم تُضَف بعد
-    const all = draft.name.trim() ? [...recs, draft] : recs;
+    const cleanAtt = attendees.filter((a) => a.name.trim() && a.title.trim());
+    if (cleanAtt.length === 0)
+      return notify("أضف الحضور (الاسم والمنصب)", "error");
+    if (!minutes.trim()) return notify("اكتب محضر الاجتماع", "error");
+    if (recs.length === 0)
+      return notify("أضف توصية واحدة على الأقل عبر «إضافة للقائمة»", "error");
     setBusy(true);
     startTransition(async () => {
       const res = await createMeeting({
         type,
         title,
-        meeting_date: date || null,
-        committee: committee || null,
-        attendees: attendees || null,
-        minutes: minutes || null,
-        recommendations: all
+        meeting_date: date,
+        committee: null,
+        attendees: JSON.stringify(cleanAtt),
+        minutes,
+        recommendations: recs
           .filter((r) => r.name.trim())
           .map((r) => ({
             name: r.name,
@@ -363,7 +412,7 @@ function CreateMeetingForm({
       {/* بيانات الاجتماع */}
       <div className="space-y-3">
         <h3 className="text-sm font-bold text-mushar-dark">بيانات الاجتماع</h3>
-        <div className="grid gap-3 sm:grid-cols-3">
+        <div className="grid gap-3 sm:grid-cols-2">
           <div>
             <label className="label">نوع الاجتماع *</label>
             <FilterSelect
@@ -385,18 +434,6 @@ function CreateMeetingForm({
               onChange={(e) => setDate(e.target.value)}
             />
           </div>
-          <div>
-            <label className="label">اللجنة (اختياري)</label>
-            <FilterSelect
-              className="w-full"
-              value={committee}
-              onValueChange={setCommittee}
-              options={[
-                { value: "", label: "— غير مرتبط بلجنة —" },
-                ...orgUnits.map((u) => ({ value: u.name, label: u.name })),
-              ]}
-            />
-          </div>
         </div>
         <div>
           <label className="label">عنوان الاجتماع *</label>
@@ -408,15 +445,48 @@ function CreateMeetingForm({
           />
         </div>
         <div>
-          <label className="label">الحضور (الأسماء)</label>
-          <textarea
-            className="input min-h-[60px]"
-            value={attendees}
-            onChange={(e) => setAttendees(e.target.value)}
-          />
+          <label className="label">الحضور * (الاسم والمنصب)</label>
+          <div className="space-y-1.5">
+            {attendees.map((a, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <input
+                  className="input flex-1"
+                  placeholder="الاسم"
+                  value={a.name}
+                  onChange={(e) => patchAttendee(i, { name: e.target.value })}
+                />
+                <input
+                  className="input flex-1"
+                  placeholder="المنصب"
+                  value={a.title}
+                  onChange={(e) => patchAttendee(i, { title: e.target.value })}
+                />
+                <button
+                  type="button"
+                  onClick={() =>
+                    setAttendees((s) =>
+                      s.length > 1 ? s.filter((_, idx) => idx !== i) : s
+                    )
+                  }
+                  className="shrink-0 rounded-lg p-2 text-slate-400 hover:text-red-600 disabled:opacity-30"
+                  disabled={attendees.length === 1}
+                  aria-label="حذف"
+                >
+                  <Trash2 size={15} />
+                </button>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={() => setAttendees((s) => [...s, { name: "", title: "" }])}
+              className="btn-ghost py-1.5 text-xs"
+            >
+              <Plus size={14} className="inline" /> إضافة حاضر
+            </button>
+          </div>
         </div>
         <div>
-          <label className="label">محضر الاجتماع / جدول الأعمال / الملاحظات</label>
+          <label className="label">محضر الاجتماع / جدول الأعمال / الملاحظات *</label>
           <textarea
             className="input min-h-[90px]"
             value={minutes}
@@ -481,7 +551,7 @@ function CreateMeetingForm({
           />
           <textarea
             className="input min-h-[44px] text-sm"
-            placeholder="وصف التوصية (اختياري)"
+            placeholder="وصف التوصية *"
             value={draft.description}
             onChange={(e) => patchDraft({ description: e.target.value })}
           />
@@ -543,7 +613,7 @@ function CreateMeetingForm({
 
           {/* الإدارات المشاركة */}
           <div>
-            <label className="label text-[11px]">الإدارات المشاركة (اختياري)</label>
+            <label className="label text-[11px]">الإدارات المشاركة *</label>
             <div className="flex flex-wrap gap-1.5">
               {orgUnits.map((u) => {
                 const on = draft.participant_unit_ids.includes(u.id);
@@ -811,12 +881,7 @@ function MeetingCard({
 
       {open && (
         <div className="space-y-4 border-t border-slate-100 bg-slate-50/50 p-5">
-          {meeting.attendees && (
-            <p className="text-xs text-slate-500">
-              <Users size={12} className="ml-1 inline text-slate-400" />
-              <span className="font-semibold">الحضور:</span> {meeting.attendees}
-            </p>
-          )}
+          {meeting.attendees && <AttendeesView raw={meeting.attendees} />}
           {meeting.minutes && (
             <div className="rounded-lg border border-slate-200 bg-white p-3 text-xs leading-relaxed text-slate-600">
               <p className="mb-1 font-semibold text-slate-500">محضر الاجتماع</p>
