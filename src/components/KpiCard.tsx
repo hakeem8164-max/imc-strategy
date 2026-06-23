@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
+import Meter from "@/components/ui/Meter";
 import type { Kpi } from "@/lib/types";
 import { formatValue, achievementPct, achievementColor } from "@/lib/format";
 
@@ -102,12 +103,7 @@ export default function KpiCard({
           <div className="mb-1 flex justify-between text-[11px] font-medium">
             <span style={{ color }}>{pct}% من المستهدف الكلي</span>
           </div>
-          <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
-            <div
-              className="h-full rounded-full transition-all"
-              style={{ width: `${Math.min(pct, 100)}%`, backgroundColor: color }}
-            />
-          </div>
+          <Meter value={Math.min(pct, 100)} color={color} label="نسبة التحقق من المستهدف" />
         </div>
       )}
     </Link>

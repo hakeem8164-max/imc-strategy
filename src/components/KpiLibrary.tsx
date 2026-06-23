@@ -8,6 +8,7 @@ import FilterSelect from "@/components/ui/FilterSelect";
 import ToggleSwitch from "@/components/ui/ToggleSwitch";
 import NumberInput from "@/components/ui/NumberInput";
 import Modal from "@/components/ui/Modal";
+import { TextField, TextAreaField } from "@/components/ui/Field";
 import { notify } from "@/components/ui/toast";
 import { confirmDialog, promptDialog } from "@/components/ui/confirm";
 import {
@@ -479,14 +480,12 @@ function EditKpiModal({
     <Modal open onClose={onClose} title="تحرير المؤشر">
       <div>
         <div className="space-y-4">
-          <div>
-            <label className="label">اسم المؤشر</label>
-            <input
-              className="input"
-              value={f.name}
-              onChange={(e) => set({ name: e.target.value })}
-            />
-          </div>
+          <TextField
+            label="اسم المؤشر"
+            value={f.name}
+            onChange={(v) => set({ name: v })}
+            required
+          />
 
           <div>
             <label className="label">الهدف الاستراتيجي (المنظور)</label>
@@ -504,14 +503,11 @@ function EditKpiModal({
             />
           </div>
 
-          <div>
-            <label className="label">الوصف</label>
-            <textarea
-              className="input min-h-[70px]"
-              value={f.description ?? ""}
-              onChange={(e) => set({ description: e.target.value || null })}
-            />
-          </div>
+          <TextAreaField
+            label="الوصف"
+            value={f.description ?? ""}
+            onChange={(v) => set({ description: v || null })}
+          />
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
