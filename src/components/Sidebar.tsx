@@ -137,6 +137,7 @@ function NavLinks({
             key={item.href}
             href={item.href}
             onClick={onNavigate}
+            prefetch={false}
             className={itemCls(active)}
           >
             <Icon size={18} strokeWidth={2} />
@@ -263,6 +264,7 @@ function CollapsibleGroup({
                 key={item.href}
                 href={item.href}
                 onClick={onNavigate}
+                prefetch={false}
                 className={`flex items-center gap-3 rounded-lg px-3.5 py-2 text-[13px] transition ${
                   active
                     ? "bg-mushar-primary text-white shadow-sm"

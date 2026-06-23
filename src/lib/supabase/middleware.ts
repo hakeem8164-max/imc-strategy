@@ -4,6 +4,15 @@ import { NextResponse, type NextRequest } from "next/server";
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
+  // طلبات الجلب المسبق (prefetch) لا تحتاج تحقّق جلسة عبر الشبكة؛
+  // الحماية مكفولة في الطلب الفعلي وعلى مستوى الصفحة. تخطّيها يوفّر
+  // رحلات auth/v1/user كثيرة عند تمرير الروابط.
+  const isPrefetch =
+    request.headers.get("next-router-prefetch") === "1" ||
+    request.headers.get("purpose") === "prefetch" ||
+    (request.headers.get("sec-purpose") || "").includes("prefetch");
+  if (isPrefetch) return supabaseResponse;
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
