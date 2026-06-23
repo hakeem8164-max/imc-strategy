@@ -840,3 +840,30 @@ export async function getMyRecommendations(userId: string): Promise<MeetingRecom
     .order("due_date", { ascending: true, nullsFirst: false });
   return (data as MeetingRecommendation[]) ?? [];
 }
+
+// ===== فهرس البحث الشامل (لوحة الأوامر ⌘K) =====
+export type SearchItem = {
+  type: string;
+  label: string;
+  sub?: string;
+  href: string;
+  keywords?: string;
+};
+
+/** فهرس خفيف للبحث الفوري: المؤشرات والمبادرات والاجتماعات. */
+export async function getSearchIndex(): Promise<SearchItem[]> {
+  const supabase = await createClient();
+  const [kpisRes, initsRes, meetingsRes] = await Promise.all([
+    supabase.from("kpis").select("id,name,code").eq("is_active", true),
+    supabase.from("kpi_initiatives").select("id,title,kpi_id"),
+    supabase.from("meetings").select("id,title,type"),
+  ]);
+  const items: SearchItem[] = [];
+  for (const k of (kpisRes.data as { id: string; name: string; code: string }[]) ?? [])
+    items.push({ type: "مؤشر", label: k.name, sub: `#${k.code}`, href: `/kpis/${k.id}`, keywords: k.code });
+  for (const i of (initsRes.data as { id: string; title: string; kpi_id: string }[]) ?? [])
+    items.push({ type: "مبادرة", label: i.title, href: `/kpis/${i.kpi_id}` });
+  for (const m of (meetingsRes.data as { id: string; title: string; type: string }[]) ?? [])
+    items.push({ type: "اجتماع", label: m.title, sub: m.type, href: `/meetings` });
+  return items;
+}

@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import AppShell from "@/components/AppShell";
-import { getProfile, getOrgProfile, getAuthUser } from "@/lib/data";
+import { getProfile, getOrgProfile, getAuthUser, getSearchIndex } from "@/lib/data";
 
 export default async function AppLayout({
   children,
@@ -11,7 +11,11 @@ export default async function AppLayout({
   if (!user) redirect("/login");
   if (user.user_metadata?.must_change_password) redirect("/account/password");
 
-  const [profile, org] = await Promise.all([getProfile(), getOrgProfile()]);
+  const [profile, org, searchItems] = await Promise.all([
+    getProfile(),
+    getOrgProfile(),
+    getSearchIndex(),
+  ]);
   if (!profile) redirect("/login");
 
   return (
@@ -19,6 +23,7 @@ export default async function AppLayout({
       profile={profile}
       orgName={org?.name ?? "شركة المساجد المتكاملة"}
       role={profile.role}
+      searchItems={searchItems}
     >
       {children}
     </AppShell>
