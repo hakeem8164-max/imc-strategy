@@ -302,15 +302,31 @@ function CreateMeetingForm({
   const [committee, setCommittee] = useState("");
   const [attendees, setAttendees] = useState("");
   const [minutes, setMinutes] = useState("");
-  const [recs, setRecs] = useState<RecDraft[]>([emptyRec()]);
+  const [recs, setRecs] = useState<RecDraft[]>([]);
+  const [draft, setDraft] = useState<RecDraft>(emptyRec());
 
-  function patchRec(i: number, p: Partial<RecDraft>) {
-    setRecs((s) => s.map((r, idx) => (idx === i ? { ...r, ...p } : r)));
+  function patchDraft(p: Partial<RecDraft>) {
+    setDraft((s) => ({ ...s, ...p }));
+  }
+  function toggleParticipant(id: string) {
+    setDraft((s) => ({
+      ...s,
+      participant_unit_ids: s.participant_unit_ids.includes(id)
+        ? s.participant_unit_ids.filter((x) => x !== id)
+        : [...s.participant_unit_ids, id],
+    }));
+  }
+  function addToList() {
+    if (!draft.name.trim()) return notify("اكتب اسم التوصية", "error");
+    setRecs((s) => [...s, draft]);
+    setDraft(emptyRec());
   }
 
   function submit() {
     if (!type) return notify("اختر نوع الاجتماع", "error");
     if (!title.trim()) return notify("اكتب عنوان الاجتماع", "error");
+    // ضمّ المسودّة الحالية إن كان لها اسم ولم تُضَف بعد
+    const all = draft.name.trim() ? [...recs, draft] : recs;
     setBusy(true);
     startTransition(async () => {
       const res = await createMeeting({
@@ -320,7 +336,7 @@ function CreateMeetingForm({
         committee: committee || null,
         attendees: attendees || null,
         minutes: minutes || null,
-        recommendations: recs
+        recommendations: all
           .filter((r) => r.name.trim())
           .map((r) => ({
             name: r.name,
@@ -343,60 +359,66 @@ function CreateMeetingForm({
   }
 
   return (
-    <div className="card space-y-4 p-5">
-      <h3 className="text-sm font-bold text-mushar-dark">إنشاء اجتماع جديد</h3>
-      <div className="grid gap-3 sm:grid-cols-2">
-        <div>
-          <label className="label">نوع الاجتماع *</label>
-          <FilterSelect
-            className="w-full"
-            value={type}
-            onValueChange={setType}
-            options={[
-              { value: "", label: "اختر النوع" },
-              ...MEETING_TYPES.map((t) => ({ value: t, label: t })),
-            ]}
-          />
+    <div className="card space-y-5 p-5">
+      {/* بيانات الاجتماع */}
+      <div className="space-y-3">
+        <h3 className="text-sm font-bold text-mushar-dark">بيانات الاجتماع</h3>
+        <div className="grid gap-3 sm:grid-cols-3">
+          <div>
+            <label className="label">نوع الاجتماع *</label>
+            <FilterSelect
+              className="w-full"
+              value={type}
+              onValueChange={setType}
+              options={[
+                { value: "", label: "— اختر النوع —" },
+                ...MEETING_TYPES.map((t) => ({ value: t, label: t })),
+              ]}
+            />
+          </div>
+          <div>
+            <label className="label">التاريخ *</label>
+            <input
+              type="date"
+              className="input"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="label">اللجنة (اختياري)</label>
+            <FilterSelect
+              className="w-full"
+              value={committee}
+              onValueChange={setCommittee}
+              options={[
+                { value: "", label: "— غير مرتبط بلجنة —" },
+                ...orgUnits.map((u) => ({ value: u.name, label: u.name })),
+              ]}
+            />
+          </div>
         </div>
         <div>
-          <label className="label">تاريخ المحضر</label>
-          <input
-            type="date"
-            className="input"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-          />
-        </div>
-        <div className="sm:col-span-2">
           <label className="label">عنوان الاجتماع *</label>
           <input
             className="input"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="مثال: الاجتماع الدوري الأول"
+            placeholder="مثال: الاجتماع الأول لمجلس النظارة"
           />
         </div>
-        <div className="sm:col-span-2">
-          <label className="label">اللجنة / الجهة (اختياري)</label>
-          <input
-            className="input"
-            value={committee}
-            onChange={(e) => setCommittee(e.target.value)}
-          />
-        </div>
-        <div className="sm:col-span-2">
-          <label className="label">الحضور</label>
-          <input
-            className="input"
+        <div>
+          <label className="label">الحضور (الأسماء)</label>
+          <textarea
+            className="input min-h-[60px]"
             value={attendees}
             onChange={(e) => setAttendees(e.target.value)}
-            placeholder="أسماء الحاضرين، مفصولة بفواصل"
           />
         </div>
-        <div className="sm:col-span-2">
-          <label className="label">محضر الاجتماع</label>
+        <div>
+          <label className="label">محضر الاجتماع / جدول الأعمال / الملاحظات</label>
           <textarea
-            className="input min-h-[80px]"
+            className="input min-h-[90px]"
             value={minutes}
             onChange={(e) => setMinutes(e.target.value)}
           />
@@ -404,28 +426,154 @@ function CreateMeetingForm({
       </div>
 
       {/* التوصيات */}
-      <div className="space-y-3 border-t border-slate-100 pt-3">
-        <div className="flex items-center justify-between">
-          <h4 className="text-sm font-bold text-mushar-dark">التوصيات</h4>
-          <button
-            onClick={() => setRecs((s) => [...s, emptyRec()])}
-            className="btn-ghost py-1.5 text-xs"
-          >
-            <Plus size={14} className="inline" /> توصية
-          </button>
-        </div>
-        {recs.map((r, i) => (
-          <RecEditor
-            key={i}
-            r={r}
-            idx={i}
-            domains={domains}
-            orgUnits={orgUnits}
-            users={users}
-            onPatch={(p) => patchRec(i, p)}
-            onRemove={recs.length > 1 ? () => setRecs((s) => s.filter((_, idx) => idx !== i)) : undefined}
+      <div className="space-y-3 border-t border-slate-100 pt-4">
+        <h3 className="text-sm font-bold text-mushar-dark">
+          التوصيات <span className="text-slate-400">({recs.length})</span>
+        </h3>
+
+        {/* التوصيات المُضافة */}
+        {recs.length > 0 && (
+          <div className="space-y-1.5">
+            {recs.map((r, i) => (
+              <div
+                key={i}
+                className="flex items-center gap-2 rounded-lg bg-slate-50 px-3 py-2 text-xs"
+              >
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-mushar-pale/60 text-[10px] font-bold text-mushar-primary">
+                  {i + 1}
+                </span>
+                <span className="min-w-0 flex-1 truncate font-semibold text-mushar-dark">
+                  {r.name}
+                </span>
+                <span
+                  className="shrink-0 rounded px-1.5 py-0.5 text-[10px] font-bold"
+                  style={{
+                    backgroundColor: `${PRIORITY[r.priority].color}1a`,
+                    color: PRIORITY[r.priority].color,
+                  }}
+                >
+                  {PRIORITY[r.priority].label}
+                </span>
+                <button
+                  onClick={() => setRecs((s) => s.filter((_, idx) => idx !== i))}
+                  className="shrink-0 text-slate-400 hover:text-red-600"
+                >
+                  <Trash2 size={13} />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* مُنشئ التوصية */}
+        <div className="space-y-3 rounded-xl border border-dashed border-slate-200 p-3">
+          <p className="text-xs font-semibold text-slate-500">
+            إضافة توصية{" "}
+            <span className="font-normal text-slate-400">
+              (تُنشأ كمهمّة في المتابعة عند الحفظ)
+            </span>
+          </p>
+          <input
+            className="input text-sm"
+            placeholder="اسم التوصية *"
+            value={draft.name}
+            onChange={(e) => patchDraft({ name: e.target.value })}
           />
-        ))}
+          <textarea
+            className="input min-h-[44px] text-sm"
+            placeholder="وصف التوصية (اختياري)"
+            value={draft.description}
+            onChange={(e) => patchDraft({ description: e.target.value })}
+          />
+          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
+            <div>
+              <label className="label text-[11px]">المجال</label>
+              <FilterSelect
+                className="w-full"
+                value={draft.domain_id}
+                onValueChange={(v) => patchDraft({ domain_id: v })}
+                options={[
+                  { value: "", label: "بدون" },
+                  ...domains.map((d) => ({ value: d.id, label: d.name })),
+                ]}
+              />
+            </div>
+            <div>
+              <label className="label text-[11px]">الإدارة المسؤولة</label>
+              <SearchableSelect
+                value={draft.owner_unit_id}
+                onValueChange={(v) => patchDraft({ owner_unit_id: v })}
+                placeholder="— غير محدد —"
+                options={orgUnits.map((u) => ({ value: u.id, label: u.name }))}
+              />
+            </div>
+            <div>
+              <label className="label text-[11px]">المسؤول</label>
+              <SearchableSelect
+                value={draft.owner_user_id}
+                onValueChange={(v) => patchDraft({ owner_user_id: v })}
+                placeholder="— غير محدد —"
+                options={users
+                  .filter((u) => u.full_name)
+                  .map((u) => ({ value: u.id, label: u.full_name! }))}
+              />
+            </div>
+            <div>
+              <label className="label text-[11px]">تاريخ الاستحقاق</label>
+              <input
+                type="date"
+                className="input"
+                value={draft.due_date}
+                onChange={(e) => patchDraft({ due_date: e.target.value })}
+              />
+            </div>
+            <div>
+              <label className="label text-[11px]">الأولوية</label>
+              <FilterSelect
+                className="w-full"
+                value={draft.priority}
+                onValueChange={(v) => patchDraft({ priority: v as RecDraft["priority"] })}
+                options={(Object.keys(PRIORITY) as (keyof typeof PRIORITY)[]).map((k) => ({
+                  value: k,
+                  label: PRIORITY[k].label,
+                }))}
+              />
+            </div>
+          </div>
+
+          {/* الإدارات المشاركة */}
+          <div>
+            <label className="label text-[11px]">الإدارات المشاركة (اختياري)</label>
+            <div className="flex flex-wrap gap-1.5">
+              {orgUnits.map((u) => {
+                const on = draft.participant_unit_ids.includes(u.id);
+                return (
+                  <button
+                    key={u.id}
+                    type="button"
+                    onClick={() => toggleParticipant(u.id)}
+                    className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold transition ${
+                      on
+                        ? "border-mushar-primary bg-mushar-primary text-white"
+                        : "border-slate-200 bg-white text-slate-500 hover:border-mushar-pale"
+                    }`}
+                  >
+                    {u.name}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="flex justify-end">
+            <button
+              onClick={addToList}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-mushar-accent px-4 py-2 text-xs font-bold text-white transition hover:bg-mushar-accentDark"
+            >
+              <Plus size={14} /> إضافة للقائمة
+            </button>
+          </div>
+        </div>
       </div>
 
       <div className="flex justify-end gap-2 border-t border-slate-100 pt-3">
