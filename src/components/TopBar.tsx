@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -26,6 +27,10 @@ export default function TopBar({
   const supabase = createClient();
   const name = profile.full_name || profile.email || "مستخدم";
   const initials = name.trim().charAt(0);
+  const [isMac, setIsMac] = useState(true);
+  useEffect(() => {
+    setIsMac(/Mac|iPhone|iPad|iPod/i.test(navigator.platform || navigator.userAgent));
+  }, []);
 
   async function signOut() {
     await supabase.auth.signOut();
@@ -72,7 +77,7 @@ export default function TopBar({
           >
             <Search size={18} />
             <span className="hidden text-xs text-white/70 lg:inline">
-              بحث… <kbd className="rounded bg-white/15 px-1">⌘K</kbd>
+              بحث… <kbd className="rounded bg-white/15 px-1">{isMac ? "⌘K" : "Ctrl K"}</kbd>
             </span>
           </button>
           <Tip content="تبديل المظهر">
