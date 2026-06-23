@@ -17,7 +17,7 @@ export default async function AppLayout({
   return (
     <AppShell
       profile={profile}
-      orgName={org?.name ?? "نظام إدارة الأداء"}
+      orgName={org?.name ?? "شركة المساجد المتكاملة"}
       role={profile.role}
     >
       {children}

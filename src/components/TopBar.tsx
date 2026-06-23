@@ -32,7 +32,7 @@ export default function TopBar({
   }
 
   return (
-    <header className="sticky top-0 z-30 bg-gradient-to-l from-brand-dark via-brand-primary to-brand-dark text-white shadow-sm print:hidden">
+    <header className="sticky top-0 z-30 bg-gradient-to-l from-mushar-dark via-mushar-primary to-mushar-dark text-white shadow-sm print:hidden">
       <div className="mx-auto flex max-w-[1500px] items-center justify-between gap-4 px-5 py-3">
         {/* يمين: زر القائمة (جوال) + الشعار واسم المنصة */}
         <div className="flex items-center gap-2 sm:gap-3">
@@ -44,8 +44,8 @@ export default function TopBar({
             <Menu size={20} />
           </button>
           <Image
-            src="/logo-light.png"
-            alt="الشعار"
+            src="/mushar-logo-light.png"
+            alt="المساجد المتكاملة"
             width={300}
             height={170}
             priority
@@ -53,9 +53,9 @@ export default function TopBar({
           />
           <div className="border-r border-white/15 pr-3">
             <h1 className="text-sm font-extrabold leading-tight sm:text-base">
-              نظام إدارة الأداء
+              منصة المساجد المتكاملة لإدارة الأداء
             </h1>
-            <p className="hidden text-[11px] text-brand-pale/70 sm:block">
+            <p className="hidden text-[11px] text-mushar-pale/70 sm:block">
               {orgName}
             </p>
           </div>
@@ -71,12 +71,12 @@ export default function TopBar({
           </Tip>
           <MenuPrimitive.Root>
             <MenuPrimitive.Trigger className="flex items-center gap-2 rounded-lg px-1.5 py-1 outline-none transition hover:bg-white/10 data-[popup-open]:bg-white/10">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-mint/20 text-sm font-bold text-brand-mint">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-mushar-mint/20 text-sm font-bold text-mushar-mint">
                 {initials}
               </div>
               <div className="hidden text-right sm:block">
                 <p className="text-sm font-bold leading-tight">{name}</p>
-                <p className="text-[11px] text-brand-mint">
+                <p className="text-[11px] text-mushar-mint">
                   {ROLE_LABELS[profile.role]}
                 </p>
               </div>
@@ -84,8 +84,8 @@ export default function TopBar({
             </MenuPrimitive.Trigger>
             <MenuPrimitive.Portal>
               <MenuPrimitive.Positioner sideOffset={8} align="end" className="z-[70]">
-                <MenuPrimitive.Popup className={`min-w-[200px] rounded-xl border border-slate-100 bg-white p-1 text-brand-dark shadow-cardHover outline-none dark:border-brand-line dark:bg-brand-surface dark:text-brand-ink ${popupMotion}`}>
-                  <div className="border-b border-slate-100 px-3 py-2 dark:border-brand-line">
+                <MenuPrimitive.Popup className={`min-w-[200px] rounded-xl border border-slate-100 bg-white p-1 text-mushar-dark shadow-cardHover outline-none dark:border-mushar-line dark:bg-mushar-surface dark:text-mushar-ink ${popupMotion}`}>
+                  <div className="border-b border-slate-100 px-3 py-2 dark:border-mushar-line">
                     <p className="text-sm font-bold">{name}</p>
                     <p className="text-[11px] text-slate-400">
                       {ROLE_LABELS[profile.role]}
@@ -93,14 +93,14 @@ export default function TopBar({
                   </div>
                   <MenuPrimitive.Item
                     onClick={() => router.push("/account/password")}
-                    className="flex cursor-default items-center gap-2 rounded-lg px-3 py-2 text-sm outline-none data-[highlighted]:bg-brand-pale dark:data-[highlighted]:bg-brand-hover"
+                    className="flex cursor-default items-center gap-2 rounded-lg px-3 py-2 text-sm outline-none data-[highlighted]:bg-mushar-pale dark:data-[highlighted]:bg-mushar-hover"
                   >
                     <KeyRound size={15} className="text-slate-400" />
                     تغيير كلمة المرور
                   </MenuPrimitive.Item>
                   <MenuPrimitive.Item
                     onClick={signOut}
-                    className="flex cursor-default items-center gap-2 rounded-lg px-3 py-2 text-sm text-brand-accent outline-none data-[highlighted]:bg-brand-accent/10"
+                    className="flex cursor-default items-center gap-2 rounded-lg px-3 py-2 text-sm text-mushar-accent outline-none data-[highlighted]:bg-mushar-accent/10"
                   >
                     <LogOut size={15} />
                     تسجيل الخروج

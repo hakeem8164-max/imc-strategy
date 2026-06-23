@@ -159,7 +159,7 @@ export default function InitiativesManager({
 
       {showForm && canManage && (
         <div className="card space-y-4 p-5">
-          <h3 className="font-bold text-brand-dark">مبادرة جديدة</h3>
+          <h3 className="font-bold text-mushar-dark">مبادرة جديدة</h3>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="sm:col-span-2">
               <label className="label">الهدف الاستراتيجي المرتبط *</label>
@@ -254,8 +254,8 @@ export default function InitiativesManager({
           {/* المعالم */}
           <div className="rounded-xl border border-slate-200 p-3">
             <div className="mb-2 flex flex-wrap items-center gap-2">
-              <Flag size={15} className="text-brand-primary" />
-              <h4 className="text-sm font-bold text-brand-dark">
+              <Flag size={15} className="text-mushar-primary" />
+              <h4 className="text-sm font-bold text-mushar-dark">
                 المعالم (5 على الأقل)
               </h4>
               <span
@@ -305,7 +305,7 @@ export default function InitiativesManager({
                   />
                   <button
                     onClick={() => setMs((s) => s.filter((_, i) => i !== idx))}
-                    className="rounded-lg px-2 text-xs text-brand-accent hover:bg-brand-accent/10 disabled:cursor-not-allowed disabled:opacity-30"
+                    className="rounded-lg px-2 text-xs text-mushar-accent hover:bg-mushar-accent/10 disabled:cursor-not-allowed disabled:opacity-30"
                     title={ms.length <= 5 ? "الحد الأدنى 5 معالم" : "حذف الصف"}
                     disabled={ms.length <= 5}
                   >
@@ -327,8 +327,8 @@ export default function InitiativesManager({
           {/* المخرجات */}
           <div className="rounded-xl border border-slate-200 p-3">
             <div className="mb-2 flex items-center gap-2">
-              <PackageCheck size={15} className="text-brand-primary" />
-              <h4 className="text-sm font-bold text-brand-dark">
+              <PackageCheck size={15} className="text-mushar-primary" />
+              <h4 className="text-sm font-bold text-mushar-dark">
                 المخرجات (كل مخرج على حدة)
               </h4>
             </div>
@@ -349,7 +349,7 @@ export default function InitiativesManager({
                   />
                   <button
                     onClick={() => setDels((s) => s.filter((_, i) => i !== idx))}
-                    className="rounded-lg px-2 text-xs text-brand-accent hover:bg-brand-accent/10"
+                    className="rounded-lg px-2 text-xs text-mushar-accent hover:bg-mushar-accent/10"
                     disabled={dels.length <= 1}
                   >
                     ✕
@@ -366,7 +366,7 @@ export default function InitiativesManager({
           </div>
 
           {err && (
-            <div className="rounded-lg bg-brand-accent/10 px-3 py-2.5 text-sm text-brand-accent">
+            <div className="rounded-lg bg-mushar-accent/10 px-3 py-2.5 text-sm text-mushar-accent">
               {err}
             </div>
           )}
@@ -470,7 +470,7 @@ function InitiativeCard({
     <div className="card space-y-3 p-5">
       <div className="flex items-start justify-between gap-2">
         {obj && (
-          <span className="inline-flex items-center gap-1 rounded-md bg-brand-pale/40 px-2 py-0.5 text-[11px] font-semibold text-brand-primary">
+          <span className="inline-flex items-center gap-1 rounded-md bg-mushar-pale/40 px-2 py-0.5 text-[11px] font-semibold text-mushar-primary">
             <Target size={12} />
             {obj.code ? `${obj.code} ` : ""}
             {obj.name}
@@ -483,7 +483,7 @@ function InitiativeCard({
         />
       </div>
 
-      <h3 className="text-sm font-bold leading-relaxed text-brand-dark">
+      <h3 className="text-sm font-bold leading-relaxed text-mushar-dark">
         {i.title}
       </h3>
       {i.description && (
@@ -492,7 +492,7 @@ function InitiativeCard({
 
       <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-slate-500">
         {i.start_year && (
-          <span className="font-semibold text-brand-dark">
+          <span className="font-semibold text-mushar-dark">
             سنة البداية: {i.start_year}
           </span>
         )}
@@ -512,7 +512,7 @@ function InitiativeCard({
         </div>
         <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
           <div
-            className="h-full rounded-full bg-brand-primary"
+            className="h-full rounded-full bg-mushar-primary"
             style={{ width: `${Math.min(doneWeight, 100)}%` }}
           />
         </div>
@@ -527,7 +527,7 @@ function InitiativeCard({
         </span>
         <button
           onClick={() => setOpen((v) => !v)}
-          className="mr-auto inline-flex items-center gap-1 font-semibold text-brand-primary hover:underline"
+          className="mr-auto inline-flex items-center gap-1 font-semibold text-mushar-primary hover:underline"
         >
           {open ? "إخفاء" : "للمزيد"}
           <ChevronDown
@@ -558,7 +558,7 @@ function InitiativeCard({
         <div className="flex justify-end border-t border-slate-100 pt-3">
           <button
             onClick={remove}
-            className="inline-flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-semibold text-brand-accent hover:bg-brand-accent/10"
+            className="inline-flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-semibold text-mushar-accent hover:bg-mushar-accent/10"
           >
             <Trash2 size={14} /> حذف المبادرة
           </button>
@@ -621,8 +621,8 @@ function MilestonesSection({
   return (
     <div>
       <div className="mb-2 flex items-center gap-2">
-        <Flag size={14} className="text-brand-primary" />
-        <h4 className="text-sm font-bold text-brand-dark">المعالم</h4>
+        <Flag size={14} className="text-mushar-primary" />
+        <h4 className="text-sm font-bold text-mushar-dark">المعالم</h4>
       </div>
       <div className="space-y-1.5">
         {milestones.map((m) => (
@@ -635,16 +635,16 @@ function MilestonesSection({
               checked={m.done}
               disabled={!canManage}
               onChange={(e) => act(() => toggleMilestone(m.id, e.target.checked))}
-              className="h-4 w-4 accent-brand-primary"
+              className="h-4 w-4 accent-mushar-primary"
             />
             <span
               className={`font-medium ${
-                m.done ? "text-slate-400 line-through" : "text-brand-dark"
+                m.done ? "text-slate-400 line-through" : "text-mushar-dark"
               }`}
             >
               {m.title}
             </span>
-            <span className="rounded bg-white px-1.5 py-0.5 font-bold text-brand-primary">
+            <span className="rounded bg-white px-1.5 py-0.5 font-bold text-mushar-primary">
               {m.weight}%
             </span>
             <StatusBadge
@@ -664,7 +664,7 @@ function MilestonesSection({
                   }
                   act(() => deleteMilestone(m.id));
                 }}
-                className="mr-auto text-brand-accent hover:underline disabled:opacity-30"
+                className="mr-auto text-mushar-accent hover:underline disabled:opacity-30"
                 disabled={milestones.length <= 5}
               >
                 حذف
@@ -756,8 +756,8 @@ function DeliverablesSection({
   return (
     <div>
       <div className="mb-2 flex items-center gap-2">
-        <PackageCheck size={14} className="text-brand-primary" />
-        <h4 className="text-sm font-bold text-brand-dark">المخرجات</h4>
+        <PackageCheck size={14} className="text-mushar-primary" />
+        <h4 className="text-sm font-bold text-mushar-dark">المخرجات</h4>
         <span className="text-[11px] text-slate-400">
           المنجز {deliverables.filter((d) => d.done).length} من{" "}
           {deliverables.length}
@@ -778,7 +778,7 @@ function DeliverablesSection({
             />
             <span
               className={`font-medium ${
-                d.done ? "text-emerald-700 line-through" : "text-brand-dark"
+                d.done ? "text-emerald-700 line-through" : "text-mushar-dark"
               }`}
             >
               {d.title}
@@ -786,7 +786,7 @@ function DeliverablesSection({
             {canManage && (
               <button
                 onClick={() => act(() => deleteDeliverable(d.id))}
-                className="mr-auto text-brand-accent hover:underline"
+                className="mr-auto text-mushar-accent hover:underline"
               >
                 حذف
               </button>

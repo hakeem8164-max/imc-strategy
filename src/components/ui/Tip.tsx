@@ -23,7 +23,7 @@ export default function Tip({
       <Tooltip.Portal>
         <Tooltip.Positioner sideOffset={6} className="z-[80]">
           <Tooltip.Popup
-            className={`rounded-md bg-brand-dark px-2 py-1 text-[11px] font-medium text-white shadow-lg ${popupMotion}`}
+            className={`rounded-md bg-mushar-dark px-2 py-1 text-[11px] font-medium text-white shadow-lg ${popupMotion}`}
           >
             {content}
           </Tooltip.Popup>

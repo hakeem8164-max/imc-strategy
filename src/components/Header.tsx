@@ -10,7 +10,7 @@ export default function Header({
 }) {
   return (
     <div className="mb-5">
-      <h1 className="text-xl font-extrabold text-brand-dark">{title}</h1>
+      <h1 className="text-xl font-extrabold text-mushar-dark">{title}</h1>
       {subtitle && <p className="mt-0.5 text-sm text-slate-400">{subtitle}</p>}
     </div>
   );

@@ -43,7 +43,7 @@ export default function StatCard({
           <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: accent }} />
         )}
       </div>
-      <p className="mt-3 text-2xl font-extrabold text-brand-dark sm:text-3xl">{value}</p>
+      <p className="mt-3 text-2xl font-extrabold text-mushar-dark sm:text-3xl">{value}</p>
       <p className="mt-1 text-sm font-medium text-slate-500">{label}</p>
       {hint && <p className="mt-0.5 text-xs text-slate-400">{hint}</p>}
     </div>

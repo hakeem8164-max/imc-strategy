@@ -2,10 +2,10 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "نظام إدارة الأداء",
-    short_name: "نظام إدارة الأداء",
+    name: "منصة المساجد المتكاملة لإدارة الأداء",
+    short_name: "المساجد المتكاملة | الأداء",
     description:
-      "نظام إدارة الأداء — الإدخال والمتابعة ولوحة القيادة",
+      "منصة المساجد المتكاملة لإدارة الأداء — الإدخال والمتابعة ولوحة القيادة",
     start_url: "/",
     scope: "/",
     display: "standalone",

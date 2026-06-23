@@ -102,11 +102,11 @@ export default function KpiDecisions({
   return (
     <div className="card p-6">
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="flex items-center gap-2 text-base font-bold text-brand-dark">
-          <Gavel size={18} className="text-brand-primary" />
+        <h3 className="flex items-center gap-2 text-base font-bold text-mushar-dark">
+          <Gavel size={18} className="text-mushar-primary" />
           القرارات والملاحظات التنفيذية
           {openCount > 0 && (
-            <span className="rounded-full bg-brand-accent/10 px-2 py-0.5 text-xs font-semibold text-brand-accent">
+            <span className="rounded-full bg-mushar-accent/10 px-2 py-0.5 text-xs font-semibold text-mushar-accent">
               {openCount} قيد المتابعة
             </span>
           )}
@@ -149,7 +149,7 @@ export default function KpiDecisions({
           <div className="grid gap-3 sm:grid-cols-2">
             <div>
               <label className="mb-1 block text-xs font-semibold text-slate-500">
-                المسؤول عن المتابعة <span className="text-brand-accent">*</span>
+                المسؤول عن المتابعة <span className="text-mushar-accent">*</span>
               </label>
               <FilterSelect
                 className="w-full"
@@ -166,7 +166,7 @@ export default function KpiDecisions({
             </div>
             <div>
               <label className="mb-1 block text-xs font-semibold text-slate-500">
-                تاريخ الاستحقاق <span className="text-brand-accent">*</span>
+                تاريخ الاستحقاق <span className="text-mushar-accent">*</span>
               </label>
               <input
                 type="date"
@@ -176,7 +176,7 @@ export default function KpiDecisions({
               />
             </div>
           </div>
-          {err && <p className="text-sm font-medium text-brand-accent">{err}</p>}
+          {err && <p className="text-sm font-medium text-mushar-accent">{err}</p>}
           <div className="flex gap-2">
             <button
               onClick={submit}
@@ -278,22 +278,22 @@ function DecisionItem({
         done
           ? "border-slate-100 bg-slate-50/50"
           : overdue
-          ? "border-brand-accent/40 bg-brand-accent/5"
-          : "border-brand-pale/60 bg-brand-pale/10"
+          ? "border-mushar-accent/40 bg-mushar-accent/5"
+          : "border-mushar-pale/60 bg-mushar-pale/10"
       }`}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1">
           <p
             className={`text-sm font-medium ${
-              done ? "text-slate-400 line-through" : "text-brand-dark"
+              done ? "text-slate-400 line-through" : "text-mushar-dark"
             }`}
           >
             {d.body}
           </p>
           {d.action && (
             <p className="mt-1.5 flex items-center gap-1.5 text-xs text-slate-500">
-              <ListChecks size={13} className="text-brand-primary" />
+              <ListChecks size={13} className="text-mushar-primary" />
               <span className="font-semibold">الإجراء:</span> {d.action}
             </p>
           )}
@@ -307,7 +307,7 @@ function DecisionItem({
             {d.due_date && (
               <span
                 className={`flex items-center gap-1 ${
-                  overdue ? "font-semibold text-brand-accent" : ""
+                  overdue ? "font-semibold text-mushar-accent" : ""
                 }`}
               >
                 <CalendarClock size={12} />
@@ -340,7 +340,7 @@ function DecisionItem({
                 {u.author?.full_name && <span>{u.author.full_name}</span>}
                 <span>{fmtDateTime(u.created_at)}</span>
                 {u.mention?.full_name && (
-                  <span className="flex items-center gap-0.5 text-brand-primary">
+                  <span className="flex items-center gap-0.5 text-mushar-primary">
                     <AtSign size={10} />
                     {u.mention.full_name}
                   </span>
@@ -390,7 +390,7 @@ function DecisionItem({
               إلغاء
             </button>
           </div>
-          {err && <p className="text-xs font-medium text-brand-accent">{err}</p>}
+          {err && <p className="text-xs font-medium text-mushar-accent">{err}</p>}
         </div>
       )}
 
@@ -400,7 +400,7 @@ function DecisionItem({
           <button
             onClick={() => setShowForm(true)}
             disabled={pending}
-            className="inline-flex items-center gap-1 text-xs font-semibold text-brand-primary hover:underline disabled:opacity-50"
+            className="inline-flex items-center gap-1 text-xs font-semibold text-mushar-primary hover:underline disabled:opacity-50"
           >
             <MessageSquarePlus size={13} /> إضافة تحديث
           </button>
@@ -409,7 +409,7 @@ function DecisionItem({
           <button
             onClick={toggle}
             disabled={pending}
-            className="inline-flex items-center gap-1 text-xs font-semibold text-brand-primary hover:underline disabled:opacity-50"
+            className="inline-flex items-center gap-1 text-xs font-semibold text-mushar-primary hover:underline disabled:opacity-50"
           >
             {done ? (
               <>
@@ -426,7 +426,7 @@ function DecisionItem({
           <button
             onClick={remove}
             disabled={pending}
-            className="inline-flex items-center gap-1 text-xs font-semibold text-brand-accent hover:underline disabled:opacity-50"
+            className="inline-flex items-center gap-1 text-xs font-semibold text-mushar-accent hover:underline disabled:opacity-50"
           >
             <Trash2 size={13} /> حذف
           </button>

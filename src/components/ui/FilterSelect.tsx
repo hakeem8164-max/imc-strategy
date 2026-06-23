@@ -45,7 +45,7 @@ export default function FilterSelect({
               <Select.Item key={o.value} value={o.value} className={itemClass}>
                 <Select.ItemText>{o.label}</Select.ItemText>
                 <Select.ItemIndicator>
-                  <Check size={15} className="text-brand-primary" />
+                  <Check size={15} className="text-mushar-primary" />
                 </Select.ItemIndicator>
               </Select.Item>
             ))}

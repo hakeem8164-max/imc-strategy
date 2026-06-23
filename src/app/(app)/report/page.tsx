@@ -155,13 +155,13 @@ export default async function ReportPage() {
     period: latestPeriod || "—",
   }));
 
-  const orgName = org?.name ?? "نظام إدارة الأداء";
+  const orgName = org?.name ?? "شركة المساجد المتكاملة";
 
   return (
     <div className="space-y-5">
       {/* أزرار (تختفي عند الطباعة) */}
       <div className="flex items-center justify-between gap-3 print:hidden">
-        <h1 className="text-xl font-extrabold text-brand-dark">
+        <h1 className="text-xl font-extrabold text-mushar-dark">
           التقرير التنفيذي
         </h1>
         <ReportActions
@@ -175,7 +175,7 @@ export default async function ReportPage() {
         {/* ترويسة */}
         <div className="flex items-center justify-between gap-4 border-b border-slate-200 pb-5">
           <div>
-            <h2 className="text-2xl font-extrabold text-brand-dark">
+            <h2 className="text-2xl font-extrabold text-mushar-dark">
               تقرير أداء المؤشرات
             </h2>
             <p className="mt-1 text-sm text-slate-500">{orgName}</p>
@@ -184,15 +184,15 @@ export default async function ReportPage() {
             </p>
           </div>
           <Image
-            src="/logo.png"
-            alt="الشعار"
+            src="/mushar-logo.png"
+            alt="المساجد المتكاملة"
             width={110}
             height={66}
             className="h-auto w-[100px] dark:hidden"
           />
           <Image
-            src="/logo-light.png"
-            alt="الشعار"
+            src="/mushar-logo-light.png"
+            alt="المساجد المتكاملة"
             width={110}
             height={66}
             className="hidden h-auto w-[100px] dark:block"
@@ -201,7 +201,7 @@ export default async function ReportPage() {
 
         {/* الملخص التنفيذي */}
         <section className="mt-6">
-          <h3 className="mb-3 text-sm font-bold text-brand-primary">
+          <h3 className="mb-3 text-sm font-bold text-mushar-primary">
             الملخّص التنفيذي
           </h3>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -215,7 +215,7 @@ export default async function ReportPage() {
         {/* الأداء حسب المنظور */}
         {dimAgg.length > 0 && (
           <section className="mt-7">
-            <h3 className="mb-3 text-sm font-bold text-brand-primary">
+            <h3 className="mb-3 text-sm font-bold text-mushar-primary">
               الأداء حسب المنظور الاستراتيجي
             </h3>
             <table className="w-full text-sm">
@@ -229,7 +229,7 @@ export default async function ReportPage() {
               <tbody>
                 {dimAgg.map((d) => (
                   <tr key={d.name} className="border-b border-slate-100">
-                    <td className="py-2 font-semibold text-brand-dark">
+                    <td className="py-2 font-semibold text-mushar-dark">
                       <span
                         className="ml-2 inline-block h-2.5 w-2.5 rounded-full align-middle"
                         style={{ backgroundColor: d.color }}
@@ -253,7 +253,7 @@ export default async function ReportPage() {
         {/* مقارنة الإدارات */}
         {unitStats.length > 0 && (
           <section className="mt-7">
-            <h3 className="mb-3 text-sm font-bold text-brand-primary">
+            <h3 className="mb-3 text-sm font-bold text-mushar-primary">
               مقارنة أداء الإدارات
             </h3>
             <table className="w-full text-sm">
@@ -271,10 +271,10 @@ export default async function ReportPage() {
                 {unitStats.map((u, i) => (
                   <tr key={u.name} className="border-b border-slate-100">
                     <td className="py-2 text-slate-400">{i + 1}</td>
-                    <td className="py-2 font-semibold text-brand-dark">{u.name}</td>
+                    <td className="py-2 font-semibold text-mushar-dark">{u.name}</td>
                     <td className="py-2 text-slate-500">{u.n}</td>
                     <td className="py-2 text-green-600">{u.met}</td>
-                    <td className="py-2 text-brand-accent">{u.behind}</td>
+                    <td className="py-2 text-mushar-accent">{u.behind}</td>
                     <td
                       className="py-2 font-bold"
                       style={{ color: bandFor(u.score, bands).color }}
@@ -295,7 +295,7 @@ export default async function ReportPage() {
         </section>
 
         <p className="mt-8 border-t border-slate-200 pt-4 text-center text-[11px] text-slate-400">
-          أُنشئ هذا التقرير تلقائيًا من نظام إدارة الأداء — {today}
+          أُنشئ هذا التقرير تلقائيًا من منصة المساجد المتكاملة لإدارة الأداء — {today}
         </p>
       </div>
     </div>
@@ -317,7 +317,7 @@ function SummaryStat({
     <div className="rounded-xl border border-slate-100 p-3 text-center">
       <p className="text-xs text-slate-400">{label}</p>
       <p
-        className="mt-1 text-2xl font-extrabold text-brand-dark"
+        className="mt-1 text-2xl font-extrabold text-mushar-dark"
         style={color ? { color } : undefined}
       >
         {value}
@@ -339,13 +339,13 @@ function PerfList({
   if (rows.length === 0) return null;
   return (
     <div>
-      <h3 className="mb-3 text-sm font-bold text-brand-primary">{title}</h3>
+      <h3 className="mb-3 text-sm font-bold text-mushar-primary">{title}</h3>
       <ol className="space-y-2">
         {rows.map((r, i) => (
           <li key={i} className="flex items-center justify-between gap-2 text-sm">
             <span className="min-w-0 flex-1 truncate">
               <span className="text-slate-400">{i + 1}. </span>
-              <span className="font-semibold text-brand-dark">{r.name}</span>
+              <span className="font-semibold text-mushar-dark">{r.name}</span>
               <span className="text-xs text-slate-400"> — {r.unit}</span>
             </span>
             <span

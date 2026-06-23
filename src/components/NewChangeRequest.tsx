@@ -419,7 +419,7 @@ export default function NewChangeRequest({
 
   return (
     <div className="card space-y-5 p-5 sm:p-6">
-      <h3 className="text-lg font-bold text-brand-dark">طلب تغيير جديد</h3>
+      <h3 className="text-lg font-bold text-mushar-dark">طلب تغيير جديد</h3>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
@@ -454,9 +454,9 @@ export default function NewChangeRequest({
       </div>
 
       {domain === "initiative" && action === "create" && (
-        <div className="rounded-lg bg-brand-pale/30 p-3 text-sm text-slate-600">
+        <div className="rounded-lg bg-mushar-pale/30 p-3 text-sm text-slate-600">
           إنشاء مبادرة جديدة يتم من{" "}
-          <Link href="/initiatives" className="font-semibold text-brand-primary underline">صفحة المبادرات</Link>{" "}
+          <Link href="/initiatives" className="font-semibold text-mushar-primary underline">صفحة المبادرات</Link>{" "}
           (لاحتوائها على المعالم والمخرجات)، ويُرفع كطلب تغيير تلقائيًا.
         </div>
       )}
@@ -545,14 +545,14 @@ export default function NewChangeRequest({
             <label className="label">مرفق (اختياري)</label>
             <input
               type="file"
-              className="block w-full text-sm text-slate-500 file:ml-3 file:rounded-lg file:border-0 file:bg-brand-pale/50 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-brand-primary"
+              className="block w-full text-sm text-slate-500 file:ml-3 file:rounded-lg file:border-0 file:bg-mushar-pale/50 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-mushar-primary"
               onChange={(e) => setFile(e.target.files?.[0] ?? null)}
             />
           </div>
         </div>
       )}
 
-      {err && <div className="rounded-lg bg-brand-accent/10 px-3 py-2.5 text-sm text-brand-accent">{err}</div>}
+      {err && <div className="rounded-lg bg-mushar-accent/10 px-3 py-2.5 text-sm text-mushar-accent">{err}</div>}
 
       <div className="flex justify-end gap-2">
         <button onClick={() => { setOpen(false); reset(); }} className="btn-ghost">إلغاء</button>

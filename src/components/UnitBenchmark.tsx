@@ -22,8 +22,8 @@ export default function UnitBenchmark({
 
   return (
     <div className="card p-5">
-      <h3 className="mb-1 flex items-center gap-2 text-sm font-bold text-brand-dark">
-        <Trophy size={18} className="text-brand-primary" />
+      <h3 className="mb-1 flex items-center gap-2 text-sm font-bold text-mushar-dark">
+        <Trophy size={18} className="text-mushar-primary" />
         مقارنة أداء الإدارات
       </h3>
       <p className="mb-4 text-xs text-slate-400">
@@ -48,7 +48,7 @@ export default function UnitBenchmark({
               </span>
               <div className="min-w-0 flex-1">
                 <div className="mb-1 flex items-center justify-between gap-2">
-                  <span className="truncate text-sm font-semibold text-brand-dark">
+                  <span className="truncate text-sm font-semibold text-mushar-dark">
                     {u.name}
                   </span>
                   <span className="shrink-0 text-sm font-bold" style={{ color }}>
@@ -68,7 +68,7 @@ export default function UnitBenchmark({
                   <span>{u.count} مؤشر</span>
                   <span className="text-green-600">{u.met} محقّقة</span>
                   {u.behind > 0 && (
-                    <span className="text-brand-accent">{u.behind} متعثّرة</span>
+                    <span className="text-mushar-accent">{u.behind} متعثّرة</span>
                   )}
                   {u.delta !== null && (
                     <span

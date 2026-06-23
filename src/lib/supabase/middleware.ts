@@ -49,8 +49,8 @@ export async function updateSession(request: NextRequest) {
   const isPublicAsset =
     path.startsWith("/_next") ||
     path.startsWith("/favicon") ||
-    path === "/logo.png" ||
-    path === "/logo-light.png";
+    path === "/mushar-logo.png" ||
+    path === "/mushar-logo-light.png";
 
   if (!user && !isAuthRoute && !isPublicAsset) {
     const url = request.nextUrl.clone();

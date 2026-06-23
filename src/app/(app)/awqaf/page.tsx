@@ -71,7 +71,7 @@ export default async function AwqafPage() {
                       {o.code}
                     </span>
                   )}
-                  <h2 className="text-base font-bold text-brand-dark">{o.name}</h2>
+                  <h2 className="text-base font-bold text-mushar-dark">{o.name}</h2>
                   <span className="text-xs text-slate-400">({list.length})</span>
                   <div className="mr-2 h-px flex-1 bg-slate-100" />
                 </div>

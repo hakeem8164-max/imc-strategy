@@ -56,7 +56,7 @@ export default function PermissionsMatrix({
         <tbody>
           {PERMISSIONS.map((perm) => (
             <tr key={perm.key} className="border-b border-slate-100 last:border-0">
-              <td className="px-4 py-3 font-medium text-brand-dark">
+              <td className="px-4 py-3 font-medium text-mushar-dark">
                 {perm.label}
               </td>
               {ROLES.map((role) => {
@@ -69,7 +69,7 @@ export default function PermissionsMatrix({
                       onClick={() => toggle(role, perm.key)}
                       disabled={locked || savingKey === key}
                       className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
-                        checked ? "bg-brand-primary" : "bg-slate-300"
+                        checked ? "bg-mushar-primary" : "bg-slate-300"
                       } ${locked ? "cursor-not-allowed opacity-60" : ""}`}
                       title={locked ? "مدير النظام: صلاحية كاملة دائماً" : ""}
                     >

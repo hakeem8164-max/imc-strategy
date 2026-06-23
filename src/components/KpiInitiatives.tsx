@@ -94,11 +94,11 @@ export default function KpiInitiatives({
   return (
     <div className="card p-6">
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="flex items-center gap-2 text-base font-bold text-brand-dark">
-          <Rocket size={18} className="text-brand-primary" />
+        <h3 className="flex items-center gap-2 text-base font-bold text-mushar-dark">
+          <Rocket size={18} className="text-mushar-primary" />
           الخطط التصحيحية والمبادرات
           {active > 0 && (
-            <span className="rounded-full bg-brand-primary/10 px-2 py-0.5 text-xs font-semibold text-brand-primary">
+            <span className="rounded-full bg-mushar-primary/10 px-2 py-0.5 text-xs font-semibold text-mushar-primary">
               {active} نشطة
             </span>
           )}
@@ -178,7 +178,7 @@ export default function KpiInitiatives({
               />
             </div>
           </div>
-          {err && <p className="text-sm font-medium text-brand-accent">{err}</p>}
+          {err && <p className="text-sm font-medium text-mushar-accent">{err}</p>}
           <div className="flex gap-2">
             <button
               onClick={submit}
@@ -285,7 +285,7 @@ function InitiativeItem({
     <div className="rounded-xl border border-slate-100 p-4">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-bold text-brand-dark">{i.title}</p>
+          <p className="text-sm font-bold text-mushar-dark">{i.title}</p>
           {i.description && (
             <p className="mt-1 text-xs leading-relaxed text-slate-500">
               {i.description}
@@ -322,11 +322,11 @@ function InitiativeItem({
       <div className="mt-3">
         <div className="mb-1 flex items-center justify-between text-[11px] text-slate-400">
           <span>نسبة الإنجاز</span>
-          <span className="font-bold text-brand-dark">{i.progress}%</span>
+          <span className="font-bold text-mushar-dark">{i.progress}%</span>
         </div>
         <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
           <div
-            className="h-full rounded-full bg-brand-primary transition-all"
+            className="h-full rounded-full bg-mushar-primary transition-all"
             style={{ width: `${i.progress}%` }}
           />
         </div>
@@ -340,7 +340,7 @@ function InitiativeItem({
               <button
                 onClick={() => canManage && toggleMs(m)}
                 disabled={!canManage || pending}
-                className="shrink-0 text-brand-primary disabled:opacity-60"
+                className="shrink-0 text-mushar-primary disabled:opacity-60"
               >
                 {m.done ? <CheckSquare size={16} /> : <Square size={16} />}
               </button>
@@ -360,7 +360,7 @@ function InitiativeItem({
                 <button
                   onClick={() => removeMs(m)}
                   disabled={pending}
-                  className="text-slate-300 hover:text-brand-accent"
+                  className="text-slate-300 hover:text-mushar-accent"
                 >
                   <Trash2 size={13} />
                 </button>
@@ -429,7 +429,7 @@ function InitiativeItem({
           {!showMs && (
             <button
               onClick={() => setShowMs(true)}
-              className="inline-flex items-center gap-1 text-xs font-semibold text-brand-primary hover:underline"
+              className="inline-flex items-center gap-1 text-xs font-semibold text-mushar-primary hover:underline"
             >
               <Flag size={13} /> معلَم
             </button>
@@ -437,7 +437,7 @@ function InitiativeItem({
           <button
             onClick={remove}
             disabled={pending}
-            className="mr-auto inline-flex items-center gap-1 text-xs font-semibold text-brand-accent hover:underline disabled:opacity-50"
+            className="mr-auto inline-flex items-center gap-1 text-xs font-semibold text-mushar-accent hover:underline disabled:opacity-50"
           >
             <Trash2 size={13} /> حذف الخطة
           </button>

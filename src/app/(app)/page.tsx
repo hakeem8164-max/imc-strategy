@@ -270,21 +270,21 @@ export default async function DashboardPage({
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-extrabold text-brand-dark">لوحة الأداء التنفيذية</h1>
+        <h1 className="text-xl font-extrabold text-mushar-dark">لوحة الأداء التنفيذية</h1>
         <PrintButton />
       </div>
 
       <DashboardFilters dimensions={dimensions} orgUnits={usedUnits} periods={periods} />
 
       {/* بطاقة Hero */}
-      <div className="overflow-hidden rounded-2xl bg-gradient-to-l from-brand-dark via-brand-primary to-brand-teal px-6 py-7 text-white shadow-card sm:px-8">
+      <div className="overflow-hidden rounded-2xl bg-gradient-to-l from-mushar-dark via-mushar-primary to-mushar-teal px-6 py-7 text-white shadow-card sm:px-8">
         <div className="flex flex-wrap items-center justify-between gap-8">
           <div>
-            <p className="text-sm text-brand-pale/80">
-              لوحة قيادة الأداء — نظام إدارة الأداء{fPeriod ? ` · ${fPeriod}` : ""}
+            <p className="text-sm text-mushar-pale/80">
+              لوحة قيادة الأداء — المساجد المتكاملة{fPeriod ? ` · ${fPeriod}` : ""}
             </p>
             <p className="mt-3 text-5xl font-extrabold leading-none sm:text-6xl">{overall}%</p>
-            <p className="mt-3 text-lg font-semibold text-brand-pale">{statusWord}</p>
+            <p className="mt-3 text-lg font-semibold text-mushar-pale">{statusWord}</p>
             {overallDelta !== null && (
               <p
                 className={`mt-2 inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-sm font-semibold ${
@@ -292,7 +292,7 @@ export default async function DashboardPage({
                     ? "bg-emerald-400/20 text-emerald-100"
                     : overallDelta < 0
                     ? "bg-rose-400/20 text-rose-100"
-                    : "bg-white/10 text-brand-pale"
+                    : "bg-white/10 text-mushar-pale"
                 }`}
               >
                 {overallDelta > 0 ? <TrendingUp size={16} /> : overallDelta < 0 ? <TrendingDown size={16} /> : <Minus size={16} />}
@@ -306,11 +306,11 @@ export default async function DashboardPage({
               { v: met, l: "محقّقة" },
               { v: behind, l: "متعثّرة" },
               { v: `${dataConfidence}%`, l: "ثقة البيانات" },
-              { v: <>{withData}<span className="text-base text-brand-pale/70">/{totalKpis}</span></>, l: "لها نتائج" },
+              { v: <>{withData}<span className="text-base text-mushar-pale/70">/{totalKpis}</span></>, l: "لها نتائج" },
             ].map((b, i) => (
               <div key={i} className="flex flex-col items-center justify-center rounded-xl bg-white/10 px-2 py-3 text-center backdrop-blur sm:min-w-[88px] sm:px-3 sm:py-4">
                 <p className="text-2xl font-extrabold">{b.v}</p>
-                <p className="mt-1 text-[11px] text-brand-pale/80">{b.l}</p>
+                <p className="mt-1 text-[11px] text-mushar-pale/80">{b.l}</p>
               </div>
             ))}
           </div>
@@ -318,15 +318,15 @@ export default async function DashboardPage({
       </div>
 
       {insights.length > 0 && (
-        <div className="card border-r-4 border-brand-primary p-5">
+        <div className="card border-r-4 border-mushar-primary p-5">
           <div className="mb-2 flex items-center gap-2">
-            <Lightbulb size={18} className="text-brand-primary" />
-            <h3 className="text-sm font-bold text-brand-dark">أبرز الرؤى</h3>
+            <Lightbulb size={18} className="text-mushar-primary" />
+            <h3 className="text-sm font-bold text-mushar-dark">أبرز الرؤى</h3>
           </div>
           <ul className="grid gap-2 sm:grid-cols-2">
             {insights.map((t, i) => (
               <li key={i} className="flex items-start gap-2 text-sm text-slate-600">
-                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-mint" />
+                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-mushar-mint" />
                 {t}
               </li>
             ))}
@@ -347,7 +347,7 @@ export default async function DashboardPage({
                 href={`/initiatives/follow-up#${c.initiative_id}`}
                 className="flex items-center justify-between gap-2 rounded-lg bg-white px-3 py-2 text-xs hover:bg-red-100/40"
               >
-                <span className="font-medium text-brand-dark">
+                <span className="font-medium text-mushar-dark">
                   {c.initiative?.title ?? "مبادرة"}: {c.body}
                 </span>
                 <span className="shrink-0 font-semibold text-red-600">عرض ←</span>
@@ -362,7 +362,7 @@ export default async function DashboardPage({
       <OpenDecisions decisions={openDecisions} />
 
       {withData === 0 && (
-        <div className="card border-r-4 border-brand-mint p-5 text-sm text-slate-600">
+        <div className="card border-r-4 border-mushar-mint p-5 text-sm text-slate-600">
           لا توجد نتائج معتمدة لهذا التصفية. جرّب تغيير الفلاتر أو اعتمد قياسات من
           صفحة <b>المراجعة والاعتماد</b>.
         </div>
@@ -402,7 +402,7 @@ export default async function DashboardPage({
 
       {dimAgg.length > 0 && (
         <div>
-          <h2 className="mb-3 text-base font-bold text-brand-dark">
+          <h2 className="mb-3 text-base font-bold text-mushar-dark">
             تحليل المناظير (انقر للتعمّق)
           </h2>
           <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-4">
@@ -416,7 +416,7 @@ export default async function DashboardPage({
                 >
                   <div className="mb-2 flex items-center gap-2">
                     <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: d.color }} />
-                    <span className="line-clamp-1 text-sm font-semibold text-brand-dark">{d.name}</span>
+                    <span className="line-clamp-1 text-sm font-semibold text-mushar-dark">{d.name}</span>
                   </div>
                   <p className="text-2xl font-extrabold" style={{ color: c }}>{d.score}%</p>
                   <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
@@ -449,8 +449,8 @@ function MoverList({
   const c = up ? "#16a34a" : "#A11249";
   return (
     <div className="card p-5">
-      <h3 className="mb-4 flex items-center gap-2 text-sm font-bold text-brand-dark">
-        {up ? <TrendingUp size={16} className="text-emerald-600" /> : <TrendingDown size={16} className="text-brand-accent" />}
+      <h3 className="mb-4 flex items-center gap-2 text-sm font-bold text-mushar-dark">
+        {up ? <TrendingUp size={16} className="text-emerald-600" /> : <TrendingDown size={16} className="text-mushar-accent" />}
         {title}
       </h3>
       {rows.length === 0 ? (
@@ -460,7 +460,7 @@ function MoverList({
           {rows.map((r) => (
             <Link key={r.id} href={`/kpis/${r.id}`} className="flex items-center justify-between gap-2 rounded-xl px-2 py-2 transition hover:bg-slate-50">
               <div className="min-w-0">
-                <p className="truncate text-sm font-medium text-brand-dark">{r.name}</p>
+                <p className="truncate text-sm font-medium text-mushar-dark">{r.name}</p>
                 <p className="text-[11px] text-slate-400">{r.dim}</p>
               </div>
               <span className="shrink-0 rounded-md px-2 py-0.5 text-xs font-bold" style={{ backgroundColor: `${c}1a`, color: c }}>
@@ -486,7 +486,7 @@ function PerformerList({
   const color = (r: number) => bandFor(r, bands).color;
   return (
     <div className="card p-5">
-      <h3 className="mb-4 text-sm font-bold text-brand-dark">{title}</h3>
+      <h3 className="mb-4 text-sm font-bold text-mushar-dark">{title}</h3>
       {rows.length === 0 ? (
         <p className="py-8 text-center text-sm text-slate-400">لا توجد بيانات</p>
       ) : (
@@ -494,7 +494,7 @@ function PerformerList({
           {rows.map((r) => (
             <Link key={r.id} href={`/kpis/${r.id}`} className="block rounded-xl px-2 py-1.5 transition hover:bg-slate-50">
               <div className="mb-1 flex items-center justify-between gap-2">
-                <span className="line-clamp-1 text-sm font-medium text-brand-dark">{r.name}</span>
+                <span className="line-clamp-1 text-sm font-medium text-mushar-dark">{r.name}</span>
                 <span className="shrink-0 text-sm font-bold" style={{ color: color(r.ratio) }}>{r.ratio}%</span>
               </div>
               <div className="flex items-center justify-between text-[11px] text-slate-400">

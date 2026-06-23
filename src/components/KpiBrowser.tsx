@@ -293,7 +293,7 @@ export default function KpiBrowser({
                   type="checkbox"
                   checked={onlyMine}
                   onChange={(e) => setOnlyMine(e.target.checked)}
-                  className="h-4 w-4 accent-brand-primary"
+                  className="h-4 w-4 accent-mushar-primary"
                 />
                 مؤشراتي فقط
               </label>
@@ -301,7 +301,7 @@ export default function KpiBrowser({
             {active && (
               <button
                 onClick={reset}
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-accent hover:underline"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-mushar-accent hover:underline"
               >
                 <RotateCcw size={13} /> إعادة تعيين
               </button>
@@ -309,13 +309,13 @@ export default function KpiBrowser({
           </div>
           <div className="flex items-center gap-3">
             <span className="text-xs text-slate-400">
-              النتائج: <b className="text-brand-dark">{filtered.length}</b> من {kpis.length}
+              النتائج: <b className="text-mushar-dark">{filtered.length}</b> من {kpis.length}
             </span>
             <div className="flex overflow-hidden rounded-lg border border-slate-200">
               <button
                 onClick={() => setView("cards")}
                 className={`flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold ${
-                  view === "cards" ? "bg-brand-primary text-white" : "text-slate-500"
+                  view === "cards" ? "bg-mushar-primary text-white" : "text-slate-500"
                 }`}
               >
                 <LayoutGrid size={14} /> بطاقات
@@ -323,7 +323,7 @@ export default function KpiBrowser({
               <button
                 onClick={() => setView("table")}
                 className={`flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold ${
-                  view === "table" ? "bg-brand-primary text-white" : "text-slate-500"
+                  view === "table" ? "bg-mushar-primary text-white" : "text-slate-500"
                 }`}
               >
                 <List size={14} /> جدول
@@ -332,7 +332,7 @@ export default function KpiBrowser({
           </div>
         </div>
         {period !== "" && (
-          <p className="text-[11px] text-brand-primary">
+          <p className="text-[11px] text-mushar-primary">
             تعرض النتائج لفترة: <b>{period}</b>
           </p>
         )}
@@ -350,7 +350,7 @@ export default function KpiBrowser({
             <section key={d.id}>
               <div className="mb-3 flex items-center gap-2">
                 <span className="h-4 w-1.5 rounded-full" style={{ backgroundColor: d.color }} />
-                <h2 className="text-base font-bold text-brand-dark">{d.name}</h2>
+                <h2 className="text-base font-bold text-mushar-dark">{d.name}</h2>
                 <span className="text-xs text-slate-400">({total})</span>
                 <div className="mr-2 h-px flex-1 bg-slate-100" />
               </div>
@@ -359,7 +359,7 @@ export default function KpiBrowser({
                   <div key={o.id}>
                     <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-600">
                       {o.code && (
-                        <span className="text-xs font-bold text-brand-accent">
+                        <span className="text-xs font-bold text-mushar-accent">
                           {o.code}
                         </span>
                       )}
@@ -408,7 +408,7 @@ export default function KpiBrowser({
 
 function TrendIcon({ t }: { t: Meta["trend"] }) {
   if (t === "up") return <TrendingUp size={14} className="text-emerald-600" />;
-  if (t === "down") return <TrendingDown size={14} className="text-brand-accent" />;
+  if (t === "down") return <TrendingDown size={14} className="text-mushar-accent" />;
   if (t === "flat") return <Minus size={14} className="text-slate-400" />;
   return <span className="text-slate-300">—</span>;
 }
@@ -444,7 +444,7 @@ function TableView({
                 <td className="px-4 py-3">
                   <Link
                     href={`/kpis/${k.id}`}
-                    className="font-medium text-brand-dark hover:text-brand-primary"
+                    className="font-medium text-mushar-dark hover:text-mushar-primary"
                   >
                     {k.name}
                   </Link>
@@ -464,7 +464,7 @@ function TableView({
                 <td className="px-4 py-3 text-slate-500">{k.owner_unit?.name ?? "—"}</td>
                 <td className="px-4 py-3 text-slate-500">{k.frequency ?? "—"}</td>
                 <td className="px-4 py-3">
-                  <span className="inline-flex items-center gap-1.5 font-semibold text-brand-dark">
+                  <span className="inline-flex items-center gap-1.5 font-semibold text-mushar-dark">
                     {formatValue(m?.value ?? null, k.unit)}
                     <TrendIcon t={m?.trend ?? "none"} />
                   </span>

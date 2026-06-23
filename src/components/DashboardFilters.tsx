@@ -64,7 +64,7 @@ export default function DashboardFilters({
       {active && (
         <button
           onClick={() => router.push(pathname)}
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-accent hover:underline"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-mushar-accent hover:underline"
         >
           <RotateCcw size={13} /> إعادة تعيين
         </button>

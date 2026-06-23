@@ -36,7 +36,7 @@ export function OverallGauge({ score }: { score: number }) {
   const data = [{ name: "الأداء", value: score, fill: scoreColor(score) }];
   return (
     <div className="card flex flex-col items-center p-5">
-      <h3 className="mb-2 self-start text-sm font-bold text-brand-dark">
+      <h3 className="mb-2 self-start text-sm font-bold text-mushar-dark">
         مؤشر الأداء العام
       </h3>
       <ResponsiveContainer width="100%" height={220}>
@@ -57,7 +57,7 @@ export function OverallGauge({ score }: { score: number }) {
         </RadialBarChart>
       </ResponsiveContainer>
       <div className="-mt-32 mb-12 text-center">
-        <p className="text-4xl font-extrabold text-brand-dark">{score}%</p>
+        <p className="text-4xl font-extrabold text-mushar-dark">{score}%</p>
         <p className="text-xs text-slate-400">متوسط التحقّق</p>
       </div>
     </div>
@@ -72,7 +72,7 @@ export function StatusDonut({
   const total = data.reduce((s, d) => s + d.value, 0);
   return (
     <div className="card p-5">
-      <h3 className="mb-2 text-sm font-bold text-brand-dark">
+      <h3 className="mb-2 text-sm font-bold text-mushar-dark">
         توزيع حالة المؤشرات
       </h3>
       {total === 0 ? (
@@ -112,7 +112,7 @@ export function DimensionRadar({
 }) {
   return (
     <div className="card p-5">
-      <h3 className="mb-2 text-sm font-bold text-brand-dark">
+      <h3 className="mb-2 text-sm font-bold text-mushar-dark">
         تحقّق المناظير (نظرة متوازنة)
       </h3>
       <ResponsiveContainer width="100%" height={300}>
@@ -143,7 +143,7 @@ export function PerformanceTrend({
 }) {
   return (
     <div className="card p-5">
-      <h3 className="mb-1 text-sm font-bold text-brand-dark">
+      <h3 className="mb-1 text-sm font-bold text-mushar-dark">
         تتبّع الأداء عبر الزمن
       </h3>
       <p className="mb-3 text-xs text-slate-400">
@@ -207,7 +207,7 @@ export function DimensionBars({
 }) {
   return (
     <div className="card p-5">
-      <h3 className="mb-2 text-sm font-bold text-brand-dark">{title}</h3>
+      <h3 className="mb-2 text-sm font-bold text-mushar-dark">{title}</h3>
       <ResponsiveContainer width="100%" height={300}>
         <BarChart
           data={data}

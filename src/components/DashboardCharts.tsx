@@ -23,7 +23,7 @@ export interface DimensionDatum {
 export function DimensionBarChart({ data }: { data: DimensionDatum[] }) {
   return (
     <div className="card p-5">
-      <h3 className="mb-4 text-sm font-bold text-brand-dark">
+      <h3 className="mb-4 text-sm font-bold text-mushar-dark">
         عدد المؤشرات حسب المنظور
       </h3>
       <ResponsiveContainer width="100%" height={300}>
@@ -60,7 +60,7 @@ export function AchievementPie({
   const total = data.reduce((s, d) => s + d.value, 0);
   return (
     <div className="card p-5">
-      <h3 className="mb-4 text-sm font-bold text-brand-dark">
+      <h3 className="mb-4 text-sm font-bold text-mushar-dark">
         حالة إدخال البيانات
       </h3>
       {total === 0 ? (

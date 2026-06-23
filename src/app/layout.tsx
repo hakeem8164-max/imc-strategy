@@ -14,15 +14,15 @@ const cairo = Cairo({
 });
 
 export const metadata: Metadata = {
-  title: "نظام إدارة الأداء",
+  title: "منصة المساجد المتكاملة لإدارة الأداء",
   description:
-    "نظام إدارة الأداء — الإدخال والمتابعة ولوحة المعلومات",
+    "منصة المساجد المتكاملة لإدارة الأداء — الإدخال والمتابعة ولوحة المعلومات",
   manifest: "/manifest.webmanifest",
-  applicationName: "نظام إدارة الأداء",
+  applicationName: "المساجد المتكاملة | الأداء",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "نظام إدارة الأداء",
+    title: "المساجد المتكاملة | الأداء",
   },
   icons: {
     icon: "/icon-192.png",
@@ -47,7 +47,7 @@ export default function RootLayout({
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('brand_theme');if(t==='dark'||(!t&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark')}}catch(e){}})()`,
+            __html: `(function(){try{var t=localStorage.getItem('mushar_theme');if(t==='dark'||(!t&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark')}}catch(e){}})()`,
           }}
         />
       </head>

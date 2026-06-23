@@ -31,20 +31,20 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-bl from-brand-dark via-brand-primary to-brand-teal p-4">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-bl from-mushar-dark via-mushar-primary to-mushar-teal p-4">
       <div className="w-full max-w-md">
         <div className="card overflow-hidden">
           <div className="flex flex-col items-center gap-4 border-b border-slate-100 bg-white px-8 pt-10 pb-6">
             <Image
-              src="/logo.png"
-              alt="الشعار"
+              src="/mushar-logo.png"
+              alt="المساجد المتكاملة"
               width={300}
               height={170}
               priority
               className="h-auto w-[180px]"
             />
             <div className="text-center">
-              <h1 className="text-xl font-bold text-brand-dark">
+              <h1 className="text-xl font-bold text-mushar-dark">
                 منصة إدارة مؤشرات الأداء
               </h1>
               <p className="mt-1 text-sm text-slate-500">
@@ -64,7 +64,7 @@ export default function LoginPage() {
                 required
                 autoComplete="email"
                 className="input"
-                placeholder="name@brand.sa"
+                placeholder="name@mushar.sa"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -86,7 +86,7 @@ export default function LoginPage() {
             </div>
 
             {error && (
-              <div className="rounded-lg bg-brand-accent/10 px-3 py-2.5 text-sm text-brand-accent">
+              <div className="rounded-lg bg-mushar-accent/10 px-3 py-2.5 text-sm text-mushar-accent">
                 {error}
               </div>
             )}
@@ -97,7 +97,7 @@ export default function LoginPage() {
           </form>
         </div>
         <p className="mt-6 text-center text-xs text-white/70">
-          © {new Date().getFullYear()} نظام إدارة الأداء — جميع الحقوق محفوظة
+          © {new Date().getFullYear()} شركة المساجد المتكاملة — جميع الحقوق محفوظة
         </p>
       </div>
     </div>

@@ -3,11 +3,11 @@
 @tailwind utilities;
 
 :root {
-  --brand-primary: #8C341F;
-  --brand-dark: #5A2114;
-  --brand-mint: #BD9258;
-  --brand-pale: #F3E6D6;
-  --brand-accent: #BD9258;
+  --mushar-primary: #8C341F;
+  --mushar-dark: #5A2114;
+  --mushar-mint: #BD9258;
+  --mushar-pale: #F3E6D6;
+  --mushar-accent: #BD9258;
 }
 
 html,
@@ -50,13 +50,13 @@ html.dark body {
 
 @layer components {
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-brand-primary px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-dark disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-mushar-primary px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-mushar-dark disabled:opacity-50 disabled:cursor-not-allowed;
   }
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-brand-pale bg-white px-4 py-2.5 text-sm font-semibold text-brand-dark transition hover:bg-brand-pale/40;
+    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-mushar-pale bg-white px-4 py-2.5 text-sm font-semibold text-mushar-dark transition hover:bg-mushar-pale/40;
   }
   .input {
-    @apply w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-brand-dark outline-none transition focus:border-brand-primary focus:ring-2 focus:ring-brand-pale;
+    @apply w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-mushar-dark outline-none transition focus:border-mushar-primary focus:ring-2 focus:ring-mushar-pale;
   }
   .label {
     @apply mb-1.5 block text-sm font-medium text-slate-600;
@@ -112,7 +112,7 @@ html.dark body {
 }
 
 /* النصوص الشائعة */
-.dark .text-brand-dark {
+.dark .text-mushar-dark {
   color: #e6eef0;
 }
 .dark .text-slate-700 {
@@ -154,7 +154,7 @@ html.dark body {
     border-color: #e2e8f0 !important;
     box-shadow: none !important;
   }
-  .dark .text-brand-dark {
+  .dark .text-mushar-dark {
     color: #5A2114 !important;
   }
   .dark .text-slate-600,

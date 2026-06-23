@@ -11,7 +11,7 @@ export default function DueAlerts({ items }: { items: DueItem[] }) {
     <div className="card border-r-4 border-amber-400 p-5">
       <div className="mb-3 flex items-center gap-2">
         <AlertTriangle size={18} className="text-amber-500" />
-        <h3 className="text-sm font-bold text-brand-dark">
+        <h3 className="text-sm font-bold text-mushar-dark">
           مؤشرات تحتاج إدخال نتيجة ({items.length})
         </h3>
       </div>
@@ -25,7 +25,7 @@ export default function DueAlerts({ items }: { items: DueItem[] }) {
       </div>
       <Link
         href="/performance/review"
-        className="mt-3 inline-block text-xs font-semibold text-brand-primary hover:underline"
+        className="mt-3 inline-block text-xs font-semibold text-mushar-primary hover:underline"
       >
         الانتقال لإدخال النتائج ←
       </Link>
@@ -38,7 +38,7 @@ function Row({ item }: { item: DueItem }) {
   return (
     <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-slate-50 px-3 py-2">
       <div className="min-w-0">
-        <p className="truncate text-sm font-medium text-brand-dark">
+        <p className="truncate text-sm font-medium text-mushar-dark">
           {item.kpi.name}
         </p>
         <p className="text-[11px] text-slate-400">
@@ -48,7 +48,7 @@ function Row({ item }: { item: DueItem }) {
       <span
         className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-bold ${
           overdue
-            ? "bg-brand-accent/10 text-brand-accent"
+            ? "bg-mushar-accent/10 text-mushar-accent"
             : "bg-amber-100 text-amber-700"
         }`}
       >

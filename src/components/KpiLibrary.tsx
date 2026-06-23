@@ -215,7 +215,7 @@ export default function KpiLibrary({
                     className="h-3 w-3 rounded-full"
                     style={{ backgroundColor: d.color }}
                   />
-                  <h3 className="font-bold text-brand-dark">{d.name}</h3>
+                  <h3 className="font-bold text-mushar-dark">{d.name}</h3>
                   <span className="text-xs text-slate-400">
                     ({dimObjectives.length} أهداف · {dimKpiCount} مؤشر)
                   </span>
@@ -227,13 +227,13 @@ export default function KpiLibrary({
                       setObjName("");
                       setOpenDim((s) => ({ ...s, [d.id]: true }));
                     }}
-                    className="rounded-lg bg-white px-3 py-1.5 text-xs font-semibold text-brand-primary shadow-sm hover:bg-brand-pale/40"
+                    className="rounded-lg bg-white px-3 py-1.5 text-xs font-semibold text-mushar-primary shadow-sm hover:bg-mushar-pale/40"
                   >
                     + هدف
                   </button>
                   <button
                     onClick={() => removeDim(d)}
-                    className="rounded-lg px-2 py-1.5 text-xs font-semibold text-brand-accent hover:bg-brand-accent/10"
+                    className="rounded-lg px-2 py-1.5 text-xs font-semibold text-mushar-accent hover:bg-mushar-accent/10"
                   >
                     حذف المنظور
                   </button>
@@ -284,10 +284,10 @@ export default function KpiLibrary({
                         className="rounded-xl border border-slate-100"
                       >
                         <div className="flex flex-wrap items-center gap-2 border-b border-slate-100 bg-slate-50/60 px-4 py-2.5">
-                          <span className="text-xs font-bold text-brand-accent">
+                          <span className="text-xs font-bold text-mushar-accent">
                             {o.code ?? "هدف"}
                           </span>
-                          <h4 className="text-sm font-bold text-brand-dark">
+                          <h4 className="text-sm font-bold text-mushar-dark">
                             {o.name}
                           </h4>
                           <span className="text-xs text-slate-400">
@@ -296,7 +296,7 @@ export default function KpiLibrary({
                           <div className="mr-auto flex items-center gap-1">
                             <button
                               onClick={() => createKpi(o.id)}
-                              className="rounded-lg bg-white px-2.5 py-1 text-xs font-semibold text-brand-primary shadow-sm hover:bg-brand-pale/40"
+                              className="rounded-lg bg-white px-2.5 py-1 text-xs font-semibold text-mushar-primary shadow-sm hover:bg-mushar-pale/40"
                             >
                               + مؤشر
                             </button>
@@ -308,7 +308,7 @@ export default function KpiLibrary({
                             </button>
                             <button
                               onClick={() => removeObjective(o)}
-                              className="rounded-lg px-2 py-1 text-xs font-semibold text-brand-accent hover:bg-brand-accent/10"
+                              className="rounded-lg px-2 py-1 text-xs font-semibold text-mushar-accent hover:bg-mushar-accent/10"
                             >
                               حذف
                             </button>
@@ -329,7 +329,7 @@ export default function KpiLibrary({
                                 }`}
                               >
                                 <div className="min-w-[200px] flex-1">
-                                  <p className="text-sm font-semibold text-brand-dark">
+                                  <p className="text-sm font-semibold text-mushar-dark">
                                     {k.name}
                                   </p>
                                   <p className="text-xs text-slate-400">
@@ -346,7 +346,7 @@ export default function KpiLibrary({
                                   <p className="text-[11px] text-slate-400">
                                     المستهدف الكلي
                                   </p>
-                                  <p className="text-sm font-bold text-brand-primary">
+                                  <p className="text-sm font-bold text-mushar-primary">
                                     {k.target_total != null
                                       ? formatNum(k.target_total)
                                       : "—"}
@@ -366,7 +366,7 @@ export default function KpiLibrary({
                                 </button>
                                 <button
                                   onClick={() => removeKpi(k)}
-                                  className="rounded-lg px-2 py-1.5 text-xs font-semibold text-brand-accent hover:bg-brand-accent/10"
+                                  className="rounded-lg px-2 py-1.5 text-xs font-semibold text-mushar-accent hover:bg-mushar-accent/10"
                                 >
                                   حذف
                                 </button>
@@ -602,11 +602,11 @@ function EditKpiModal({
             </div>
           </div>
 
-          <div className="rounded-xl bg-brand-pale/30 px-4 py-3">
+          <div className="rounded-xl bg-mushar-pale/30 px-4 py-3">
             <span className="text-sm text-slate-600">
               المستهدف الكلي (تلقائي):{" "}
             </span>
-            <span className="text-lg font-bold text-brand-primary">
+            <span className="text-lg font-bold text-mushar-primary">
               {total != null ? formatNum(total) : "—"}
               {f.unit}
             </span>
@@ -617,7 +617,7 @@ function EditKpiModal({
           </div>
 
           {err && (
-            <div className="rounded-lg bg-brand-accent/10 px-3 py-2.5 text-sm text-brand-accent">
+            <div className="rounded-lg bg-mushar-accent/10 px-3 py-2.5 text-sm text-mushar-accent">
               {err}
             </div>
           )}

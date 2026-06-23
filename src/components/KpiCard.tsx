@@ -57,14 +57,14 @@ export default function KpiCard({
         </p>
       )}
 
-      <h3 className="text-sm font-bold leading-relaxed text-brand-dark line-clamp-2">
+      <h3 className="text-sm font-bold leading-relaxed text-mushar-dark line-clamp-2">
         {kpi.name}
       </h3>
 
       <div className="mt-auto flex items-end justify-between gap-2">
         <div className="min-w-0">
           <p className="text-xs text-slate-400">آخر قيمة</p>
-          <p className="text-xl font-extrabold text-brand-dark">
+          <p className="text-xl font-extrabold text-mushar-dark">
             {formatValue(value, kpi.unit)}
           </p>
           {prevValue !== null && prevValue !== undefined && (

@@ -136,19 +136,19 @@ export default function OrgStructureManager({
               >
                 {u.unit_type}
               </span>
-              <span className="text-sm font-semibold text-brand-dark">
+              <span className="text-sm font-semibold text-mushar-dark">
                 {u.name}
               </span>
               <div className="mr-auto flex gap-1 opacity-0 transition group-hover:opacity-100">
                 <button
                   onClick={() => rename(u)}
-                  className="rounded px-2 py-1 text-xs text-brand-primary hover:bg-brand-pale/50"
+                  className="rounded px-2 py-1 text-xs text-mushar-primary hover:bg-mushar-pale/50"
                 >
                   تعديل
                 </button>
                 <button
                   onClick={() => remove(u)}
-                  className="rounded px-2 py-1 text-xs text-brand-accent hover:bg-brand-accent/10"
+                  className="rounded px-2 py-1 text-xs text-mushar-accent hover:bg-mushar-accent/10"
                 >
                   حذف
                 </button>
@@ -165,7 +165,7 @@ export default function OrgStructureManager({
     <div className="space-y-6">
       {/* بيانات المنشأة */}
       <div className="card p-5">
-        <h3 className="mb-3 text-base font-bold text-brand-dark">
+        <h3 className="mb-3 text-base font-bold text-mushar-dark">
           بيانات المنشأة
         </h3>
         <label className="label">اسم المنشأة</label>
@@ -183,7 +183,7 @@ export default function OrgStructureManager({
 
       {/* أنواع الوحدات */}
       <div className="card p-5">
-        <h3 className="mb-1 text-base font-bold text-brand-dark">
+        <h3 className="mb-1 text-base font-bold text-mushar-dark">
           أنواع الوحدات
         </h3>
         <p className="mb-3 text-xs text-slate-400">
@@ -199,10 +199,10 @@ export default function OrgStructureManager({
                 className="inline-block h-3 w-3 rounded-full"
                 style={{ backgroundColor: t.color }}
               />
-              <span className="font-medium text-brand-dark">{t.name}</span>
+              <span className="font-medium text-mushar-dark">{t.name}</span>
               <button
                 onClick={() => removeType(t)}
-                className="rounded px-1.5 text-xs text-slate-400 hover:bg-brand-accent/10 hover:text-brand-accent"
+                className="rounded px-1.5 text-xs text-slate-400 hover:bg-mushar-accent/10 hover:text-mushar-accent"
                 title="حذف النوع"
               >
                 ✕
@@ -236,14 +236,14 @@ export default function OrgStructureManager({
             إضافة نوع
           </button>
           {typeMsg && (
-            <span className="text-sm text-brand-accent">{typeMsg}</span>
+            <span className="text-sm text-mushar-accent">{typeMsg}</span>
           )}
         </div>
       </div>
 
       {/* إضافة وحدة تنظيمية */}
       <div className="card p-5">
-        <h3 className="mb-3 text-base font-bold text-brand-dark">
+        <h3 className="mb-3 text-base font-bold text-mushar-dark">
           إضافة وحدة تنظيمية
         </h3>
         <div className="grid gap-3 md:grid-cols-4">
@@ -286,12 +286,12 @@ export default function OrgStructureManager({
             </div>
           </div>
         </div>
-        {msg && <p className="mt-2 text-sm text-brand-accent">{msg}</p>}
+        {msg && <p className="mt-2 text-sm text-mushar-accent">{msg}</p>}
       </div>
 
       {/* شجرة الهيكل */}
       <div className="card p-5">
-        <h3 className="mb-3 text-base font-bold text-brand-dark">
+        <h3 className="mb-3 text-base font-bold text-mushar-dark">
           الهيكل التنظيمي
         </h3>
         {units.length === 0 ? (

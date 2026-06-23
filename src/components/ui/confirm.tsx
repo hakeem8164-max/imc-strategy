@@ -86,7 +86,7 @@ export default function ConfirmProvider({ children }: { children: React.ReactNod
         <AlertDialog.Portal>
           <AlertDialog.Backdrop className="fixed inset-0 z-[90] bg-black/40 transition-opacity data-[ending-style]:opacity-0 data-[starting-style]:opacity-0" />
           <AlertDialog.Popup className={`card fixed left-1/2 top-1/2 z-[91] w-[90vw] max-w-sm -translate-x-1/2 -translate-y-1/2 p-5 outline-none ${popupMotion}`}>
-            <AlertDialog.Title className="text-base font-bold text-brand-dark">
+            <AlertDialog.Title className="text-base font-bold text-mushar-dark">
               {state.title ?? (isPrompt ? "إدخال" : "تأكيد")}
             </AlertDialog.Title>
             <AlertDialog.Description className="mt-2 text-sm leading-relaxed text-slate-600">
@@ -123,7 +123,7 @@ export default function ConfirmProvider({ children }: { children: React.ReactNod
                 onClick={() => close(isPrompt ? state.input : true)}
                 className={
                   state.danger
-                    ? "rounded-lg bg-brand-accent px-4 py-2 text-sm font-semibold text-white transition hover:opacity-90"
+                    ? "rounded-lg bg-mushar-accent px-4 py-2 text-sm font-semibold text-white transition hover:opacity-90"
                     : "btn-primary"
                 }
               >

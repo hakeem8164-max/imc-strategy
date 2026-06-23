@@ -77,7 +77,7 @@ export default function GanttChart({
               return (
                 <div
                   key={y}
-                  className="absolute top-0 flex h-5 items-center justify-center border-l border-slate-200 text-[11px] font-bold text-brand-dark"
+                  className="absolute top-0 flex h-5 items-center justify-center border-l border-slate-200 text-[11px] font-bold text-mushar-dark"
                   style={{ insetInlineStart: `${left}%`, width: `${pos(end) - left}%` }}
                 >
                   {y}
@@ -138,7 +138,7 @@ export default function GanttChart({
               );
             })}
             {todayPct !== null && (
-              <div className="absolute bottom-0 top-0 z-10 w-0.5 bg-brand-accent" style={{ insetInlineStart: `${todayPct}%` }} title="اليوم" />
+              <div className="absolute bottom-0 top-0 z-10 w-0.5 bg-mushar-accent" style={{ insetInlineStart: `${todayPct}%` }} title="اليوم" />
             )}
           </div>
 

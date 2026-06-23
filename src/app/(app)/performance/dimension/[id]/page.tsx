@@ -102,7 +102,7 @@ export default async function DimensionPage({
       <div className="space-y-6">
         <Link
           href="/"
-          className="inline-flex items-center gap-1 text-sm font-medium text-brand-primary hover:underline"
+          className="inline-flex items-center gap-1 text-sm font-medium text-mushar-primary hover:underline"
         >
           → العودة إلى لوحة الأداء التنفيذية
         </Link>
@@ -126,7 +126,7 @@ export default async function DimensionPage({
         </div>
 
         <div className="card p-5">
-          <h3 className="mb-4 text-sm font-bold text-brand-dark">
+          <h3 className="mb-4 text-sm font-bold text-mushar-dark">
             مؤشرات المنظور
           </h3>
           <div className="space-y-3">
@@ -137,7 +137,7 @@ export default async function DimensionPage({
                 className="block rounded-xl px-2 py-2 transition hover:bg-slate-50"
               >
                 <div className="mb-1 flex items-center justify-between gap-2">
-                  <span className="line-clamp-1 text-sm font-medium text-brand-dark">
+                  <span className="line-clamp-1 text-sm font-medium text-mushar-dark">
                     {r.k.name}
                   </span>
                   <span

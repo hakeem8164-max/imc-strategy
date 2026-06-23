@@ -75,7 +75,7 @@ export default function PerformanceSettings({
     <div className="space-y-6">
       {/* شطور الأداء */}
       <div className="card p-5">
-        <h3 className="mb-1 text-base font-bold text-brand-dark">
+        <h3 className="mb-1 text-base font-bold text-mushar-dark">
           شطور الأداء (العتبات والألوان)
         </h3>
         <p className="mb-4 text-xs text-slate-400">
@@ -133,7 +133,7 @@ export default function PerformanceSettings({
               </div>
               <button
                 onClick={() => remove(b)}
-                className="mr-auto rounded-lg p-2 text-brand-accent hover:bg-brand-accent/10"
+                className="mr-auto rounded-lg p-2 text-mushar-accent hover:bg-mushar-accent/10"
                 title="حذف"
               >
                 <Trash2 size={16} />
@@ -179,7 +179,7 @@ export default function PerformanceSettings({
 
       {/* خيارات عامة */}
       <div className="card p-5">
-        <h3 className="mb-1 text-base font-bold text-brand-dark">خيارات عامة</h3>
+        <h3 className="mb-1 text-base font-bold text-mushar-dark">خيارات عامة</h3>
         <p className="mb-4 text-xs text-slate-400">
           إعدادات إضافية لسلوك المؤشرات.
         </p>

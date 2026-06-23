@@ -32,7 +32,7 @@ export default async function InitiativeFollowUpPage() {
         </div>
         {initiatives.length > 0 && (
           <div className="card p-5">
-            <h2 className="mb-3 text-sm font-bold text-brand-dark">
+            <h2 className="mb-3 text-sm font-bold text-mushar-dark">
               مخطط جانت الرئيسي — كل المبادرات
             </h2>
             <MasterGantt initiatives={initiatives} />
