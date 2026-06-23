@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import animate from "tailwindcss-animate";
 
 const config: Config = {
   darkMode: "class",
@@ -27,6 +28,47 @@ const config: Config = {
           field: "#0F1D22",
           hover: "#1B2D34",
         },
+        // توكنز shadcn (مربوطة بمتغيّرات CSS في globals.css) — لا تؤثّر على
+        // مكوّنات mushar الحالية لأنها أسماء مختلفة.
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
+        primary: {
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
+        },
+        secondary: {
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
+        },
+        destructive: {
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
+        },
+        muted: {
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
+        },
+        accent: {
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
+        },
+        popover: {
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
+        },
+        card: {
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
+        },
+      },
+      borderRadius: {
+        // توكنز shadcn فقط (لا تُلغي rounded الافتراضية المستخدمة حاليًا)
+        "shadcn-lg": "var(--radius)",
+        "shadcn-md": "calc(var(--radius) - 2px)",
+        "shadcn-sm": "calc(var(--radius) - 4px)",
       },
       fontFamily: {
         sans: ["var(--font-cairo)", "Tahoma", "Arial", "sans-serif"],
@@ -37,7 +79,8 @@ const config: Config = {
       },
     },
   },
-  plugins: [],
+  plugins: [animate],
 };
 
 export default config;
+

@@ -8,6 +8,51 @@
   --mushar-mint: #BD9258;
   --mushar-pale: #F3E6D6;
   --mushar-accent: #BD9258;
+
+  /* توكنز shadcn (HSL) مربوطة بهوية مُشار */
+  --background: 36 40% 98%;
+  --foreground: 14 47% 21%;
+  --card: 0 0% 100%;
+  --card-foreground: 14 47% 21%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 14 47% 21%;
+  --primary: 11 64% 33%; /* #8C341F */
+  --primary-foreground: 40 50% 97%;
+  --secondary: 33 52% 90%;
+  --secondary-foreground: 14 47% 21%;
+  --muted: 33 30% 93%;
+  --muted-foreground: 14 12% 42%;
+  --accent: 36 41% 54%; /* #BD9258 */
+  --accent-foreground: 14 47% 21%;
+  --destructive: 0 72% 45%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 30 25% 86%;
+  --input: 30 25% 86%;
+  --ring: 11 64% 33%;
+  --radius: 0.75rem;
+}
+
+html.dark {
+  /* توكنز shadcn للوضع الليلي */
+  --background: 196 35% 9%;
+  --foreground: 195 25% 92%;
+  --card: 195 33% 12%;
+  --card-foreground: 195 25% 92%;
+  --popover: 195 33% 12%;
+  --popover-foreground: 195 25% 92%;
+  --primary: 23 45% 60%;
+  --primary-foreground: 196 35% 9%;
+  --secondary: 198 30% 16%;
+  --secondary-foreground: 195 25% 92%;
+  --muted: 198 30% 16%;
+  --muted-foreground: 195 12% 65%;
+  --accent: 36 41% 54%;
+  --accent-foreground: 196 35% 9%;
+  --destructive: 0 62% 50%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 198 25% 24%;
+  --input: 198 25% 24%;
+  --ring: 23 45% 60%;
 }
 
 html,
