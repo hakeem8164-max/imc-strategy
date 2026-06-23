@@ -1,5 +1,7 @@
 import { cache } from "react";
+import { unstable_cache } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { getAdminClient } from "@/lib/supabase/admin";
 import type {
   Dimension,
   Objective,
@@ -11,6 +13,29 @@ import type {
   OrgUnitTypeDef,
   Notification,
 } from "@/lib/types";
+
+type DB = Awaited<ReturnType<typeof createClient>>;
+
+/** وسم التخزين المؤقت للبيانات العامّة — يُبطَل عند أي تعديل إداري */
+export const APP_DATA_TAG = "app-data";
+
+const adminDb = getAdminClient();
+
+/**
+ * يغلّف جالب بيانات عامّة بتخزين مؤقت عبر الطلبات (unstable_cache) عند
+ * توفّر عميل مفتاح الخدمة؛ وإلا يتراجع لعميل الجلسة العادي بلا تخزين.
+ * تُبطَل النتائج بوسم APP_DATA_TAG أو تلقائيًا كل 5 دقائق كأمان.
+ */
+function cachedGlobal<T>(
+  key: string,
+  fetcher: (db: DB) => Promise<T>
+): () => Promise<T> {
+  if (!adminDb) return () => createClient().then(fetcher);
+  return unstable_cache(() => fetcher(adminDb as unknown as DB), ["appdata", key], {
+    tags: [APP_DATA_TAG],
+    revalidate: 300,
+  });
+}
 
 export async function getNotifications(): Promise<Notification[]> {
   const supabase = await createClient();
@@ -32,25 +57,23 @@ export const getOrgProfile = cache(async (): Promise<OrgProfile | null> => {
   return (data as OrgProfile) ?? null;
 });
 
-export async function getOrgUnitTypes(): Promise<OrgUnitTypeDef[]> {
-  const supabase = await createClient();
-  const { data } = await supabase
+export const getOrgUnitTypes = cachedGlobal("org_unit_types", async (db) => {
+  const { data } = await db
     .from("org_unit_types")
     .select("*")
     .order("sort_order")
     .order("created_at");
   return (data as OrgUnitTypeDef[]) ?? [];
-}
+});
 
-export async function getOrgUnits(): Promise<OrgUnit[]> {
-  const supabase = await createClient();
-  const { data } = await supabase
+export const getOrgUnits = cachedGlobal("org_units", async (db) => {
+  const { data } = await db
     .from("org_units")
     .select("*")
     .order("sort_order")
     .order("created_at");
   return (data as OrgUnit[]) ?? [];
-}
+});
 
 export async function getRolePermissions(): Promise<
   { role: string; permission: string; allowed: boolean }[]
@@ -96,47 +119,43 @@ export const getProfile = cache(async (): Promise<Profile | null> => {
 });
 
 /** مناظير الخطة فقط (تُستثنى المناظير المستقلة مثل أهداف الوقفين) */
-export async function getDimensions(): Promise<Dimension[]> {
-  const supabase = await createClient();
-  const { data } = await supabase
+export const getDimensions = cachedGlobal("dimensions_in_plan", async (db) => {
+  const { data } = await db
     .from("dimensions")
     .select("*")
     .eq("in_plan", true)
     .order("sort_order");
   return (data as Dimension[]) ?? [];
-}
+});
 
 /** كل المناظير بما فيها المستقلة (للإدارة) */
-export async function getAllDimensions(): Promise<Dimension[]> {
-  const supabase = await createClient();
-  const { data } = await supabase
+export const getAllDimensions = cachedGlobal("dimensions_all", async (db) => {
+  const { data } = await db
     .from("dimensions")
     .select("*")
     .order("sort_order");
   return (data as Dimension[]) ?? [];
-}
+});
 
 /** أهداف الخطة فقط مع منظورها */
-export async function getObjectives(): Promise<Objective[]> {
-  const supabase = await createClient();
-  const { data } = await supabase
+export const getObjectives = cachedGlobal("objectives_in_plan", async (db) => {
+  const { data } = await db
     .from("objectives")
     .select("*, dimension:dimensions(*)")
     .order("sort_order");
   return ((data as Objective[]) ?? []).filter(
     (o) => o.dimension?.in_plan !== false
   );
-}
+});
 
 /** كل الأهداف بما فيها المستقلة (للإدارة) */
-export async function getAllObjectives(): Promise<Objective[]> {
-  const supabase = await createClient();
-  const { data } = await supabase
+export const getAllObjectives = cachedGlobal("objectives_all", async (db) => {
+  const { data } = await db
     .from("objectives")
     .select("*, dimension:dimensions(*)")
     .order("sort_order");
   return (data as Objective[]) ?? [];
-}
+});
 
 // ===== أهداف الوقفين (منظور مستقل خارج الخطة) =====
 export async function getEndowmentDimension(): Promise<Dimension | null> {
@@ -171,24 +190,22 @@ export async function getEndowmentKpis(): Promise<Kpi[]> {
 }
 
 /** مؤشرات الخطة النشطة فقط (تُستثنى المؤشرات المستقلة مثل أهداف الوقفين) */
-export async function getKpis(): Promise<Kpi[]> {
-  const supabase = await createClient();
-  const { data } = await supabase
+export const getKpis = cachedGlobal("kpis_active", async (db) => {
+  const { data } = await db
     .from("kpis")
     .select("*, dimension:dimensions(*), objective:objectives(*), owner_unit:org_units(*)")
     .eq("is_active", true)
     .order("sort_order");
   return ((data as Kpi[]) ?? []).filter((k) => k.dimension?.in_plan !== false);
-}
+});
 
-export async function getAllKpis(): Promise<Kpi[]> {
-  const supabase = await createClient();
-  const { data } = await supabase
+export const getAllKpis = cachedGlobal("kpis_all", async (db) => {
+  const { data } = await db
     .from("kpis")
     .select("*, dimension:dimensions(*), objective:objectives(*), owner_unit:org_units(*)")
     .order("sort_order");
   return (data as Kpi[]) ?? [];
-}
+});
 
 export async function getKpiById(id: string): Promise<Kpi | null> {
   const supabase = await createClient();
@@ -200,9 +217,8 @@ export async function getKpiById(id: string): Promise<Kpi | null> {
   return (data as Kpi) ?? null;
 }
 
-export async function getLatestEntries(): Promise<Record<string, KpiEntry>> {
-  const supabase = await createClient();
-  const { data } = await supabase
+export const getLatestEntries = cachedGlobal("latest_entries", async (db) => {
+  const { data } = await db
     .from("kpi_entries")
     .select("*")
     .eq("status", "approved")
@@ -213,18 +229,17 @@ export async function getLatestEntries(): Promise<Record<string, KpiEntry>> {
     if (!latest[e.kpi_id]) latest[e.kpi_id] = e;
   }
   return latest;
-}
+});
 
 /** كل القياسات المعتمدة (لتتبّع الأداء عبر الزمن) */
-export async function getApprovedEntries(): Promise<KpiEntry[]> {
-  const supabase = await createClient();
-  const { data } = await supabase
+export const getApprovedEntries = cachedGlobal("approved_entries", async (db) => {
+  const { data } = await db
     .from("kpi_entries")
     .select("*, kpi:kpis(*)")
     .eq("status", "approved")
     .order("period_date", { ascending: true });
   return (data as KpiEntry[]) ?? [];
-}
+});
 
 /** القياسات بانتظار الاعتماد النهائي (لمسؤول قياس الأداء) */
 export async function getPendingEntries(): Promise<KpiEntry[]> {
@@ -370,16 +385,15 @@ export async function getDueKpis(profile: Profile | null): Promise<DueItem[]> {
   return out.sort((a, b) => a.daysLeft - b.daysLeft);
 }
 
-export async function getBands(): Promise<import("@/lib/bands").Band[]> {
-  const supabase = await createClient();
-  const { data } = await supabase
+export const getBands = cachedGlobal("performance_bands", async (db) => {
+  const { data } = await db
     .from("performance_bands")
     .select("*")
     .order("min_pct", { ascending: false });
   const { DEFAULT_BANDS } = await import("@/lib/bands");
   const arr = (data as import("@/lib/bands").Band[]) ?? [];
   return arr.length ? arr : DEFAULT_BANDS;
-}
+});
 
 export async function getAppSettings(): Promise<import("@/lib/bands").AppSettings> {
   const supabase = await createClient();

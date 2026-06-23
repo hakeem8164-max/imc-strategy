@@ -1,7 +1,8 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { APP_DATA_TAG } from "@/lib/data";
 
 type Result = { ok: boolean; error?: string };
 
@@ -27,6 +28,7 @@ export async function updateOrgName(name: string): Promise<Result> {
     .update({ name: name.trim(), updated_at: new Date().toISOString() })
     .eq("id", 1);
   if (error) return { ok: false, error: "تعذّر الحفظ" };
+  revalidateTag(APP_DATA_TAG);
   revalidatePath("/admin/settings");
   return { ok: true };
 }
@@ -45,6 +47,7 @@ export async function addOrgUnit(input: {
     parent_id: input.parent_id,
   });
   if (error) return { ok: false, error: "تعذّر الإضافة" };
+  revalidateTag(APP_DATA_TAG);
   revalidatePath("/admin/settings");
   return { ok: true };
 }
@@ -57,6 +60,7 @@ export async function renameOrgUnit(id: string, name: string): Promise<Result> {
     .update({ name: name.trim() })
     .eq("id", id);
   if (error) return { ok: false, error: "تعذّر التعديل" };
+  revalidateTag(APP_DATA_TAG);
   revalidatePath("/admin/settings");
   return { ok: true };
 }
@@ -66,6 +70,7 @@ export async function deleteOrgUnit(id: string): Promise<Result> {
   if (!ok) return { ok: false, error: "صلاحية مدير النظام مطلوبة" };
   const { error } = await supabase.from("org_units").delete().eq("id", id);
   if (error) return { ok: false, error: "تعذّر الحذف" };
+  revalidateTag(APP_DATA_TAG);
   revalidatePath("/admin/settings");
   return { ok: true };
 }
@@ -89,6 +94,7 @@ export async function addUnitType(
         ? "هذا النوع موجود مسبقًا"
         : "تعذّر الإضافة",
     };
+  revalidateTag(APP_DATA_TAG);
   revalidatePath("/admin/settings");
   return { ok: true };
 }
@@ -98,6 +104,7 @@ export async function deleteUnitType(id: string): Promise<Result> {
   if (!ok) return { ok: false, error: "صلاحية مدير النظام مطلوبة" };
   const { error } = await supabase.from("org_unit_types").delete().eq("id", id);
   if (error) return { ok: false, error: "تعذّر الحذف" };
+  revalidateTag(APP_DATA_TAG);
   revalidatePath("/admin/settings");
   return { ok: true };
 }

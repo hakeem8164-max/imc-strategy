@@ -1,7 +1,8 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { APP_DATA_TAG } from "@/lib/data";
 import {
   computeTotalTarget,
   type Aggregation,
@@ -26,6 +27,7 @@ async function requireAdmin() {
 }
 
 function revalidateAll() {
+  revalidateTag(APP_DATA_TAG);
   revalidatePath("/admin/library");
   revalidatePath("/kpis");
   revalidatePath("/");

@@ -1,7 +1,8 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { APP_DATA_TAG } from "@/lib/data";
 
 export type ActionResult = { ok: boolean; error?: string };
 
@@ -41,6 +42,7 @@ export async function addEntry(
     };
   }
 
+  revalidateTag(APP_DATA_TAG);
   revalidatePath(`/kpis/${kpiId}`);
   revalidatePath("/kpis");
   revalidatePath("/");
@@ -57,6 +59,7 @@ export async function deleteEntry(
     .delete()
     .eq("id", entryId);
   if (error) return { ok: false, error: "تعذّر حذف القيمة" };
+  revalidateTag(APP_DATA_TAG);
   revalidatePath(`/kpis/${kpiId}`);
   revalidatePath("/");
   return { ok: true };

@@ -1,7 +1,8 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { APP_DATA_TAG } from "@/lib/data";
 
 type Result = { ok: boolean; error?: string };
 
@@ -20,6 +21,7 @@ async function me() {
 }
 
 function reval() {
+  revalidateTag(APP_DATA_TAG);
   revalidatePath("/performance/review");
   revalidatePath("/");
 }
