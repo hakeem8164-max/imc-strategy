@@ -19,6 +19,8 @@ import {
   Clock,
   Settings2,
   ChevronDown,
+  Search,
+  Filter,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { notify } from "@/components/ui/toast";
@@ -99,6 +101,24 @@ function recStatusOf(r: MeetingRecommendation): RecStatus {
   });
 }
 
+/** إحصاء توصيات مجموعة (منجزة/متأخرة/متعثّرة + نسبة الإنجاز) */
+function statsOf(recs: MeetingRecommendation[]) {
+  let done = 0,
+    late = 0,
+    stalled = 0,
+    pending = 0;
+  for (const r of recs) {
+    if (r.closure_status === "pending") pending++;
+    const s = recStatusOf(r);
+    if (s === "done") done++;
+    else if (s === "late") late++;
+    else if (s === "stalled") stalled++;
+  }
+  const total = recs.length;
+  const pct = total ? Math.round((done / total) * 100) : 0;
+  return { done, late, stalled, pending, total, pct };
+}
+
 /** عرض الحضور: يحاول قراءة JSON [{name,title}] ويتراجع للنص الخام للبيانات القديمة */
 function AttendeesView({ raw }: { raw: string }) {
   let list: { name: string; title: string }[] | null = null;
@@ -152,36 +172,64 @@ export default function MeetingsManager({
   const [showCreate, setShowCreate] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
 
-  // إحصاءات لوحة المتابعة
+  // فلاتر
+  const [q, setQ] = useState("");
+  const [fType, setFType] = useState("");
+  const [fStatus, setFStatus] = useState("");
+  const [fFrom, setFFrom] = useState("");
+  const [fTo, setFTo] = useState("");
+
+  // إحصاءات لوحة المتابعة (على كامل البيانات)
   const allRecs = useMemo(
     () => meetings.flatMap((m) => m.recommendations ?? []),
     [meetings]
   );
-  const stats = useMemo(() => {
-    let done = 0,
-      late = 0,
-      stalled = 0,
-      pending = 0;
-    for (const r of allRecs) {
-      if (r.closure_status === "pending") pending++;
-      const s = recStatusOf(r);
-      if (s === "done") done++;
-      else if (s === "late") late++;
-      else if (s === "stalled") stalled++;
-    }
-    return { done, late, stalled, pending, total: allRecs.length };
-  }, [allRecs]);
+  const stats = useMemo(() => statsOf(allRecs), [allRecs]);
+
+  // تطبيق الفلاتر
+  const filtered = useMemo(() => {
+    const term = q.trim().toLowerCase();
+    return meetings.filter((m) => {
+      if (fType && m.type !== fType) return false;
+      if (fFrom && (!m.meeting_date || m.meeting_date < fFrom)) return false;
+      if (fTo && (!m.meeting_date || m.meeting_date > fTo)) return false;
+      const recs = m.recommendations ?? [];
+      if (fStatus) {
+        const ok =
+          fStatus === "pending"
+            ? recs.some((r) => r.closure_status === "pending")
+            : recs.some((r) => recStatusOf(r) === fStatus);
+        if (!ok) return false;
+      }
+      if (term) {
+        const hay = [
+          m.title,
+          m.type,
+          m.committee ?? "",
+          m.attendees ?? "",
+          m.minutes ?? "",
+          ...recs.flatMap((r) => [r.name, r.description ?? ""]),
+        ]
+          .join(" ")
+          .toLowerCase();
+        if (!hay.includes(term)) return false;
+      }
+      return true;
+    });
+  }, [meetings, q, fType, fStatus, fFrom, fTo]);
+
+  const hasFilter = !!(q || fType || fStatus || fFrom || fTo);
 
   // تجميع حسب دورة التقييم (سنة)
   const groups = useMemo(() => {
     const map = new Map<string, Meeting[]>();
-    for (const m of meetings) {
+    for (const m of filtered) {
       const key = m.cycle || "غير محدّد";
       if (!map.has(key)) map.set(key, []);
       map.get(key)!.push(m);
     }
     return Array.from(map.entries()).sort((a, b) => b[0].localeCompare(a[0]));
-  }, [meetings]);
+  }, [filtered]);
 
   const activeDomains = domains.filter((d) => d.is_active);
 
@@ -190,8 +238,20 @@ export default function MeetingsManager({
       {/* لوحة المتابعة */}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
         <StatCard icon={CalendarDays} label="عدد الاجتماعات" value={meetings.length} color="#0D9488" />
-        <StatCard icon={ClipboardList} label="إجمالي التوصيات" value={stats.total} color="#2563EB" />
-        <StatCard icon={CheckCircle2} label="منفّذة" value={stats.done} color={REC_STATUS.done.color} />
+        <StatCard
+          icon={ClipboardList}
+          label="إجمالي التوصيات"
+          value={stats.total}
+          color="#2563EB"
+          sub={stats.total ? `${stats.pct}% إنجاز` : undefined}
+        />
+        <StatCard
+          icon={CheckCircle2}
+          label="منفّذة"
+          value={stats.done}
+          color={REC_STATUS.done.color}
+          sub={stats.total ? `${stats.pct}%` : undefined}
+        />
         <StatCard icon={Clock} label="متأخرة" value={stats.late} color={REC_STATUS.late.color} />
         <StatCard icon={AlertTriangle} label="متعثّرة" value={stats.stalled} color={REC_STATUS.stalled.color} />
       </div>
@@ -229,10 +289,98 @@ export default function MeetingsManager({
         />
       )}
 
+      {/* فلاتر */}
+      {meetings.length > 0 && (
+        <div className="card space-y-3 p-4">
+          <div className="relative">
+            <Search
+              size={16}
+              className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400"
+            />
+            <input
+              className="input pr-9"
+              placeholder="ابحث في العنوان أو الحضور أو المحضر أو نصّ التوصيات…"
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+            />
+          </div>
+          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+            <div>
+              <label className="label text-[11px]">نوع الاجتماع</label>
+              <FilterSelect
+                className="w-full"
+                value={fType}
+                onValueChange={setFType}
+                options={[
+                  { value: "", label: "كل الأنواع" },
+                  ...MEETING_TYPES.map((t) => ({ value: t, label: t })),
+                ]}
+              />
+            </div>
+            <div>
+              <label className="label text-[11px]">الحالة</label>
+              <FilterSelect
+                className="w-full"
+                value={fStatus}
+                onValueChange={setFStatus}
+                options={[
+                  { value: "", label: "كل الحالات" },
+                  { value: "done", label: REC_STATUS.done.label },
+                  { value: "late", label: REC_STATUS.late.label },
+                  { value: "stalled", label: REC_STATUS.stalled.label },
+                  { value: "pending", label: "بانتظار الاعتماد" },
+                ]}
+              />
+            </div>
+            <div>
+              <label className="label text-[11px]">من تاريخ</label>
+              <input
+                type="date"
+                className="input"
+                value={fFrom}
+                onChange={(e) => setFFrom(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="label text-[11px]">إلى تاريخ</label>
+              <input
+                type="date"
+                className="input"
+                value={fTo}
+                onChange={(e) => setFTo(e.target.value)}
+              />
+            </div>
+          </div>
+          {hasFilter && (
+            <div className="flex items-center justify-between text-[11px] text-slate-400">
+              <span className="flex items-center gap-1">
+                <Filter size={12} /> {filtered.length} نتيجة
+              </span>
+              <button
+                onClick={() => {
+                  setQ("");
+                  setFType("");
+                  setFStatus("");
+                  setFFrom("");
+                  setFTo("");
+                }}
+                className="flex items-center gap-1 font-semibold text-mushar-primary hover:underline"
+              >
+                <X size={12} /> مسح الفلاتر
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* قائمة الاجتماعات مجمّعة حسب الدورة */}
       {meetings.length === 0 ? (
         <div className="card p-12 text-center text-sm text-slate-400">
           لا توجد اجتماعات بعد.
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className="card p-12 text-center text-sm text-slate-400">
+          لا توجد نتائج مطابقة للفلاتر.
         </div>
       ) : (
         groups.map(([cycle, list]) => (
@@ -268,11 +416,13 @@ function StatCard({
   label,
   value,
   color,
+  sub,
 }: {
   icon: typeof CalendarDays;
   label: string;
   value: number;
   color: string;
+  sub?: string;
 }) {
   return (
     <div className="card flex items-center gap-3 p-4">
@@ -283,7 +433,14 @@ function StatCard({
         <Icon size={20} />
       </span>
       <div className="min-w-0">
-        <p className="text-xl font-bold text-mushar-dark">{value}</p>
+        <p className="flex items-baseline gap-1.5">
+          <span className="text-xl font-bold text-mushar-dark">{value}</span>
+          {sub && (
+            <span className="text-[11px] font-bold" style={{ color }}>
+              {sub}
+            </span>
+          )}
+        </p>
         <p className="truncate text-[11px] text-slate-400">{label}</p>
       </div>
     </div>
@@ -825,6 +982,7 @@ function MeetingCard({
   const [open, setOpen] = useState(true);
   const [showAddRec, setShowAddRec] = useState(false);
   const recs = meeting.recommendations ?? [];
+  const st = statsOf(recs);
 
   function removeMeeting() {
     confirmDialog("سيُحذف الاجتماع وكل توصياته. متابعة؟", {
@@ -866,6 +1024,50 @@ function MeetingCard({
               {meeting.committee && <span>· {meeting.committee}</span>}
               <span>· {recs.length} توصية</span>
             </p>
+            {recs.length > 0 && (
+              <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                <span
+                  className="rounded-md px-1.5 py-0.5 text-[10px] font-bold"
+                  style={{
+                    backgroundColor: `${REC_STATUS.done.color}1a`,
+                    color: REC_STATUS.done.color,
+                  }}
+                >
+                  منجزة {st.done} ({st.pct}%)
+                </span>
+                {st.late > 0 && (
+                  <span
+                    className="rounded-md px-1.5 py-0.5 text-[10px] font-bold"
+                    style={{
+                      backgroundColor: `${REC_STATUS.late.color}1a`,
+                      color: REC_STATUS.late.color,
+                    }}
+                  >
+                    متأخرة {st.late}
+                  </span>
+                )}
+                {st.stalled > 0 && (
+                  <span
+                    className="rounded-md px-1.5 py-0.5 text-[10px] font-bold"
+                    style={{
+                      backgroundColor: `${REC_STATUS.stalled.color}1a`,
+                      color: REC_STATUS.stalled.color,
+                    }}
+                  >
+                    متعثّرة {st.stalled}
+                  </span>
+                )}
+                <span className="h-1.5 w-20 overflow-hidden rounded-full bg-slate-200">
+                  <span
+                    className="block h-full rounded-full"
+                    style={{
+                      width: `${st.pct}%`,
+                      backgroundColor: REC_STATUS.done.color,
+                    }}
+                  />
+                </span>
+              </div>
+            )}
           </div>
         </button>
         {canManage && (
