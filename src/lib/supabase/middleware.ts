@@ -40,9 +40,23 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // التحقق من الجلسة: نحاول أولًا تحققًا محليًّا من رمز الدخول عبر
+  // getClaims (يتم محليًّا بمفاتيح JWT اللامتماثلة بلا أي رحلة شبكة).
+  // عند الفشل (رمز منتهٍ/غير صالح) نرجع لـgetUser الذي يتحقق ويُجدّد
+  // الجلسة عبر الشبكة. هذا يلغي رحلة المصادقة من كل تنقّل تقريبًا.
+  let authed = false;
+  try {
+    const { data: claimsData } = await supabase.auth.getClaims();
+    authed = !!claimsData?.claims?.sub;
+  } catch {
+    authed = false;
+  }
+  if (!authed) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    authed = !!user;
+  }
 
   const path = request.nextUrl.pathname;
   const isAuthRoute = path.startsWith("/login");
@@ -52,13 +66,13 @@ export async function updateSession(request: NextRequest) {
     path === "/mushar-logo.png" ||
     path === "/mushar-logo-light.png";
 
-  if (!user && !isAuthRoute && !isPublicAsset) {
+  if (!authed && !isAuthRoute && !isPublicAsset) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
   }
 
-  if (user && isAuthRoute) {
+  if (authed && isAuthRoute) {
     const url = request.nextUrl.clone();
     url.pathname = "/";
     return NextResponse.redirect(url);
